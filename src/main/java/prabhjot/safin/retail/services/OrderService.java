@@ -1,9 +1,8 @@
 package prabhjot.safin.retail.services;
 
 /**
- * This class makes the necessary crud operations on the Orders table
- * 
- * @author Prabhjot Aulakh & Safin Haque
+ * Peforms crud operations on the orders table
+ * @author Prabhjot Aulakh, Safin Haque
  */
 public class OrderService {
     

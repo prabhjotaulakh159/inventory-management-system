@@ -1,9 +1,8 @@
 package prabhjot.safin.retail.models;
 
 /**
- * This represents the Warehouse Type
- * 
- * @author Prabhjot Aulakh & Safin Haque
+ * Represents a warehouse in the database
+ * @author Prabhjot Aulakh, Safin Haque
  */
 public class Warehouse {
     

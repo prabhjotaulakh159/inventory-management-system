@@ -1,9 +1,8 @@
 package prabhjot.safin.retail.models;
 
 /**
- * This represents the Customer Type
- * 
- * @author Prabhjot Aulakh & Safin Haque
+ * Represents a customer in the database
+ * @author Prabhjot Aulakh, Safin Haque
  */
 public class Customer {
     

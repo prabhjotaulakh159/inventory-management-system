@@ -1,11 +1,8 @@
 package prabhjot.safin.retail.models;
 
-
-
 /**
- * This represents the Review Type
- * 
- * @author Prabhjot Aulakh & Safin Haque
+ * Represents a review in the database
+ * @author Prabhjot Aulakh, Safin Haque
  */
 public class Review {
     

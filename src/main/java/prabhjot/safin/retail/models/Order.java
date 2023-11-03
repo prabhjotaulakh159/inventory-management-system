@@ -1,11 +1,8 @@
 package prabhjot.safin.retail.models;
 
-
-
 /**
- * This represents the Orders Type
- * 
- * @author Prabhjot Aulakh & Safin Haque
+ * Represents an orders in the database
+ * @author Prabhjot Aulakh, Safin Haque
  */
 public class Order {
     
