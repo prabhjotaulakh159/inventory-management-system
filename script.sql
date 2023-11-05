@@ -56,3 +56,34 @@ CREATE TABLE orders (
     prodid      NUMBER          REFERENCES products (prodid) ON DELETE CASCADE NOT NULL,
     quantity    NUMBER(10)      NOT NULL CHECK (quantity > 0)
 );
+
+
+INSERT INTO categories(category) VALUES('Beauty');
+INSERT INTO categories(category) VALUES('Cars');
+INSERT INTO categories(category) VALUES('DVD');
+INSERT INTO categories(category) VALUES('Electronics');
+INSERT INTO categories(category) VALUES('Grocery');
+INSERT INTO categories(category) VALUES('Health');
+INSERT INTO categories(category) VALUES('Toys');
+INSERT INTO categories(category) VALUES('Vehicle');
+INSERT INTO categories(category) VALUES('Video Games');
+
+
+INSERT INTO warehouses(wname, waddress) 
+VALUES('Warehouse A','100 rue William, saint laurent, Quebec, Canada');
+
+
+INSERT INTO warehouses(wname, waddress) 
+VALUES('Warehouse B', '304 Rue François-Perrault, Villera Saint-Michel, Montréal, QC');
+
+INSERT INTO warehouses(wname, waddress)
+VALUES('Warehouse C', '86700 Weston Rd, Toronto, Canada');
+
+INSERT INTO warehouses(wname, waddress)
+VALUES('Warehouse D', '170  Sideroad, Quebec City, Canada');
+
+INSERT INTO warehouses(wname, waddress)
+VALUES('Warehouse E', '1231 Trudea road, Ottawa, Canada ');
+
+INSERT INTO warehouses(wname, waddress)
+VALUES('Warehouse F', '16  Whitlock Rd, Alberta, Canada');
