@@ -1,3 +1,5 @@
+DROP TABLE prod_stores;
+DROP TABLE stores;
 DROP TABLE customers;
 DROP TABLE prod_warehouses;
 DROP TABLE warehouses;
@@ -33,5 +35,16 @@ CREATE TABLE customers (
     lname       VARCHAR2(100)       NOT NULL CHECK (LENGTH(lname)>0),
     email       VARCHAR2(100)       NOT NULL CHECK (LENGTH(email)>0),
     address     VARCHAR2(100)       NOT NULL CHECK (LENGTH(address)>0)
+);
+
+CREATE TABLE stores (
+    storeid     NUMBER              GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sname       VARCHAR2(100)       NOT NULL CHECK(LENGTH(sname)>0)
+);
+
+CREATE TABLE prod_stores(
+    prodid      NUMBER          REFERENCES  products(prodid) ON DELETE CASCADE NOT NULL,
+    storeid     NUMBER          REFERENCES  stores(storeid)ON DELETE CASCADE NOT NULL ,
+    price       NUMBER(10,2)    NOT NULL CHECK(price>0)
 );
 
