@@ -1,3 +1,4 @@
+DROP TABLE customers;
 DROP TABLE prod_warehouses;
 DROP TABLE warehouses;
 DROP TABLE products;
@@ -24,5 +25,13 @@ CREATE TABLE prod_warehouses (
     prodid      NUMBER          REFERENCES products (prodid) ON DELETE CASCADE NOT NULL,
     whid        NUMBER          REFERENCES warehouses (whid) ON DELETE CASCADE NOT NULL,
     quantity    NUMBER(10)      NOT NULL CHECK (quantity >= 0)
+);
+
+CREATE TABLE customers (
+    custid      NUMBER              GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fname       VARCHAR2(100)       NOT NULL CHECK (LENGTH(fname)>0),
+    lname       VARCHAR2(100)       NOT NULL CHECK (LENGTH(lname)>0),
+    email       VARCHAR2(100)       NOT NULL CHECK (LENGTH(email)>0),
+    address     VARCHAR2(100)       NOT NULL CHECK (LENGTH(address)>0)
 );
 
