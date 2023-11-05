@@ -57,6 +57,17 @@ CREATE TABLE orders (
     quantity    NUMBER(10)      NOT NULL CHECK (quantity > 0)
 );
 
+INSERT INTO customers (fname, lname, email, address) VALUES ('alex', 'brown', 'alex@gmail.com', '090 boul saint laurent, montreal, quebec, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('Amanda', 'Harry', 'am.harry@yahioo.com', '100 boul saint laurent, montreal, quebec, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('daneil', 'hanne', 'daneil@yahoo.com', '100 atwater street, toronto, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('Jack', 'Jonhson', 'johnson.a@gmail.com', 'Calgary, Alberta, Canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('John', 'belle', 'abcd@yahoo.com', '105 Young street, toronto, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('John', 'boura', 'bdoura@gmail.com', '100 Young street, toronto, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('mahsa', 'sadeghi', 'msadeghi@dawsoncollege.qc.ca', 'dawson college, montreal, quebec, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('martin', 'Li', 'm.li@gmail.com', '87 boul saint laurent, montreal, quebec, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('martin', 'alexandre', 'marting@yahoo.com', 'brossard, quebec, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('Noah', 'Garcia', 'g.noah@yahoo.com', '22222 happy street, Laval, quebec, canada');
+INSERT INTO customers (fname, lname, email, address) VALUES ('olivia', 'smith', 'smith@hotmail.com', '76 boul decalthon, laval, quebec, canada');
 
 INSERT INTO categories(category) VALUES('Beauty');
 INSERT INTO categories(category) VALUES('Cars');
@@ -68,22 +79,11 @@ INSERT INTO categories(category) VALUES('Toys');
 INSERT INTO categories(category) VALUES('Vehicle');
 INSERT INTO categories(category) VALUES('Video Games');
 
+INSERT INTO warehouses(wname, waddress) VALUES('Warehouse A','100 rue William, saint laurent, Quebec, Canada');
+INSERT INTO warehouses(wname, waddress) VALUES('Warehouse B', '304 Rue François-Perrault, Villera Saint-Michel, Montréal, QC');
+INSERT INTO warehouses(wname, waddress) VALUES('Warehouse C', '86700 Weston Rd, Toronto, Canada');
+INSERT INTO warehouses(wname, waddress) VALUES('Warehouse D', '170  Sideroad, Quebec City, Canada');
+INSERT INTO warehouses(wname, waddress) VALUES('Warehouse E', '1231 Trudea road, Ottawa, Canada ');
+INSERT INTO warehouses(wname, waddress) VALUES('Warehouse F', '16  Whitlock Rd, Alberta, Canada');
 
-INSERT INTO warehouses(wname, waddress) 
-VALUES('Warehouse A','100 rue William, saint laurent, Quebec, Canada');
-
-
-INSERT INTO warehouses(wname, waddress) 
-VALUES('Warehouse B', '304 Rue François-Perrault, Villera Saint-Michel, Montréal, QC');
-
-INSERT INTO warehouses(wname, waddress)
-VALUES('Warehouse C', '86700 Weston Rd, Toronto, Canada');
-
-INSERT INTO warehouses(wname, waddress)
-VALUES('Warehouse D', '170  Sideroad, Quebec City, Canada');
-
-INSERT INTO warehouses(wname, waddress)
-VALUES('Warehouse E', '1231 Trudea road, Ottawa, Canada ');
-
-INSERT INTO warehouses(wname, waddress)
-VALUES('Warehouse F', '16  Whitlock Rd, Alberta, Canada');
+COMMIT;
