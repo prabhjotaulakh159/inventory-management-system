@@ -1,3 +1,4 @@
+DROP TRIGGER on_order_creation_stock_depletion;
 DROP TRIGGER warehouse_audit_log;
 DROP TRIGGER store_audit_log;
 DROP TRIGGER product_warehouse_audit_log;
@@ -230,27 +231,33 @@ BEGIN
 END;    
 /
 
---My Trigger
-CREATE OR REPLACE TRIGGER warehouse_quantity_update AFTER INSERT or DELETE  ON orders
+CREATE OR REPLACE TRIGGER on_order_creation_stock_depletion BEFORE INSERT ON orders
 FOR EACH ROW
 DECLARE
-warehouseid NUMBER;
+    warehouseid warehouses.whid%TYPE;
 BEGIN
-   
-    IF INSERTING THEN
-    
-        SELECT
-            pw.whid INTO warehouseid
-        FROM prod_warehouses pw 
-        WHERE pw.quantity>0 AND pw.prodid = prodid
-        ORDER BY pw.quantity DESC
-        FETCH FIRST ROW ONLY;
-        
-    UPDATE prod_warehouses SET quantity= quantity - :NEW.quantity WHERE prodid= :NEW.prodid AND whid= warehouseid;
-    
-    ELSIF DELETING THEN
-        UPDATE prod_warehouses SET quantity= quantity + :OLD.quantity WHERE prodid= prodid AND whid= warehouseid;
-    END IF;
+   SELECT whid INTO warehouseid FROM prod_warehouses WHERE quantity > 0 
+        AND prodid = :NEW.prodid ORDER BY quantity ASC FETCH FIRST ROW ONLY;
+    UPDATE prod_warehouses SET quantity = quantity - :NEW.quantity 
+        WHERE whid = warehouseid AND prodid = :NEW.prodid;
+    EXCEPTION 
+        WHEN no_data_found THEN 
+            DBMS_OUTPUT.PUT_LINE('this item is out of stock');
+END;
+/
+
+CREATE OR REPLACE TRIGGER on_order_creation_stock_depletion BEFORE INSERT ON orders
+FOR EACH ROW
+DECLARE
+    warehouseid warehouses.whid%TYPE;
+BEGIN
+   SELECT whid INTO warehouseid FROM prod_warehouses WHERE quantity > 0 
+        AND prodid = :NEW.prodid ORDER BY quantity ASC FETCH FIRST ROW ONLY;
+    UPDATE prod_warehouses SET quantity = quantity - :NEW.quantity 
+        WHERE whid = warehouseid AND prodid = :NEW.prodid;
+    EXCEPTION 
+        WHEN no_data_found THEN 
+            DBMS_OUTPUT.PUT_LINE('this item is out of stock');
 END;
 /
 
