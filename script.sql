@@ -1,3 +1,4 @@
+DROP TRIGGER on_order_creation_stock_depletion;
 DROP TRIGGER warehouse_audit_log;
 DROP TRIGGER store_audit_log;
 DROP TRIGGER product_warehouse_audit_log;
@@ -228,6 +229,21 @@ BEGIN
         INSERT INTO category_audit (action, catid) VALUES ('update', :old.catid);
     END IF;
 END;    
+/
+
+CREATE OR REPLACE TRIGGER on_order_creation_stock_depletion BEFORE INSERT ON orders
+FOR EACH ROW
+DECLARE
+    warehouseid warehouses.whid%TYPE;
+BEGIN
+   SELECT whid INTO warehouseid FROM prod_warehouses WHERE quantity > 0 
+        AND prodid = :NEW.prodid ORDER BY quantity ASC FETCH FIRST ROW ONLY;
+    UPDATE prod_warehouses SET quantity = quantity - :NEW.quantity 
+        WHERE whid = warehouseid AND prodid = :NEW.prodid;
+    EXCEPTION 
+        WHEN no_data_found THEN 
+            DBMS_OUTPUT.PUT_LINE('this item is out of stock');
+END;
 /
 
 INSERT INTO customers (fname, lname, email, address) VALUES ('alex', 'brown', 'alex@gmail.com', '090 boul saint laurent, montreal, quebec, canada');
