@@ -1,3 +1,19 @@
+DROP TRIGGER warehouse_audit_log;
+DROP TRIGGER store_audit_log;
+DROP TRIGGER product_warehouse_audit_log;
+DROP TRIGGER product_store_price_audit_log;
+DROP TRIGGER product_audit_log;
+DROP TRIGGER order_audit_log;
+DROP TRIGGER customer_audit_log;
+DROP TRIGGER category_audit_log;
+DROP TABLE category_audit;
+DROP TABLE order_audit;
+DROP TABLE customer_audit;
+DROP TABLE store_audit;
+DROP TABLE product_store_price_audit;
+DROP TABLE product_warehouse_audit;
+DROP TABLE product_audit;
+DROP TABLE warehouse_audit;
 DROP TABLE orders;
 DROP TABLE prod_stores_prices;
 DROP TABLE stores;
@@ -7,6 +23,7 @@ DROP TABLE warehouses;
 DROP TABLE products;
 DROP TABLE categories;
 
+-- regular tables 
 CREATE TABLE categories (
     catid       NUMBER          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     category    VARCHAR2(100)   NOT NULL CHECK (LENGTH(category) > 0)
@@ -57,6 +74,161 @@ CREATE TABLE orders (
     quantity    NUMBER(10)      NOT NULL CHECK (quantity > 0),
     order_date  DATE            NOT NULL
 );
+
+-- audit tables
+CREATE TABLE warehouse_audit (
+    action          CHAR(6)     NOT NULL,
+    audit_date      DATE        DEFAULT SYSDATE NOT NULL,
+    whid            NUMBER      REFERENCES warehouses (whid) NOT NULL
+);
+
+CREATE TABLE product_audit (
+    action          CHAR(6)         NOT NULL,
+    audit_date      DATE            DEFAULT SYSDATE NOT NULL,
+    prodid          NUMBER          REFERENCES products (prodid) NOT NULL
+);
+
+CREATE TABLE product_warehouse_audit (
+    action          CHAR(6)         NOT NULL,
+    audit_date      DATE            DEFAULT SYSDATE NOT NULL,
+    prodid          NUMBER          REFERENCES products (prodid) NOT NULL,
+    whid            NUMBER          REFERENCES warehouses (whid) NOT NULL
+);
+
+CREATE TABLE product_store_price_audit (
+    action          CHAR(6)         NOT NULL,
+    audit_date      DATE            DEFAULT SYSDATE NOT NULL,
+    storeid         NUMBER          REFERENCES stores (storeid) NOT NULL,
+    prodid          NUMBER          REFERENCES products (prodid) NOT NULL
+);
+
+CREATE TABLE store_audit (
+    action          CHAR(6)         NOT NULL,
+    audit_date      DATE            DEFAULT SYSDATE NOT NULL,
+    storeid         NUMBER          REFERENCES stores (storeid) NOT NULL
+);
+
+CREATE TABLE customer_audit (
+    action          CHAR(6)         NOT NULL,
+    audit_date      DATE            DEFAULT SYSDATE NOT NULL,
+    custid          NUMBER          REFERENCES customers (custid) NOT NULL
+);
+
+CREATE TABLE order_audit (
+    action          CHAR(6)         NOT NULL,
+    audit_date      DATE            DEFAULT SYSDATE NOT NULL,
+    ordid           NUMBER          REFERENCES orders (ordid) NOT NULL
+);
+
+CREATE TABLE category_audit (
+    action          CHAR(6)         NOT NULL,
+    audit_date      DATE            DEFAULT SYSDATE NOT NULL,
+    catid           NUMBER          REFERENCES categories (catid) NOT NULL
+);
+
+CREATE OR REPLACE TRIGGER warehouse_audit_log AFTER INSERT OR UPDATE OR DELETE ON warehouses 
+FOR EACH ROW
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO warehouse_audit (action, whid) VALUES ('insert', :new.whid);
+    ELSIF UPDATING THEN 
+        INSERT INTO warehouse_audit (action, whid) VALUES ('update', :new.whid);
+    ELSIF DELETING THEN 
+        INSERT INTO warehouse_audit (action, whid) VALUES ('delete', :old.whid);
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER product_audit_log AFTER INSERT OR UPDATE OR DELETE ON products 
+FOR EACH ROW
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO product_audit (action, prodid) VALUES ('insert', :new.prodid);
+    ELSIF UPDATING THEN 
+        INSERT INTO product_audit (action, prodid) VALUES ('update', :new.prodid);
+    ELSIF DELETING THEN 
+        INSERT INTO product_audit (action, prodid) VALUES ('delete', :old.prodid);
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER customer_audit_log AFTER INSERT OR UPDATE OR DELETE ON customers 
+FOR EACH ROW
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO customer_audit (action, custid) VALUES ('insert', :new.custid);
+    ELSIF UPDATING THEN 
+        INSERT INTO customer_audit (action, custid) VALUES ('update', :new.custid);
+    ELSIF DELETING THEN 
+        INSERT INTO customer_audit (action, custid) VALUES ('delete', :old.custid);
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER product_warehouse_audit_log AFTER INSERT OR UPDATE OR DELETE ON prod_warehouses 
+FOR EACH ROW
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO product_warehouse_audit (action, prodid, whid) VALUES ('insert', :new.prodid, :new.whid);
+    ELSIF UPDATING THEN 
+        INSERT INTO product_warehouse_audit (action, prodid, whid) VALUES ('update', :new.prodid, :new.whid);
+    ELSIF DELETING THEN 
+        INSERT INTO product_warehouse_audit (action, prodid, whid) VALUES ('update', :old.prodid, :old.whid);
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER product_store_price_audit_log AFTER INSERT OR UPDATE OR DELETE ON prod_stores_prices 
+FOR EACH ROW 
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO product_store_price_audit (action, prodid, storeid) VALUES ('insert', :new.prodid, :new.storeid);
+    ELSIF UPDATING THEN 
+        INSERT INTO product_store_price_audit (action, prodid, storeid) VALUES ('update', :new.prodid, :new.storeid);
+    ELSIF DELETING THEN 
+        INSERT INTO product_store_price_audit (action, prodid, storeid) VALUES ('update', :old.prodid, :old.storeid);
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER store_audit_log AFTER INSERT OR UPDATE OR DELETE ON stores 
+FOR EACH ROW 
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO store_audit (action, storeid) VALUES ('insert', :new.storeid);
+    ELSIF UPDATING THEN 
+        INSERT INTO store_audit (action, storeid) VALUES ('update', :new.storeid);
+    ELSIF DELETING THEN 
+        INSERT INTO store_audit (action, storeid) VALUES ('update', :old.storeid);
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER order_audit_log AFTER INSERT OR DELETE ON orders 
+FOR EACH ROW
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO order_audit (action, ordid) VALUES ('insert', :new.ordid);
+    ELSIF UPDATING THEN 
+        INSERT INTO order_audit (action, ordid) VALUES ('update', :new.ordid);
+    ELSIF DELETING THEN 
+        INSERT INTO order_audit (action, ordid) VALUES ('update', :old.ordid);
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER category_audit_log AFTER INSERT OR UPDATE OR DELETE ON categories 
+FOR EACH ROW
+BEGIN 
+    IF INSERTING THEN 
+        INSERT INTO category_audit (action, catid) VALUES ('insert', :new.catid);
+    ELSIF UPDATING THEN 
+        INSERT INTO category_audit (action, catid) VALUES ('update', :new.catid);
+    ELSIF DELETING THEN 
+        INSERT INTO category_audit (action, catid) VALUES ('update', :old.catid);
+    END IF;
+END;    
+/
 
 INSERT INTO customers (fname, lname, email, address) VALUES ('alex', 'brown', 'alex@gmail.com', '090 boul saint laurent, montreal, quebec, canada');
 INSERT INTO customers (fname, lname, email, address) VALUES ('Amanda', 'Harry', 'am.harry@yahioo.com', '100 boul saint laurent, montreal, quebec, canada');
