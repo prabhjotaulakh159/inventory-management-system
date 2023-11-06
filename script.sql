@@ -230,6 +230,30 @@ BEGIN
 END;    
 /
 
+--My Trigger
+CREATE OR REPLACE TRIGGER warehouse_quantity_update AFTER INSERT or DELETE  ON orders
+FOR EACH ROW
+DECLARE
+warehouseid NUMBER;
+BEGIN
+   
+    IF INSERTING THEN
+    
+        SELECT
+            pw.whid INTO warehouseid
+        FROM prod_warehouses pw 
+        WHERE pw.quantity>0 AND pw.prodid = prodid
+        ORDER BY pw.quantity DESC
+        FETCH FIRST ROW ONLY;
+        
+    UPDATE prod_warehouses SET quantity= quantity - :NEW.quantity WHERE prodid= :NEW.prodid AND whid= warehouseid;
+    
+    ELSIF DELETING THEN
+        UPDATE prod_warehouses SET quantity= quantity + :OLD.quantity WHERE prodid= prodid AND whid= warehouseid;
+    END IF;
+END;
+/
+
 INSERT INTO customers (fname, lname, email, address) VALUES ('alex', 'brown', 'alex@gmail.com', '090 boul saint laurent, montreal, quebec, canada');
 INSERT INTO customers (fname, lname, email, address) VALUES ('Amanda', 'Harry', 'am.harry@yahioo.com', '100 boul saint laurent, montreal, quebec, canada');
 INSERT INTO customers (fname, lname, email, address) VALUES ('daneil', 'hanne', 'daneil@yahoo.com', '100 atwater street, toronto, canada');
