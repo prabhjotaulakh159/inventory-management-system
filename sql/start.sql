@@ -53,7 +53,7 @@ CREATE TABLE orders (
     order_id            NUMBER              GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     customer_id         NUMBER              REFERENCES customers (customer_id) ON DELETE CASCADE NOT NULL,
     store_id            NUMBER              REFERENCES stores (store_id) ON DELETE CASCADE NOT NULL,
-    order_date          DATE                NOT NULL
+    order_date          DATE                DEFAULT SYSDATE NOT NULL
 );
 
 CREATE TABLE orders_products (
@@ -66,7 +66,7 @@ CREATE TABLE reviews (
     review_id           NUMBER              GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     customer_id         NUMBER              REFERENCES customers (customer_id) ON DELETE CASCADE NOT NULL,
     product_id          NUMBER              REFERENCES products (product_id) ON DELETE CASCADE NOT NULL,
-    flags               NUMBER              NOT NULL CHECK (flags > -1),
+    flags               NUMBER              DEFAULT 0 NOT NULL CHECK (flags > -1),
     rating              NUMBER              NOT NULL CHECK (rating >= 1 AND rating <= 5),
     description         VARCHAR2(100)       NOT NULL CHECK (LENGTH(description) > 0)
 );
@@ -77,70 +77,70 @@ AUDIT TABLES
 CREATE TABLE admins_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    admin_id           NUMBER               REFERENCES admins (admin_id) NOT NULL
+    admin_id           NUMBER               NOT NULL
 );
 
 CREATE TABLE customers_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    customer_id         NUMBER              REFERENCES customers (customer_id) NOT NULL
+    customer_id         NUMBER              NOT NULL
 );
 
 CREATE TABLE categories_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    category_id         NUMBER              REFERENCES categories (category_id) NOT NULL
+    category_id         NUMBER              NOT NULL
 );
 
 CREATE TABLE warehouses_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    warehouse_id        NUMBER              REFERENCES warehouses (warehouse_id) NOT NULL
+    warehouse_id        NUMBER              NOT NULL
 );
 
 CREATE TABLE products_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    product_id          NUMBER              REFERENCES products (product_id) NOT NULL
+    product_id          NUMBER              NOT NULL
 );
 
 CREATE TABLE products_warehouses_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    product_id          NUMBER              REFERENCES products (product_id) NOT NULL,
-    warehouse_id        NUMBER              REFERENCES warehouses (warehouse_id) NOT NULL
+    product_id          NUMBER              NOT NULL,
+    warehouse_id        NUMBER              NOT NULL
 );
 
 CREATE TABLE stores_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    store_id            NUMBER              REFERENCES stores (store_id) NOT NULL
+    store_id            NUMBER              NOT NULL
 );
 
 CREATE TABLE products_stores_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    store_id            NUMBER              REFERENCES stores (store_id) NOT NULL,
-    product_id          NUMBER              REFERENCES products (product_id) NOT NULL
+    store_id            NUMBER              NOT NULL,
+    product_id          NUMBER              NOT NULL
 );
 
 CREATE TABLE orders_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    order_id            NUMBER              REFERENCES orders (order_id) NOT NULL
+    order_id            NUMBER              NOT NULL
 );
 
 CREATE TABLE orders_products_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    order_id            NUMBER              REFERENCES orders (order_id) NOT NULL,
-    product_id          NUMBER              REFERENCES products (product_id) NOT NULL
+    order_id            NUMBER              NOT NULL,
+    product_id          NUMBER              NOT NULL
 );
 
 CREATE TABLE reviews_audit (
     action              CHAR(6)             NOT NULL CHECK (action IN ('insert', 'update', 'delete')),
     audit_date          DATE                DEFAULT SYSDATE NOT NULL,
-    review_id           NUMBER              REFERENCES reviews (review_id) NOT NULL
+    review_id           NUMBER              NOT NULL
 );
 
 /*******************************************************************************
@@ -342,4 +342,183 @@ BEGIN
         VALUES ('update', :OLD.review_id);
     END IF;
 END;
+/
+
+/*******************************************************************************
+OBJECTS
+*******************************************************************************/
+CREATE TYPE order_obj AS OBJECT (
+    product     NUMBER,
+    quantity    NUMBER
+);
+/
+
+CREATE TYPE warehouse_obj AS OBJECT (
+    name        VARCHAR2(100),
+    address     VARCHAR2(100)
+);
+/
+
+/*******************************************************************************
+PACKAGES
+*******************************************************************************/
+CREATE OR REPLACE PACKAGE order_pkg AS 
+    depleted_stock EXCEPTION;
+    TYPE order_array IS VARRAY(100) OF order_obj;
+    PROCEDURE create_order(customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_array, v_order_id OUT NUMBER);
+    PROCEDURE delete_order(v_order_id IN NUMBER, out_id OUT NUMBER);
+    FUNCTION total_spent(customer NUMBER) RETURN NUMBER;
+    FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
+END order_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY order_pkg AS 
+    -- creates an order and updates stock in the warehouse by removing the product from the least populous warehouse
+    -- customer is the customer id
+    -- store is the store id
+    -- products is an array of order_obj which we'll loop through
+    PROCEDURE create_order (customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_array, v_order_id OUT NUMBER) AS 
+        warehouse_with_least_stock NUMBER;
+    BEGIN 
+        INSERT INTO orders (customer_id, store_id) VALUES (customer, store) RETURNING order_id INTO v_order_id;
+        FOR  i IN 1 .. products.COUNT LOOP
+            INSERT INTO orders_products (order_id, product_id, quantity) VALUES (v_order_id, products(i).product, products(i).quantity);
+        END LOOP;
+    EXCEPTION 
+        WHEN order_pkg.depleted_stock THEN 
+            DBMS_OUTPUT.PUT_LINE('One of the items is out of stock');
+            ROLLBACK;
+    END;
+     
+    -- Delete an order
+    -- v_order_id is the id of the order to be deleted
+    PROCEDURE delete_order (v_order_id IN NUMBER, out_id OUT NUMBER) AS
+    BEGIN 
+        DELETE FROM orders WHERE order_id = v_order_id RETURNING order_id INTO out_id;
+    END;
+    
+    -- Total spent on orders by a customer
+    -- customer is the customer id
+    FUNCTION total_spent(customer NUMBER) RETURN NUMBER AS
+        total_spent NUMBER;
+    BEGIN 
+        SELECT SUM(ps.price * op.quantity) INTO total_spent FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id
+        INNER JOIN orders_products op ON o.order_id = op.order_id 
+        INNER JOIN products p ON op.product_id = p.product_id
+        INNER JOIN products_stores ps ON p.product_id = ps.product_id
+        WHERE c.customer_id = customer;
+        RETURN total_spent;
+    END;
+    
+    -- Returns total price of an order
+    -- order_number is the order for which we will calculate the total
+    FUNCTION price_order(order_number NUMBER) RETURN NUMBER AS 
+        spent NUMBER;
+    BEGIN 
+        SELECT SUM(ps.price * op.quantity) INTO spent FROM orders o
+        INNER JOIN orders_products op ON o.order_id = op.order_id 
+        INNER JOIN products p ON op.product_id = p.product_id
+        INNER JOIN products_stores ps ON p.product_id = ps.product_id
+        WHERE o.order_id = order_number;
+        RETURN spent;
+    END;
+END order_pkg;
+/
+
+CREATE OR REPLACE PACKAGE warehouse_pkg AS 
+    PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
+    PROCEDURE update_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
+    PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER);
+END warehouse_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS 
+    PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
+    BEGIN 
+        INSERT INTO warehouses (name, address) VALUES (warehouse.name, warehouse.address) RETURNING warehouse_id INTO warehouse_id_p;
+    END;
+    
+    PROCEDURE update_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
+    BEGIN 
+        UPDATE warehouses SET name = warehouse.name, address = warehouse.address RETURNING warehouse_id INTO warehouse_id_p;
+    END;
+    
+    PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER) AS 
+    BEGIN 
+        DELETE warehouses WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
+    END;
+END warehouse_pkg;
+/
+/*******************************************************************************
+SPECIAL TRIGGERS
+*******************************************************************************/
+-- Checks if the item we want to order is in stock and removes it if it is
+CREATE OR REPLACE TRIGGER validate_stock
+BEFORE INSERT OR UPDATE 
+ON orders_products
+FOR EACH ROW
+DECLARE 
+    stock   NUMBER;
+BEGIN 
+    SELECT SUM(quantity) INTO stock FROM products_warehouses WHERE 
+    product_id = :NEW.product_id;
+    IF :NEW.quantity > stock THEN 
+        RAISE order_pkg.depleted_stock;
+    END IF;
+    UPDATE products_warehouses SET quantity = quantity - :NEW.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :NEW.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
+    AND product_id = :NEW.product_id;
+END;
+/
+
+-- Once an order is deleted, we simply replenish the warehouse with the 
+-- least amount of stock of a product
+CREATE OR REPLACE TRIGGER replenish_stock 
+BEFORE DELETE 
+ON orders_products 
+FOR EACH ROW 
+BEGIN 
+    UPDATE products_warehouses SET quantity = quantity + :OLD.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :OLD.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
+    AND product_id = :OLD.product_id;
+END;
+/
+
+/*******************************************************************************
+TEST DATA
+*******************************************************************************/
+INSERT INTO admins (password) VALUES ('admin');
+
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('Prabhjot', 'Aulakh', 'prabhjot@email.com', 'Dawson College', 'customer');
+
+INSERT INTO categories (category) VALUES ('Toys');
+INSERT INTO categories (category) VALUES ('Grocery');
+
+INSERT INTO stores (name) VALUES ('Marche Atwater');
+
+INSERT INTO products (category_id, name) VALUES (1, 'Lego Batman');
+INSERT INTO products (category_id, name) VALUES (1, 'Lego Superman');
+INSERT INTO products (category_id, name) VALUES (2, 'Apple');
+
+INSERT INTO products_stores (product_id, store_id, price) VALUES (1, 1, 20);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (2, 1, 25);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (3, 1, 5);
+
+INSERT INTO warehouses (name, address) VALUES ('Warehouse A', 'Brossard, Quebec');
+INSERT INTO warehouses (name, address) VALUES ('Warehouse B', 'Terrbonne, Quebec');
+
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 1, 20);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 2, 25);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (2, 3, 10);
+
+INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 1, 5, 'Nice ! Might order');
+INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 2, 5, 'Amazing !');
+INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 3, 1, 'It was rotten :(');
+
+INSERT INTO orders (customer_id, store_id) VALUES (1, 1);
+INSERT INTO orders (customer_id, store_id) VALUES (1, 1);
+
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (1, 1, 10);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (1, 2, 10);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (1, 3, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (2, 3, 1);
+COMMIT;
 /

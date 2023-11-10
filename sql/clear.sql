@@ -1,4 +1,11 @@
-DROP TRIGGER check_in_warehouse_before_order;
+DROP PACKAGE warehouse_pkg;
+DROP PACKAGE order_pkg;
+
+DROP TYPE warehouse_obj;
+DROP TYPE order_obj;
+
+DROP TRIGGER replenish_stock;
+DROP TRIGGER validate_stock;
 DROP TRIGGER reviews_audit_log;
 DROP TRIGGER orders_products_audit_log;
 DROP TRIGGER orders_audit_log;
