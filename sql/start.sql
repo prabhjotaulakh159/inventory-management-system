@@ -374,9 +374,36 @@ CREATE TYPE products_obj AS OBJECT (
 );
 /
 
+CREATE TYPE admin_obj AS OBJECT (
+    id          NUMBER,
+    password    VARCHAR2(100)
+);
+/
 /*******************************************************************************
 PACKAGES
 *******************************************************************************/
+CREATE OR REPLACE PACKAGE admin_pkg AS
+    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN;
+END admin_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY admin_pkg AS 
+    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN AS 
+        pword VARCHAR2(100);
+    BEGIN 
+        SELECT password INTO pword FROM admins WHERE admin_id = admin_v.id;
+        IF admin_v.password = pword THEN
+            RETURN TRUE;
+        ELSE 
+            RETURN FALSE;
+        END IF;
+        EXCEPTION 
+            WHEN no_data_found THEN 
+                    DBMS_OUTPUT.PUT_LINE('admin not found');
+    END;
+END admin_pkg;
+/
+
 CREATE OR REPLACE PACKAGE order_pkg AS 
     depleted_stock EXCEPTION;
     TYPE order_array IS VARRAY(100) OF order_obj;
@@ -477,31 +504,32 @@ END warehouse_pkg;
 /
 
 CREATE OR REPLACE PACKAGE products_pckg AS
-    PROCEDURE add_product(vproducts IN products_type);
-    PROCEDURE delete_product(vproducts IN products_type);
-    PROCEDURE update_product(vproducts IN products_type);
-END;
+    PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER);
+    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER);
+    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER);
+END products_pckg;
+/
 
 CREATE OR REPLACE PACKAGE BODY products_pckg AS
 
-     PROCEDURE add_product(vproducts IN products_type, products_id_o OUT NUMBER) IS
+     PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
         BEGIN
             INSERT INTO products(category_id, name)
             VALUES(vproducts.catid, vproducts.pname)
-            RETURNING product_id INTO product_id_o;
+            RETURNING product_id INTO products_id_o;
         END;
 
-    PROCEDURE delete_product(vproducts IN products_type, products_id_o OUT NUMBER) IS
+    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
         BEGIN
             DELETE FROM products WHERE category_id=vproducts.catid AND name=vproducts.pname 
-            RETURNING product_id INTO product_id_o;
+            RETURNING product_id INTO products_id_o;
         END;
-    PROCEDURE update_product(vproducts IN products_type, products_id_o OUT NUMBER) IS
+    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
         BEGIN
             UPDATE products SET name=vproducts.pname WHERE product_id=vproducts.prodid 
-            RETURNING product_id INTO product_id_o;
+            RETURNING product_id INTO products_id_o;
         END;
-END;
+END products_pckg;
 /
 
 CREATE OR REPLACE PACKAGE review_pkg AS
@@ -516,6 +544,9 @@ END review_pkg;
 /
 
 CREATE OR REPLACE PACKAGE BODY review_pkg AS 
+    -- creates a review
+    -- review: object with customer, product, rating, and description
+    -- id: id of created review
     PROCEDURE create_review(review IN review_obj, id OUT NUMBER) AS
     BEGIN 
         INSERT INTO reviews (customer_id, product_id, rating, description)
@@ -523,11 +554,16 @@ CREATE OR REPLACE PACKAGE BODY review_pkg AS
         RETURNING review_id INTO id;
     END;
 
+    -- flags a review
+    -- id: id of the review to flag
     PROCEDURE flag_review (id IN NUMBER) AS 
     BEGIN 
         UPDATE reviews SET flags = flags + 1 WHERE review_id = id;
     END;
 
+    -- updates a review
+    -- rev_id: id of review to update
+    -- review: object with customer, product, rating and description
     PROCEDURE update_review (rev_id IN OUT NUMBER, review IN review_obj) AS 
     BEGIN 
         UPDATE reviews SET rating = review.rating, description = review.description 
@@ -537,11 +573,14 @@ CREATE OR REPLACE PACKAGE BODY review_pkg AS
                 DBMS_OUTPUT.PUT_LINE('Review id does not exist');
     END;
 
+    -- deletes a review
+    -- id: id of review to delete
     PROCEDURE delete_review(id IN NUMBER) AS 
     BEGIN
         DELETE FROM reviews WHERE review_id = id;
     END;
 
+    -- Returns array of review id's that are considered flagged 3 times
     FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged  AS
         flagged_reviews review_pkg.flagged;
     BEGIN
@@ -554,6 +593,9 @@ CREATE OR REPLACE PACKAGE BODY review_pkg AS
                 DBMS_OUTPUT.PUT_LINE('No flagged reviews were found');
     END;
 
+    -- Deletes all flagged (3+) reviews
+    -- flagged_reviews: array of flagged review ids 
+    -- num_deleted: number of rows deleted
     PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER) AS
     BEGIN
         num_deleted := flagged_reviews.COUNT;
@@ -563,6 +605,7 @@ CREATE OR REPLACE PACKAGE BODY review_pkg AS
     END;
 END review_pkg;
 /
+
 /*******************************************************************************
 SPECIAL TRIGGERS
 *******************************************************************************/

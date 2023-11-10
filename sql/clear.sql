@@ -1,7 +1,10 @@
+DROP PACKAGE admin_pkg;
 DROP PACKAGE review_pkg;
 DROP PACKAGE warehouse_pkg;
 DROP PACKAGE order_pkg;
 
+DROP TYPE admin_obj;
+DROP TYPE products_obj;
 DROP TYPE review_obj;
 DROP TYPE warehouse_obj;
 DROP TYPE order_obj;
