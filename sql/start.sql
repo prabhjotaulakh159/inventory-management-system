@@ -367,6 +367,13 @@ CREATE TYPE review_obj AS OBJECT (
 );
 /
 
+CREATE TYPE products_obj AS OBJECT (
+    prodid      NUMBER,
+    catid       NUMBER,
+    pname       VARCHAR(100)
+);
+/
+
 /*******************************************************************************
 PACKAGES
 *******************************************************************************/
@@ -469,6 +476,34 @@ CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
 END warehouse_pkg;
 /
 
+CREATE OR REPLACE PACKAGE products_pckg AS
+    PROCEDURE add_product(vproducts IN products_type);
+    PROCEDURE delete_product(vproducts IN products_type);
+    PROCEDURE update_product(vproducts IN products_type);
+END;
+
+CREATE OR REPLACE PACKAGE BODY products_pckg AS
+
+     PROCEDURE add_product(vproducts IN products_type, products_id_o OUT NUMBER) IS
+        BEGIN
+            INSERT INTO products(category_id, name)
+            VALUES(vproducts.catid, vproducts.pname)
+            RETURNING product_id INTO product_id_o;
+        END;
+
+    PROCEDURE delete_product(vproducts IN products_type, products_id_o OUT NUMBER) IS
+        BEGIN
+            DELETE FROM products WHERE category_id=vproducts.catid AND name=vproducts.pname 
+            RETURNING product_id INTO product_id_o;
+        END;
+    PROCEDURE update_product(vproducts IN products_type, products_id_o OUT NUMBER) IS
+        BEGIN
+            UPDATE products SET name=vproducts.pname WHERE product_id=vproducts.prodid 
+            RETURNING product_id INTO product_id_o;
+        END;
+END;
+/
+
 CREATE OR REPLACE PACKAGE review_pkg AS
     TYPE flagged IS VARRAY(1000) OF NUMBER;
     PROCEDURE create_review(review IN review_obj, id OUT NUMBER);
@@ -560,6 +595,8 @@ BEGIN
     AND product_id = :OLD.product_id;
 END;
 /
+
+
 
 /*******************************************************************************
 TEST DATA
