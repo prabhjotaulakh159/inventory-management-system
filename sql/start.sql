@@ -359,6 +359,14 @@ CREATE TYPE warehouse_obj AS OBJECT (
 );
 /
 
+CREATE TYPE review_obj AS OBJECT (
+    customer        NUMBER,
+    product         NUMBER,
+    rating          NUMBER,
+    description     VARCHAR2(100)
+);
+/
+
 CREATE TYPE products_obj AS OBJECT (
     prodid      NUMBER,
     catid       NUMBER,
@@ -434,22 +442,33 @@ END order_pkg;
 
 CREATE OR REPLACE PACKAGE warehouse_pkg AS 
     PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
-    PROCEDURE update_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
+    PROCEDURE update_warehouse (id IN NUMBER, warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
     PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER);
 END warehouse_pkg;
 /
 
-CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS 
+CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
+    -- creates a new warehouse
+    -- warehouse: object contains name and address
+    -- warehouse_id_p: id of newly created warehouse
     PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
     BEGIN 
         INSERT INTO warehouses (name, address) VALUES (warehouse.name, warehouse.address) RETURNING warehouse_id INTO warehouse_id_p;
     END;
     
-    PROCEDURE update_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
+    -- updates a  warehouse
+    -- id: id of warehouse to update
+    -- warehouse: object contains name and address
+    -- warehouse_id_p: id of newly created warehouse
+    PROCEDURE update_warehouse (id IN NUMBER, warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
     BEGIN 
-        UPDATE warehouses SET name = warehouse.name, address = warehouse.address RETURNING warehouse_id INTO warehouse_id_p;
+        UPDATE warehouses SET name = warehouse.name, address = warehouse.address 
+        WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
     END;
     
+    -- deletes a warehouse
+    -- id: id of warehouse to delete
+    -- warehouse_id_p: id of deleted warehouse
     PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER) AS 
     BEGIN 
         DELETE warehouses WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
@@ -483,6 +502,66 @@ CREATE OR REPLACE PACKAGE BODY products_pckg AS
             RETURNING product_id INTO product_id_o;
         END;
 END;
+/
+
+CREATE OR REPLACE PACKAGE review_pkg AS
+    TYPE flagged IS VARRAY(1000) OF NUMBER;
+    PROCEDURE create_review(review IN review_obj, id OUT NUMBER);
+    PROCEDURE flag_review(id IN NUMBER);
+    PROCEDURE update_review (rev_id IN OUT NUMBER, review IN review_obj);
+    PROCEDURE delete_review(id IN NUMBER);
+    PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER);
+    FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged;
+END review_pkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY review_pkg AS 
+    PROCEDURE create_review(review IN review_obj, id OUT NUMBER) AS
+    BEGIN 
+        INSERT INTO reviews (customer_id, product_id, rating, description)
+        VALUES (review.customer, review.product, review.rating, review.description)
+        RETURNING review_id INTO id;
+    END;
+
+    PROCEDURE flag_review (id IN NUMBER) AS 
+    BEGIN 
+        UPDATE reviews SET flags = flags + 1 WHERE review_id = id;
+    END;
+
+    PROCEDURE update_review (rev_id IN OUT NUMBER, review IN review_obj) AS 
+    BEGIN 
+        UPDATE reviews SET rating = review.rating, description = review.description 
+        WHERE review_id = rev_id RETURNING review_id INTO rev_id;
+        EXCEPTION 
+            WHEN no_data_found THEN 
+                DBMS_OUTPUT.PUT_LINE('Review id does not exist');
+    END;
+
+    PROCEDURE delete_review(id IN NUMBER) AS 
+    BEGIN
+        DELETE FROM reviews WHERE review_id = id;
+    END;
+
+    FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged  AS
+        flagged_reviews review_pkg.flagged;
+    BEGIN
+        flagged_reviews := review_pkg.flagged();
+        SELECT review_id BULK COLLECT INTO flagged_reviews FROM reviews
+        WHERE flags > 3;
+        RETURN flagged_reviews;
+        EXCEPTION 
+            WHEN no_data_found THEN 
+                DBMS_OUTPUT.PUT_LINE('No flagged reviews were found');
+    END;
+
+    PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER) AS
+    BEGIN
+        num_deleted := flagged_reviews.COUNT;
+        FOR i IN 1 .. flagged_reviews.COUNT LOOP
+            DELETE FROM reviews WHERE review_id = flagged_reviews(i);
+        END LOOP;
+    END;
+END review_pkg;
 /
 /*******************************************************************************
 SPECIAL TRIGGERS
