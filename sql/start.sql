@@ -382,11 +382,13 @@ CREATE TYPE admin_obj AS OBJECT (
 /*******************************************************************************
 PACKAGES
 *******************************************************************************/
+
+
+
 CREATE OR REPLACE PACKAGE admin_pkg AS
     FUNCTION login (admin_v admin_obj) RETURN BOOLEAN;
 END admin_pkg;
 /
-
 CREATE OR REPLACE PACKAGE BODY admin_pkg AS 
     FUNCTION login (admin_v admin_obj) RETURN BOOLEAN AS 
         pword VARCHAR2(100);
@@ -404,6 +406,8 @@ CREATE OR REPLACE PACKAGE BODY admin_pkg AS
 END admin_pkg;
 /
 
+
+
 CREATE OR REPLACE PACKAGE order_pkg AS 
     depleted_stock EXCEPTION;
     TYPE order_array IS VARRAY(100) OF order_obj;
@@ -413,7 +417,6 @@ CREATE OR REPLACE PACKAGE order_pkg AS
     FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
 END order_pkg;
 /
-
 CREATE OR REPLACE PACKAGE BODY order_pkg AS 
     -- creates an order and updates stock in the warehouse by removing the product from the least populous warehouse
     -- customer is the customer id
@@ -438,7 +441,7 @@ CREATE OR REPLACE PACKAGE BODY order_pkg AS
     BEGIN 
         DELETE FROM orders WHERE order_id = v_order_id RETURNING order_id INTO out_id;
     END;
-    
+
     -- Total spent on orders by a customer
     -- customer is the customer id
     FUNCTION total_spent(customer NUMBER) RETURN NUMBER AS
@@ -471,6 +474,7 @@ CREATE OR REPLACE PACKAGE warehouse_pkg AS
     PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
     PROCEDURE update_warehouse (id IN NUMBER, warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
     PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER);
+    FUNCTION get_warehouse(id IN NUMBER) RETURN warehouse_obj;
 END warehouse_pkg;
 /
 
@@ -499,6 +503,20 @@ CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
     PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER) AS 
     BEGIN 
         DELETE warehouses WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
+    END;
+
+    FUNCTION get_warehouse(id IN NUMBER) RETURN warehouse_obj AS 
+        warehouse warehouse_obj;
+        v_name VARCHAR2(100);
+        v_addr VARCHAR2(100);
+    BEGIN 
+        SELECT name, address INTO v_name, v_addr FROM warehouses 
+        WHERE warehouse_id = id;
+        warehouse := warehouse_obj(v_name, v_addr);
+        RETURN warehouse;
+        EXCEPTION 
+            WHEN no_data_found THEN 
+                DBMS_OUTPUT.PUT_LINE('Warehouse does not exist');
     END;
 END warehouse_pkg;
 /
@@ -540,6 +558,7 @@ CREATE OR REPLACE PACKAGE review_pkg AS
     PROCEDURE delete_review(id IN NUMBER);
     PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER);
     FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged;
+    FUNCTION get_review(revid IN NUMBER) RETURN review_obj;
 END review_pkg;
 /
 
@@ -602,6 +621,24 @@ CREATE OR REPLACE PACKAGE BODY review_pkg AS
         FOR i IN 1 .. flagged_reviews.COUNT LOOP
             DELETE FROM reviews WHERE review_id = flagged_reviews(i);
         END LOOP;
+    END;
+
+    FUNCTION get_review(revid IN NUMBER) RETURN review_obj AS 
+        review review_obj;
+        custid NUMBER;
+        prodid NUMBER;
+        v_rating NUMBER
+        v_flags NUMBER;
+        descrip VARCHAR2(100);
+    BEGIN 
+        SELECT customer_id, product_id, flags, rating, description
+        INTO custid, prodid, v_rating, v_flags, descrip 
+        FROM reviews WHERE review_id = revid;
+        review := review_obj(custid, prodid, v_rating, v_flags, descrip);
+        RETURN review;
+        EXCEPTION 
+            WHEN no_data_found THEN 
+                DMBS_OUTPUT.PUT_LINE('Review does not exist');
     END;
 END review_pkg;
 /
