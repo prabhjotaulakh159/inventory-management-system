@@ -440,35 +440,35 @@ END;
 --END products_pckg;
 --/
 --
---/*******************************************************************************
---SPECIAL TRIGGERS
---*******************************************************************************/
---CREATE OR REPLACE TRIGGER validate_stock
---BEFORE INSERT OR UPDATE 
---ON orders_products
---FOR EACH ROW
---DECLARE 
---    stock   NUMBER;
---BEGIN 
---    SELECT SUM(quantity) INTO stock FROM products_warehouses WHERE 
---    product_id = :NEW.product_id;
---    IF :NEW.quantity > stock THEN 
---        RAISE order_pkg.depleted_stock;
---    END IF;
---    UPDATE products_warehouses SET quantity = quantity - :NEW.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :NEW.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
---    AND product_id = :NEW.product_id;
---END;
---/
---
---CREATE OR REPLACE TRIGGER replenish_stock 
---BEFORE DELETE 
---ON orders_products 
---FOR EACH ROW 
---BEGIN 
---    UPDATE products_warehouses SET quantity = quantity + :OLD.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :OLD.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
---    AND product_id = :OLD.product_id;
---END;
---/
+/*******************************************************************************
+SPECIAL TRIGGERS
+*******************************************************************************/
+CREATE OR REPLACE TRIGGER validate_stock
+BEFORE INSERT OR UPDATE 
+ON orders_products
+FOR EACH ROW
+DECLARE 
+    stock   NUMBER;
+BEGIN 
+    SELECT SUM(quantity) INTO stock FROM products_warehouses WHERE 
+    product_id = :NEW.product_id;
+    IF :NEW.quantity > stock THEN 
+        RAISE order_pkg.depleted_stock;
+    END IF;
+    UPDATE products_warehouses SET quantity = quantity - :NEW.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :NEW.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
+    AND product_id = :NEW.product_id;
+END;
+/
+
+CREATE OR REPLACE TRIGGER replenish_stock 
+BEFORE DELETE 
+ON orders_products 
+FOR EACH ROW 
+BEGIN 
+    UPDATE products_warehouses SET quantity = quantity + :OLD.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :OLD.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
+    AND product_id = :OLD.product_id;
+END;
+/
 
 /*******************************************************************************
 TEST DATA
