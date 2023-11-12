@@ -6,19 +6,19 @@ import java.sql.SQLInput;
 import java.sql.SQLOutput;
 
 /**
- * Represents a customer in the database
+ * Represents an admin in the database
  * @author Prabhjot Aulakh, Safin Haque
  */
-public class Customer implements SQLData {
+public class Admin implements SQLData {
     private int id;
     private String password;
-    private String type = "CUSTOMER_OBJ";
+    private String type = "ADMIN_OBJ";
 
-    public Customer() {
+    public Admin() {
 
     }
 
-    public Customer(int id, String password) {
+    public Admin(int id, String password) {
         this.id = id;
         this.password = password;
     }
@@ -39,5 +39,21 @@ public class Customer implements SQLData {
     public void writeSQL(SQLOutput stream) throws SQLException {
         stream.writeInt(this.id);
         stream.writeString(this.password);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -1,4 +1,4 @@
-package prabhjot.safin.connection;
+package prabhjot.safin.retail.connection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

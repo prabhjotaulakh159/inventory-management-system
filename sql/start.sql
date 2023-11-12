@@ -68,7 +68,7 @@ CREATE TABLE reviews (
     product_id          NUMBER              REFERENCES products (product_id) ON DELETE CASCADE NOT NULL,
     flags               NUMBER              DEFAULT 0 NOT NULL CHECK (flags > -1),
     rating              NUMBER              NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    description         VARCHAR2(100)       NOT NULL CHECK (LENGTH(description) > 0)
+    description         VARCHAR2(30)        NOT NULL CHECK (LENGTH(description) > 0)
 );
 
 /*******************************************************************************
@@ -152,14 +152,11 @@ ON admins
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO admins_audit (action, admin_id)
-        VALUES ('insert', :NEW.admin_id);
+        INSERT INTO admins_audit (action, admin_id) VALUES ('insert', :NEW.admin_id);
     ELSIF UPDATING THEN 
-        INSERT INTO admins_audit (action, admin_id)
-        VALUES ('update', :NEW.admin_id);
+        INSERT INTO admins_audit (action, admin_id) VALUES ('update', :NEW.admin_id);
     ELSIF DELETING THEN 
-        INSERT INTO admins_audit (action, admin_id)
-        VALUES ('delete', :OLD.admin_id);
+        INSERT INTO admins_audit (action, admin_id) VALUES ('delete', :OLD.admin_id);
     END IF;
 END;
 /
@@ -170,14 +167,11 @@ ON customers
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO customers_audit (action, customer_id) 
-        VALUES ('insert', :NEW.customer_id);
+        INSERT INTO customers_audit (action, customer_id) VALUES ('insert', :NEW.customer_id);
     ELSIF UPDATING THEN 
-        INSERT INTO customers_audit (action, customer_id) 
-        VALUES ('update', :NEW.customer_id);
+        INSERT INTO customers_audit (action, customer_id) VALUES ('update', :NEW.customer_id);
     ELSIF DELETING THEN 
-        INSERT INTO customers_audit (action, customer_id) 
-        VALUES ('delete', :OLD.customer_id);
+        INSERT INTO customers_audit (action, customer_id) VALUES ('delete', :OLD.customer_id);
     END IF;
 END;
 /
@@ -188,14 +182,11 @@ ON categories
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO categories_audit (action, category_id) 
-        VALUES ('insert', :NEW.category_id);
+        INSERT INTO categories_audit (action, category_id) VALUES ('insert', :NEW.category_id);
     ELSIF UPDATING THEN 
-        INSERT INTO categories_audit (action, category_id) 
-        VALUES ('update', :NEW.category_id);
+        INSERT INTO categories_audit (action, category_id) VALUES ('update', :NEW.category_id);
     ELSIF DELETING THEN 
-        INSERT INTO categories_audit (action, category_id) 
-        VALUES ('update', :OLD.category_id);
+        INSERT INTO categories_audit (action, category_id) VALUES ('update', :OLD.category_id);
     END IF;
 END;    
 /
@@ -206,14 +197,11 @@ ON warehouses
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO warehouses_audit (action, warehouse_id) 
-        VALUES ('insert', :NEW.warehouse_id);
+        INSERT INTO warehouses_audit (action, warehouse_id) VALUES ('insert', :NEW.warehouse_id);
     ELSIF UPDATING THEN 
-        INSERT INTO warehouses_audit (action, warehouse_id) 
-        VALUES ('update', :NEW.warehouse_id);
+        INSERT INTO warehouses_audit (action, warehouse_id) VALUES ('update', :NEW.warehouse_id);
     ELSIF DELETING THEN 
-        INSERT INTO warehouses_audit (action, warehouse_id) 
-        VALUES ('delete', :OLD.warehouse_id);
+        INSERT INTO warehouses_audit (action, warehouse_id) VALUES ('delete', :OLD.warehouse_id);
     END IF;
 END;
 /
@@ -224,14 +212,11 @@ ON products
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO products_audit (action, product_id) 
-        VALUES ('insert', :NEW.product_id);
+        INSERT INTO products_audit (action, product_id) VALUES ('insert', :NEW.product_id);
     ELSIF UPDATING THEN 
-        INSERT INTO products_audit (action, product_id) 
-        VALUES ('update', :NEW.product_id);
+        INSERT INTO products_audit (action, product_id) VALUES ('update', :NEW.product_id);
     ELSIF DELETING THEN 
-        INSERT INTO products_audit (action, product_id) 
-        VALUES ('delete', :OLD.product_id);
+        INSERT INTO products_audit (action, product_id) VALUES ('delete', :OLD.product_id);
     END IF;
 END;
 /
@@ -242,14 +227,11 @@ ON products_warehouses
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) 
-        VALUES ('insert', :NEW.product_id, :NEW.warehouse_id);
+        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) VALUES ('insert', :NEW.product_id, :NEW.warehouse_id);
     ELSIF UPDATING THEN 
-        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) 
-        VALUES ('update', :NEW.product_id, :NEW.warehouse_id);
+        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) VALUES ('update', :NEW.product_id, :NEW.warehouse_id);
     ELSIF DELETING THEN 
-        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) 
-        VALUES ('update', :OLD.product_id, :OLD.warehouse_id);
+        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) VALUES ('update', :OLD.product_id, :OLD.warehouse_id);
     END IF;
 END;
 /
@@ -260,14 +242,11 @@ ON stores
 FOR EACH ROW 
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO stores_audit (action, store_id)
-        VALUES ('insert', :NEW.store_id);
+        INSERT INTO stores_audit (action, store_id)VALUES ('insert', :NEW.store_id);
     ELSIF UPDATING THEN 
-        INSERT INTO stores_audit (action, store_id) 
-        VALUES ('update', :NEW.store_id);
+        INSERT INTO stores_audit (action, store_id) VALUES ('update', :NEW.store_id);
     ELSIF DELETING THEN 
-        INSERT INTO stores_audit (action, store_id) 
-        VALUES ('update', :OLD.store_id);
+        INSERT INTO stores_audit (action, store_id) VALUES ('update', :OLD.store_id);
     END IF;
 END;
 /
@@ -278,14 +257,11 @@ ON products_stores
 FOR EACH ROW 
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO products_stores_audit (action, product_id, store_id) 
-        VALUES ('insert', :NEW.product_id, :NEW.store_id);
+        INSERT INTO products_stores_audit (action, product_id, store_id) VALUES ('insert', :NEW.product_id, :NEW.store_id);
     ELSIF UPDATING THEN 
-        INSERT INTO products_stores_audit (action, product_id, store_id) 
-        VALUES ('update', :NEW.product_id, :NEW.store_id);
+        INSERT INTO products_stores_audit (action, product_id, store_id) VALUES ('update', :NEW.product_id, :NEW.store_id);
     ELSIF DELETING THEN 
-        INSERT INTO products_stores_audit (action, product_id, store_id) 
-        VALUES ('update', :OLD.product_id, :OLD.store_id);
+        INSERT INTO products_stores_audit (action, product_id, store_id) VALUES ('update', :OLD.product_id, :OLD.store_id);
     END IF;
 END;
 /
@@ -296,14 +272,11 @@ ON orders
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO orders_audit (action, order_id) 
-        VALUES ('insert', :NEW.order_id);
+        INSERT INTO orders_audit (action, order_id) VALUES ('insert', :NEW.order_id);
     ELSIF UPDATING THEN 
-        INSERT INTO orders_audit (action, order_id) 
-        VALUES ('update', :NEW.order_id);
+        INSERT INTO orders_audit (action, order_id) VALUES ('update', :NEW.order_id);
     ELSIF DELETING THEN 
-        INSERT INTO orders_audit (action, order_id) 
-        VALUES ('update', :OLD.order_id);
+        INSERT INTO orders_audit (action, order_id) VALUES ('update', :OLD.order_id);
     END IF;
 END;
 /
@@ -314,14 +287,11 @@ ON orders_products
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO orders_products_audit (action, order_id, product_id) 
-        VALUES ('insert', :NEW.order_id, :NEW.product_id);
+        INSERT INTO orders_products_audit (action, order_id, product_id) VALUES ('insert', :NEW.order_id, :NEW.product_id);
     ELSIF UPDATING THEN 
-        INSERT INTO orders_products_audit (action, order_id, product_id) 
-        VALUES ('update', :NEW.order_id, :NEW.product_id);
+        INSERT INTO orders_products_audit (action, order_id, product_id) VALUES ('update', :NEW.order_id, :NEW.product_id);
     ELSIF DELETING THEN 
-        INSERT INTO orders_products_audit (action, order_id, product_id) 
-        VALUES ('delete', :OLD.order_id, :OLD.product_id);
+        INSERT INTO orders_products_audit (action, order_id, product_id) VALUES ('delete', :OLD.order_id, :OLD.product_id);
     END IF;
 END;
 /
@@ -332,314 +302,173 @@ ON reviews
 FOR EACH ROW
 BEGIN
     IF INSERTING THEN 
-        INSERT INTO reviews_audit (action, review_id) 
-        VALUES ('insert', :NEW.review_id);
+        INSERT INTO reviews_audit (action, review_id) VALUES ('insert', :NEW.review_id);
     ELSIF UPDATING THEN 
-        INSERT INTO reviews_audit (action, review_id) 
-        VALUES ('update', :NEW.review_id);
+        INSERT INTO reviews_audit (action, review_id) VALUES ('update', :NEW.review_id);
     ELSIF DELETING THEN 
-        INSERT INTO reviews_audit (action, review_id) 
-        VALUES ('update', :OLD.review_id);
+        INSERT INTO reviews_audit (action, review_id) VALUES ('update', :OLD.review_id);
     END IF;
 END;
 /
 
-/*******************************************************************************
-OBJECTS
-*******************************************************************************/
-CREATE TYPE order_obj AS OBJECT (
-    product     NUMBER,
-    quantity    NUMBER
-);
-/
-
-CREATE TYPE warehouse_obj AS OBJECT (
-    name        VARCHAR2(100),
-    address     VARCHAR2(100)
-);
-/
-
-CREATE TYPE review_obj AS OBJECT (
-    customer        NUMBER,
-    product         NUMBER,
-    rating          NUMBER,
-    description     VARCHAR2(100)
-);
-/
-
-CREATE TYPE products_obj AS OBJECT (
-    prodid      NUMBER,
-    catid       NUMBER,
-    pname       VARCHAR(100)
-);
-/
-
-CREATE TYPE admin_obj AS OBJECT (
-    id          NUMBER,
-    password    VARCHAR2(100)
-);
-/
-/*******************************************************************************
-PACKAGES
-*******************************************************************************/
-CREATE OR REPLACE PACKAGE admin_pkg AS
-    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN;
-END admin_pkg;
-/
-
-CREATE OR REPLACE PACKAGE BODY admin_pkg AS 
-    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN AS 
-        pword VARCHAR2(100);
-    BEGIN 
-        SELECT password INTO pword FROM admins WHERE admin_id = admin_v.id;
-        IF admin_v.password = pword THEN
-            RETURN TRUE;
-        ELSE 
-            RETURN FALSE;
-        END IF;
-        EXCEPTION 
-            WHEN no_data_found THEN 
-                    DBMS_OUTPUT.PUT_LINE('admin not found');
-    END;
-END admin_pkg;
-/
-
-CREATE OR REPLACE PACKAGE order_pkg AS 
-    depleted_stock EXCEPTION;
-    TYPE order_array IS VARRAY(100) OF order_obj;
-    PROCEDURE create_order(customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_array, v_order_id OUT NUMBER);
-    PROCEDURE delete_order(v_order_id IN NUMBER, out_id OUT NUMBER);
-    FUNCTION total_spent(customer NUMBER) RETURN NUMBER;
-    FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
-END order_pkg;
-/
-
-CREATE OR REPLACE PACKAGE BODY order_pkg AS 
-    -- creates an order and updates stock in the warehouse by removing the product from the least populous warehouse
-    -- customer is the customer id
-    -- store is the store id
-    -- products is an array of order_obj which we'll loop through
-    PROCEDURE create_order (customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_array, v_order_id OUT NUMBER) AS 
-        warehouse_with_least_stock NUMBER;
-    BEGIN 
-        INSERT INTO orders (customer_id, store_id) VALUES (customer, store) RETURNING order_id INTO v_order_id;
-        FOR  i IN 1 .. products.COUNT LOOP
-            INSERT INTO orders_products (order_id, product_id, quantity) VALUES (v_order_id, products(i).product, products(i).quantity);
-        END LOOP;
-    EXCEPTION 
-        WHEN order_pkg.depleted_stock THEN 
-            DBMS_OUTPUT.PUT_LINE('One of the items is out of stock');
-            ROLLBACK;
-    END;
-     
-    -- Delete an order
-    -- v_order_id is the id of the order to be deleted
-    PROCEDURE delete_order (v_order_id IN NUMBER, out_id OUT NUMBER) AS
-    BEGIN 
-        DELETE FROM orders WHERE order_id = v_order_id RETURNING order_id INTO out_id;
-    END;
-    
-    -- Total spent on orders by a customer
-    -- customer is the customer id
-    FUNCTION total_spent(customer NUMBER) RETURN NUMBER AS
-        total_spent NUMBER;
-    BEGIN 
-        SELECT SUM(ps.price * op.quantity) INTO total_spent FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id
-        INNER JOIN orders_products op ON o.order_id = op.order_id 
-        INNER JOIN products p ON op.product_id = p.product_id
-        INNER JOIN products_stores ps ON p.product_id = ps.product_id
-        WHERE c.customer_id = customer;
-        RETURN total_spent;
-    END;
-    
-    -- Returns total price of an order
-    -- order_number is the order for which we will calculate the total
-    FUNCTION price_order(order_number NUMBER) RETURN NUMBER AS 
-        spent NUMBER;
-    BEGIN 
-        SELECT SUM(ps.price * op.quantity) INTO spent FROM orders o
-        INNER JOIN orders_products op ON o.order_id = op.order_id 
-        INNER JOIN products p ON op.product_id = p.product_id
-        INNER JOIN products_stores ps ON p.product_id = ps.product_id
-        WHERE o.order_id = order_number;
-        RETURN spent;
-    END;
-END order_pkg;
-/
-
-CREATE OR REPLACE PACKAGE warehouse_pkg AS 
-    PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
-    PROCEDURE update_warehouse (id IN NUMBER, warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
-    PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER);
-END warehouse_pkg;
-/
-
-CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
-    -- creates a new warehouse
-    -- warehouse: object contains name and address
-    -- warehouse_id_p: id of newly created warehouse
-    PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
-    BEGIN 
-        INSERT INTO warehouses (name, address) VALUES (warehouse.name, warehouse.address) RETURNING warehouse_id INTO warehouse_id_p;
-    END;
-    
-    -- updates a  warehouse
-    -- id: id of warehouse to update
-    -- warehouse: object contains name and address
-    -- warehouse_id_p: id of newly created warehouse
-    PROCEDURE update_warehouse (id IN NUMBER, warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
-    BEGIN 
-        UPDATE warehouses SET name = warehouse.name, address = warehouse.address 
-        WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
-    END;
-    
-    -- deletes a warehouse
-    -- id: id of warehouse to delete
-    -- warehouse_id_p: id of deleted warehouse
-    PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER) AS 
-    BEGIN 
-        DELETE warehouses WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
-    END;
-END warehouse_pkg;
-/
-
-CREATE OR REPLACE PACKAGE products_pckg AS
-    PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER);
-    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER);
-    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER);
-END products_pckg;
-/
-
-CREATE OR REPLACE PACKAGE BODY products_pckg AS
-
-     PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
-        BEGIN
-            INSERT INTO products(category_id, name)
-            VALUES(vproducts.catid, vproducts.pname)
-            RETURNING product_id INTO products_id_o;
-        END;
-
-    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
-        BEGIN
-            DELETE FROM products WHERE category_id=vproducts.catid AND name=vproducts.pname 
-            RETURNING product_id INTO products_id_o;
-        END;
-    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
-        BEGIN
-            UPDATE products SET name=vproducts.pname WHERE product_id=vproducts.prodid 
-            RETURNING product_id INTO products_id_o;
-        END;
-END products_pckg;
-/
-
-CREATE OR REPLACE PACKAGE review_pkg AS
-    TYPE flagged IS VARRAY(1000) OF NUMBER;
-    PROCEDURE create_review(review IN review_obj, id OUT NUMBER);
-    PROCEDURE flag_review(id IN NUMBER);
-    PROCEDURE update_review (rev_id IN OUT NUMBER, review IN review_obj);
-    PROCEDURE delete_review(id IN NUMBER);
-    PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER);
-    FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged;
-END review_pkg;
-/
-
-CREATE OR REPLACE PACKAGE BODY review_pkg AS 
-    -- creates a review
-    -- review: object with customer, product, rating, and description
-    -- id: id of created review
-    PROCEDURE create_review(review IN review_obj, id OUT NUMBER) AS
-    BEGIN 
-        INSERT INTO reviews (customer_id, product_id, rating, description)
-        VALUES (review.customer, review.product, review.rating, review.description)
-        RETURNING review_id INTO id;
-    END;
-
-    -- flags a review
-    -- id: id of the review to flag
-    PROCEDURE flag_review (id IN NUMBER) AS 
-    BEGIN 
-        UPDATE reviews SET flags = flags + 1 WHERE review_id = id;
-    END;
-
-    -- updates a review
-    -- rev_id: id of review to update
-    -- review: object with customer, product, rating and description
-    PROCEDURE update_review (rev_id IN OUT NUMBER, review IN review_obj) AS 
-    BEGIN 
-        UPDATE reviews SET rating = review.rating, description = review.description 
-        WHERE review_id = rev_id RETURNING review_id INTO rev_id;
-        EXCEPTION 
-            WHEN no_data_found THEN 
-                DBMS_OUTPUT.PUT_LINE('Review id does not exist');
-    END;
-
-    -- deletes a review
-    -- id: id of review to delete
-    PROCEDURE delete_review(id IN NUMBER) AS 
-    BEGIN
-        DELETE FROM reviews WHERE review_id = id;
-    END;
-
-    -- Returns array of review id's that are considered flagged 3 times
-    FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged  AS
-        flagged_reviews review_pkg.flagged;
-    BEGIN
-        flagged_reviews := review_pkg.flagged();
-        SELECT review_id BULK COLLECT INTO flagged_reviews FROM reviews
-        WHERE flags > 3;
-        RETURN flagged_reviews;
-        EXCEPTION 
-            WHEN no_data_found THEN 
-                DBMS_OUTPUT.PUT_LINE('No flagged reviews were found');
-    END;
-
-    -- Deletes all flagged (3+) reviews
-    -- flagged_reviews: array of flagged review ids 
-    -- num_deleted: number of rows deleted
-    PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER) AS
-    BEGIN
-        num_deleted := flagged_reviews.COUNT;
-        FOR i IN 1 .. flagged_reviews.COUNT LOOP
-            DELETE FROM reviews WHERE review_id = flagged_reviews(i);
-        END LOOP;
-    END;
-END review_pkg;
-/
-
-/*******************************************************************************
-SPECIAL TRIGGERS
-*******************************************************************************/
--- Checks if the item we want to order is in stock and removes it if it is
-CREATE OR REPLACE TRIGGER validate_stock
-BEFORE INSERT OR UPDATE 
-ON orders_products
-FOR EACH ROW
-DECLARE 
-    stock   NUMBER;
-BEGIN 
-    SELECT SUM(quantity) INTO stock FROM products_warehouses WHERE 
-    product_id = :NEW.product_id;
-    IF :NEW.quantity > stock THEN 
-        RAISE order_pkg.depleted_stock;
-    END IF;
-    UPDATE products_warehouses SET quantity = quantity - :NEW.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :NEW.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
-    AND product_id = :NEW.product_id;
-END;
-/
-
--- Once an order is deleted, we simply replenish the warehouse with the 
--- least amount of stock of a product
-CREATE OR REPLACE TRIGGER replenish_stock 
-BEFORE DELETE 
-ON orders_products 
-FOR EACH ROW 
-BEGIN 
-    UPDATE products_warehouses SET quantity = quantity + :OLD.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :OLD.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
-    AND product_id = :OLD.product_id;
-END;
-/
-
-
+--/*******************************************************************************
+--OBJECTS
+--*******************************************************************************/
+--CREATE TYPE order_obj AS OBJECT (
+--    product     NUMBER,
+--    quantity    NUMBER
+--);
+--/
+--
+--CREATE TYPE products_obj AS OBJECT (
+--    prodid      NUMBER,
+--    catid       NUMBER,
+--    pname       VARCHAR(100)
+--);
+--/
+--
+--CREATE TYPE admin_obj AS OBJECT (
+--    id          NUMBER,
+--    password    VARCHAR2(100)
+--);
+--/
+--
+--/*******************************************************************************
+--PACKAGES
+--*******************************************************************************/
+--CREATE OR REPLACE PACKAGE admin_pkg AS
+--    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN;
+--END admin_pkg;
+--/
+--
+--CREATE OR REPLACE PACKAGE BODY admin_pkg AS 
+--    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN AS 
+--        pword VARCHAR2(100);
+--    BEGIN 
+--        SELECT password INTO pword FROM admins WHERE admin_id = admin_v.id;
+--        IF admin_v.password = pword THEN
+--            RETURN TRUE;
+--        ELSE 
+--            RETURN FALSE;
+--        END IF;
+--        EXCEPTION 
+--            WHEN no_data_found THEN 
+--                    DBMS_OUTPUT.PUT_LINE('admin not found');
+--    END;
+--END admin_pkg;
+--/
+--
+--CREATE OR REPLACE PACKAGE order_pkg AS 
+--    depleted_stock EXCEPTION;
+--    TYPE order_products IS VARRAY(100) OF order_obj;
+--    PROCEDURE create_order(customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_products, order OUT NUMBER);
+--    PROCEDURE delete_order(v_order_id IN NUMBER);
+--    FUNCTION get_order(v_order_id IN NUMBER) RETURN order_pkg.order_array;
+--    FUNCTION total_spent(customer NUMBER) RETURN NUMBER;
+--    FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
+--END order_pkg;
+--/
+--
+--CREATE OR REPLACE PACKAGE BODY order_pkg AS 
+--    PROCEDURE create_order (customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_products, order OUT NUMBER) AS 
+--    BEGIN 
+--        INSERT INTO orders (customer_id, store_id) VALUES (customer, store) RETURNING order_id INTO order;
+--        FOR  i IN 1 .. products.COUNT LOOP
+--            INSERT INTO orders_products (order_id, product_id, quantity) VALUES (order, products(i).product, products(i).quantity);
+--        END LOOP;
+--    EXCEPTION 
+--        WHEN order_pkg.depleted_stock THEN 
+--            DBMS_OUTPUT.PUT_LINE('One of the items is out of stock');
+--            ROLLBACK;
+--    END;
+--     
+--    PROCEDURE delete_order (v_order_id IN NUMBER) AS
+--    BEGIN 
+--        DELETE FROM orders WHERE order_id = v_order_id;
+--    END;
+--        
+--    FUNCTION total_spent(customer NUMBER) RETURN NUMBER AS
+--        total_spent NUMBER;
+--    BEGIN 
+--        SELECT SUM(ps.price * op.quantity) INTO total_spent FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id
+--        INNER JOIN orders_products op ON o.order_id = op.order_id 
+--        INNER JOIN products p ON op.product_id = p.product_id
+--        INNER JOIN products_stores ps ON p.product_id = ps.product_id
+--        WHERE c.customer_id = customer;
+--        RETURN total_spent;
+--    END;
+--    
+--    FUNCTION price_order(order_number NUMBER) RETURN NUMBER AS 
+--        spent NUMBER;
+--    BEGIN 
+--        SELECT SUM(ps.price * op.quantity) INTO spent FROM orders o
+--        INNER JOIN orders_products op ON o.order_id = op.order_id 
+--        INNER JOIN products p ON op.product_id = p.product_id
+--        INNER JOIN products_stores ps ON p.product_id = ps.product_id
+--        WHERE o.order_id = order_number;
+--        RETURN spent;
+--    END;
+--END order_pkg;
+--/
+--
+--CREATE OR REPLACE PACKAGE products_pckg AS
+--    PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER);
+--    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER);
+--    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER);
+--END products_pckg;
+--/
+--
+--CREATE OR REPLACE PACKAGE BODY products_pckg AS
+--
+--     PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
+--        BEGIN
+--            INSERT INTO products(category_id, name)
+--            VALUES(vproducts.catid, vproducts.pname)
+--            RETURNING product_id INTO products_id_o;
+--        END;
+--
+--    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
+--        BEGIN
+--            DELETE FROM products WHERE category_id=vproducts.catid AND name=vproducts.pname 
+--            RETURNING product_id INTO products_id_o;
+--        END;
+--    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
+--        BEGIN
+--            UPDATE products SET name=vproducts.pname WHERE product_id=vproducts.prodid 
+--            RETURNING product_id INTO products_id_o;
+--        END;
+--END products_pckg;
+--/
+--
+--/*******************************************************************************
+--SPECIAL TRIGGERS
+--*******************************************************************************/
+--CREATE OR REPLACE TRIGGER validate_stock
+--BEFORE INSERT OR UPDATE 
+--ON orders_products
+--FOR EACH ROW
+--DECLARE 
+--    stock   NUMBER;
+--BEGIN 
+--    SELECT SUM(quantity) INTO stock FROM products_warehouses WHERE 
+--    product_id = :NEW.product_id;
+--    IF :NEW.quantity > stock THEN 
+--        RAISE order_pkg.depleted_stock;
+--    END IF;
+--    UPDATE products_warehouses SET quantity = quantity - :NEW.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :NEW.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
+--    AND product_id = :NEW.product_id;
+--END;
+--/
+--
+--CREATE OR REPLACE TRIGGER replenish_stock 
+--BEFORE DELETE 
+--ON orders_products 
+--FOR EACH ROW 
+--BEGIN 
+--    UPDATE products_warehouses SET quantity = quantity + :OLD.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :OLD.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
+--    AND product_id = :OLD.product_id;
+--END;
+--/
 
 /*******************************************************************************
 TEST DATA
