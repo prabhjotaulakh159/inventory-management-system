@@ -1,16 +1,3 @@
-CREATE OR REPLACE TYPE order_type AS OBJECT (
-    customer    NUMBER,
-    store       NUMBER,
-    order_date  DATE
-);
-/
-
-CREATE OR REPLACE TYPE order_products_type AS OBJECT (
-    product     NUMBER,
-    quantity    NUMBER
-);
-/
-
 CREATE OR REPLACE PACKAGE order_pkg AS 
     depleted_stock EXCEPTION;
     invalid_order EXCEPTION;
@@ -26,6 +13,7 @@ CREATE OR REPLACE PACKAGE order_pkg AS
     FUNCTION get_all_orders RETURN order_pkg.orders;
     FUNCTION get_all_orders_by_customer(vcustomer_id IN NUMBER) RETURN order_pkg.orders;
     FUNCTION get_order_details(vorder_id IN NUMBER) RETURN order_pkg.products;
+    FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
 END order_pkg;
 /
 
@@ -156,6 +144,18 @@ CREATE OR REPLACE PACKAGE BODY order_pkg AS
        END LOOP;
        
        RETURN products;
+    END;
+    
+    FUNCTION price_order(order_number NUMBER) RETURN NUMBER AS 
+        spent NUMBER;
+    BEGIN 
+        order_pkg.check_if_order_exists(order_number);
+        SELECT SUM(ps.price * op.quantity) INTO spent FROM orders o
+        INNER JOIN orders_products op ON o.order_id = op.order_id 
+        INNER JOIN products p ON op.product_id = p.product_id
+        INNER JOIN products_stores ps ON p.product_id = ps.product_id
+        WHERE o.order_id = order_number;
+        RETURN spent;
     END;
 END order_pkg;
 /

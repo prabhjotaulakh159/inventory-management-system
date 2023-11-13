@@ -1,18 +1,10 @@
-CREATE OR REPLACE TYPE customer_type AS OBJECT (
-    firstname       VARCHAR2(100),
-    lastname        VARCHAR2(100),
-    email           VARCHAR2(100),
-    address         VARCHAR2(100),
-    password        VARCHAR2(100)
-);
-/
-
 CREATE OR REPLACE PACKAGE customer_pkg AS 
     invalid_customer EXCEPTION;
     
     PRAGMA EXCEPTION_INIT(invalid_customer, -20004);
     
     PROCEDURE check_if_customer_exists(id IN NUMBER);
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN;
 END customer_pkg;
 /
 
@@ -30,5 +22,16 @@ CREATE OR REPLACE PACKAGE BODY customer_pkg AS
             RAISE_APPLICATION_ERROR(-20004, 'Customer does not exist');
         END IF;
     END;
+    
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN AS 
+        vpassword VARCHAR2(100);
+    BEGIN 
+        customer_pkg.check_if_customer_exists(id);
+        SELECT password INTO vpassword FROM customers 
+        WHERE customer_id = id;
+        
+        RETURN password = vpassword;
+    END;
+
 END customer_pkg;
 /

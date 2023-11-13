@@ -12,7 +12,7 @@ import java.sql.SQLOutput;
 public class Customer implements SQLData {
     private int id;
     private String password;
-    private String type = "CUSTOMER_OBJ";
+    private String type = "CUSTOMER_TYPE";
 
     public Customer() {
 
@@ -39,5 +39,29 @@ public class Customer implements SQLData {
     public void writeSQL(SQLOutput stream) throws SQLException {
         stream.writeInt(this.id);
         stream.writeString(this.password);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

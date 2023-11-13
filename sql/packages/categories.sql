@@ -1,8 +1,3 @@
-CREATE OR REPLACE TYPE category_type AS OBJECT (
-    category    VARCHAR2(100)
-);
-/
-
 CREATE OR REPLACE PACKAGE category_pkg AS 
     invalid_category EXCEPTION;
     
@@ -96,10 +91,3 @@ CREATE OR REPLACE PACKAGE BODY category_pkg AS
     END;
 END category_pkg;
 /
-
-DECLARE 
-    category category_type;
-BEGIN 
-    category := category_pkg.get_category(1);
-    dbms_output.put_line(category.category);
-END;

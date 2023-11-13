@@ -3,7 +3,6 @@ package prabhjot.safin.retail.services;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Map;
 
 import oracle.jdbc.OracleTypes;
@@ -20,13 +19,14 @@ public class AdminService {
      * @param admin Admin type 
      */
     public boolean login(Connection connection, Admin admin) throws SQLException, ClassNotFoundException {
-        Map map = connection.getTypeMap();
+        Map<String, Class<?>> map = connection.getTypeMap();
         connection.setTypeMap(map);
         map.put(admin.getSQLTypeName(), Class.forName("prabhjot.safin.retail.models.Admin"));
-        String SQL = "{? = call admin_pkg.login(?)}";
+        String SQL = "{? = call admin_pkg.login(?, ?)}";
         CallableStatement cs = connection.prepareCall(SQL);
         cs.registerOutParameter(1, OracleTypes.PLSQL_BOOLEAN);
-        cs.setObject(2, admin);
+        cs.setInt(2, admin.getId());
+        cs.setString(3, admin.getPassword());
         cs.execute();
         return cs.getBoolean(1);
     }

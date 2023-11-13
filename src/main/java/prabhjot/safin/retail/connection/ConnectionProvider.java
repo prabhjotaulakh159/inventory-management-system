@@ -26,5 +26,12 @@ public class ConnectionProvider {
      */
     public Connection getConnection() {
         return this.connection;
-    }    
+    }
+    
+    /**
+     * Kills the connection
+     */
+    public void kill() throws SQLException {
+        this.connection.close();
+    }
 }

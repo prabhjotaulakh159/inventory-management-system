@@ -12,7 +12,7 @@ import java.sql.SQLOutput;
 public class Admin implements SQLData {
     private int id;
     private String password;
-    private String type = "ADMIN_OBJ";
+    private String type = "ADMIN_TYPE";
 
     public Admin() {
 

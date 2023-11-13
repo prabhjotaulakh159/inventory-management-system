@@ -1,12 +1,3 @@
-CREATE OR REPLACE TYPE review_type AS OBJECT (
-    customer        NUMBER,
-    product         NUMBER,
-    flags           NUMBER,
-    rating          NUMBER,
-    description     VARCHAR2(100)
-);
-/
-
 CREATE OR REPLACE PACKAGE review_pkg AS
     invalid_review EXCEPTION;
     PRAGMA EXCEPTION_INIT(invalid_review, -20000);

@@ -1,9 +1,3 @@
-CREATE OR REPLACE TYPE warehouse_type AS OBJECT (
-    name        VARCHAR2(100),
-    address     VARCHAR2(100)
-);
-/
-
 CREATE OR REPLACE PACKAGE warehouse_pkg AS 
     invalid_warehouse EXCEPTION;
     PRAGMA EXCEPTION_INIT(invalid_warehouse, -20001);    
@@ -15,9 +9,11 @@ CREATE OR REPLACE PACKAGE warehouse_pkg AS
     PROCEDURE update_warehouse(
             id IN NUMBER, vname IN VARCHAR2, vaddress IN VARCHAR2);
     PROCEDURE delete_warehouse(id IN NUMBER);
-    
+    PROCEDURE update_stock(vwarehouseid IN NUMBER, vproductid IN NUMBER, vquantity IN NUMBER);
+    PROCEDURE insert_product_into_warehouse(vwarehouseid IN NUMBER, vproductid IN NUMBER, initial_quant IN NUMBER);
     FUNCTION get_warehouse(id IN NUMBER) RETURN warehouse_type;
     FUNCTION get_all_warehouses RETURN warehouse_pkg.warehouse_array;
+    FUNCTION get_stock(id IN NUMBER) RETURN NUMBER;
 END warehouse_pkg;
 /
 
@@ -97,6 +93,38 @@ CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
         RETURN warehouse;
     END;
     
+    PROCEDURE insert_product_into_warehouse(vwarehouseid IN NUMBER, vproductid IN NUMBER, initial_quant IN NUMBER) AS
+    BEGIN 
+        warehouse_pkg.check_if_warehouse_exists(vwarehouseid);
+        product_pkg.check_if_product_exists(vproductid);
+        
+        IF initial_quant < 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Initial quantity must not be negative');
+        END IF;
+        
+        INSERT INTO products_warehouses (warehouse_id, product_id, quantity) 
+        VALUES (vwarehouseid, vproductid, initial_quant);
+    END;
+
+    
+    PROCEDURE update_stock(vwarehouseid IN NUMBER, vproductid IN NUMBER, vquantity IN NUMBER) AS
+    BEGIN 
+        warehouse_pkg.check_if_warehouse_exists(vwarehouseid);
+        product_pkg.check_if_product_exists(vproductid);
+        
+        IF vquantity < 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Quantity cannot be negative');
+        END IF;
+        
+        UPDATE products_warehouses SET quantity = vquantity 
+        WHERE warehouse_id = vwarehouseid AND product_id = vproductid;
+        
+        EXCEPTION 
+            WHEN value_error THEN 
+                RAISE_APPLICATION_ERROR(-20001, 'Invalid quantity, try another number');
+    END;
+
+    
     FUNCTION get_all_warehouses RETURN warehouse_pkg.warehouse_array AS 
         vname VARCHAR2(100);
         vaddress VARCHAR2(100);
@@ -120,6 +148,15 @@ CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
         END LOOP;
         
         RETURN warehouses;
+    END;
+    
+    FUNCTION get_stock(id IN NUMBER) RETURN NUMBER AS
+        stock NUMBER;
+    BEGIN 
+        product_pkg.check_if_product_exists(id);
+        SELECT SUM(quantity) INTO stock FROM products_warehouses 
+        WHERE product_id = id;
+        RETURN stock;
     END;
 END warehouse_pkg;
 /
