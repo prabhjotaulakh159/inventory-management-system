@@ -1,3 +1,6 @@
+-- For all documentation on package procedures/functions
+-- Please refer to the packages folder within this directory
+
 /*******************************************************************************
 REGULAR TABLES 
 *******************************************************************************/
@@ -68,7 +71,7 @@ CREATE TABLE reviews (
     product_id          NUMBER              REFERENCES products (product_id) ON DELETE CASCADE NOT NULL,
     flags               NUMBER              DEFAULT 0 NOT NULL CHECK (flags > -1),
     rating              NUMBER              NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    description         VARCHAR2(100)       NOT NULL CHECK (LENGTH(description) > 0)
+    description         VARCHAR2(30)        NOT NULL CHECK (LENGTH(description) > 0)
 );
 
 /*******************************************************************************
@@ -146,317 +149,710 @@ CREATE TABLE reviews_audit (
 /*******************************************************************************
 AUDIT TRIGGERS
 *******************************************************************************/
-CREATE OR REPLACE TRIGGER admins_audit_log 
+CREATE TRIGGER admins_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON admins
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO admins_audit (action, admin_id)
-        VALUES ('insert', :NEW.admin_id);
+        INSERT INTO admins_audit (action, admin_id) VALUES ('insert', :NEW.admin_id);
     ELSIF UPDATING THEN 
-        INSERT INTO admins_audit (action, admin_id)
-        VALUES ('update', :NEW.admin_id);
+        INSERT INTO admins_audit (action, admin_id) VALUES ('update', :NEW.admin_id);
     ELSIF DELETING THEN 
-        INSERT INTO admins_audit (action, admin_id)
-        VALUES ('delete', :OLD.admin_id);
+        INSERT INTO admins_audit (action, admin_id) VALUES ('delete', :OLD.admin_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER customers_audit_log 
+CREATE TRIGGER customers_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON customers 
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO customers_audit (action, customer_id) 
-        VALUES ('insert', :NEW.customer_id);
+        INSERT INTO customers_audit (action, customer_id) VALUES ('insert', :NEW.customer_id);
     ELSIF UPDATING THEN 
-        INSERT INTO customers_audit (action, customer_id) 
-        VALUES ('update', :NEW.customer_id);
+        INSERT INTO customers_audit (action, customer_id) VALUES ('update', :NEW.customer_id);
     ELSIF DELETING THEN 
-        INSERT INTO customers_audit (action, customer_id) 
-        VALUES ('delete', :OLD.customer_id);
+        INSERT INTO customers_audit (action, customer_id) VALUES ('delete', :OLD.customer_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER categories_audit_log 
+CREATE TRIGGER categories_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON categories 
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO categories_audit (action, category_id) 
-        VALUES ('insert', :NEW.category_id);
+        INSERT INTO categories_audit (action, category_id) VALUES ('insert', :NEW.category_id);
     ELSIF UPDATING THEN 
-        INSERT INTO categories_audit (action, category_id) 
-        VALUES ('update', :NEW.category_id);
+        INSERT INTO categories_audit (action, category_id) VALUES ('update', :NEW.category_id);
     ELSIF DELETING THEN 
-        INSERT INTO categories_audit (action, category_id) 
-        VALUES ('update', :OLD.category_id);
+        INSERT INTO categories_audit (action, category_id) VALUES ('update', :OLD.category_id);
     END IF;
 END;    
 /
 
-CREATE OR REPLACE TRIGGER warehouses_audit_log 
+CREATE TRIGGER warehouses_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON warehouses 
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO warehouses_audit (action, warehouse_id) 
-        VALUES ('insert', :NEW.warehouse_id);
+        INSERT INTO warehouses_audit (action, warehouse_id) VALUES ('insert', :NEW.warehouse_id);
     ELSIF UPDATING THEN 
-        INSERT INTO warehouses_audit (action, warehouse_id) 
-        VALUES ('update', :NEW.warehouse_id);
+        INSERT INTO warehouses_audit (action, warehouse_id) VALUES ('update', :NEW.warehouse_id);
     ELSIF DELETING THEN 
-        INSERT INTO warehouses_audit (action, warehouse_id) 
-        VALUES ('delete', :OLD.warehouse_id);
+        INSERT INTO warehouses_audit (action, warehouse_id) VALUES ('delete', :OLD.warehouse_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER products_audit_log 
+CREATE TRIGGER products_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON products 
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO products_audit (action, product_id) 
-        VALUES ('insert', :NEW.product_id);
+        INSERT INTO products_audit (action, product_id) VALUES ('insert', :NEW.product_id);
     ELSIF UPDATING THEN 
-        INSERT INTO products_audit (action, product_id) 
-        VALUES ('update', :NEW.product_id);
+        INSERT INTO products_audit (action, product_id) VALUES ('update', :NEW.product_id);
     ELSIF DELETING THEN 
-        INSERT INTO products_audit (action, product_id) 
-        VALUES ('delete', :OLD.product_id);
+        INSERT INTO products_audit (action, product_id) VALUES ('delete', :OLD.product_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER products_warehouses_audit_log 
+CREATE TRIGGER products_warehouses_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON products_warehouses 
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) 
-        VALUES ('insert', :NEW.product_id, :NEW.warehouse_id);
+        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) VALUES ('insert', :NEW.product_id, :NEW.warehouse_id);
     ELSIF UPDATING THEN 
-        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) 
-        VALUES ('update', :NEW.product_id, :NEW.warehouse_id);
+        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) VALUES ('update', :NEW.product_id, :NEW.warehouse_id);
     ELSIF DELETING THEN 
-        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) 
-        VALUES ('update', :OLD.product_id, :OLD.warehouse_id);
+        INSERT INTO products_warehouses_audit (action, product_id, warehouse_id) VALUES ('update', :OLD.product_id, :OLD.warehouse_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER stores_audit_log 
+CREATE TRIGGER stores_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON stores 
 FOR EACH ROW 
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO stores_audit (action, store_id)
-        VALUES ('insert', :NEW.store_id);
+        INSERT INTO stores_audit (action, store_id)VALUES ('insert', :NEW.store_id);
     ELSIF UPDATING THEN 
-        INSERT INTO stores_audit (action, store_id) 
-        VALUES ('update', :NEW.store_id);
+        INSERT INTO stores_audit (action, store_id) VALUES ('update', :NEW.store_id);
     ELSIF DELETING THEN 
-        INSERT INTO stores_audit (action, store_id) 
-        VALUES ('update', :OLD.store_id);
+        INSERT INTO stores_audit (action, store_id) VALUES ('update', :OLD.store_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER products_stores_audit_log 
+CREATE TRIGGER products_stores_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON products_stores 
 FOR EACH ROW 
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO products_stores_audit (action, product_id, store_id) 
-        VALUES ('insert', :NEW.product_id, :NEW.store_id);
+        INSERT INTO products_stores_audit (action, product_id, store_id) VALUES ('insert', :NEW.product_id, :NEW.store_id);
     ELSIF UPDATING THEN 
-        INSERT INTO products_stores_audit (action, product_id, store_id) 
-        VALUES ('update', :NEW.product_id, :NEW.store_id);
+        INSERT INTO products_stores_audit (action, product_id, store_id) VALUES ('update', :NEW.product_id, :NEW.store_id);
     ELSIF DELETING THEN 
-        INSERT INTO products_stores_audit (action, product_id, store_id) 
-        VALUES ('update', :OLD.product_id, :OLD.store_id);
+        INSERT INTO products_stores_audit (action, product_id, store_id) VALUES ('update', :OLD.product_id, :OLD.store_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER orders_audit_log 
+CREATE TRIGGER orders_audit_log 
 AFTER INSERT OR DELETE 
 ON orders 
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO orders_audit (action, order_id) 
-        VALUES ('insert', :NEW.order_id);
+        INSERT INTO orders_audit (action, order_id) VALUES ('insert', :NEW.order_id);
     ELSIF UPDATING THEN 
-        INSERT INTO orders_audit (action, order_id) 
-        VALUES ('update', :NEW.order_id);
+        INSERT INTO orders_audit (action, order_id) VALUES ('update', :NEW.order_id);
     ELSIF DELETING THEN 
-        INSERT INTO orders_audit (action, order_id) 
-        VALUES ('update', :OLD.order_id);
+        INSERT INTO orders_audit (action, order_id) VALUES ('update', :OLD.order_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER orders_products_audit_log 
+CREATE TRIGGER orders_products_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON orders_products
 FOR EACH ROW
 BEGIN 
     IF INSERTING THEN 
-        INSERT INTO orders_products_audit (action, order_id, product_id) 
-        VALUES ('insert', :NEW.order_id, :NEW.product_id);
+        INSERT INTO orders_products_audit (action, order_id, product_id) VALUES ('insert', :NEW.order_id, :NEW.product_id);
     ELSIF UPDATING THEN 
-        INSERT INTO orders_products_audit (action, order_id, product_id) 
-        VALUES ('update', :NEW.order_id, :NEW.product_id);
+        INSERT INTO orders_products_audit (action, order_id, product_id) VALUES ('update', :NEW.order_id, :NEW.product_id);
     ELSIF DELETING THEN 
-        INSERT INTO orders_products_audit (action, order_id, product_id) 
-        VALUES ('delete', :OLD.order_id, :OLD.product_id);
+        INSERT INTO orders_products_audit (action, order_id, product_id) VALUES ('delete', :OLD.order_id, :OLD.product_id);
     END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER reviews_audit_log 
+CREATE TRIGGER reviews_audit_log 
 AFTER INSERT OR UPDATE OR DELETE 
 ON reviews 
 FOR EACH ROW
 BEGIN
     IF INSERTING THEN 
-        INSERT INTO reviews_audit (action, review_id) 
-        VALUES ('insert', :NEW.review_id);
+        INSERT INTO reviews_audit (action, review_id) VALUES ('insert', :NEW.review_id);
     ELSIF UPDATING THEN 
-        INSERT INTO reviews_audit (action, review_id) 
-        VALUES ('update', :NEW.review_id);
+        INSERT INTO reviews_audit (action, review_id) VALUES ('update', :NEW.review_id);
     ELSIF DELETING THEN 
-        INSERT INTO reviews_audit (action, review_id) 
-        VALUES ('update', :OLD.review_id);
+        INSERT INTO reviews_audit (action, review_id) VALUES ('update', :OLD.review_id);
     END IF;
 END;
 /
 
-/*******************************************************************************
-OBJECTS
-*******************************************************************************/
-CREATE TYPE order_obj AS OBJECT (
+--/*******************************************************************************
+--OBJECTS/TYPES
+--*******************************************************************************/
+CREATE TYPE number_array IS VARRAY(100) OF NUMBER;
+/
+
+CREATE TYPE order_type AS OBJECT (
+    customer    NUMBER,
+    store       NUMBER,
+    order_date  DATE
+);
+/
+
+CREATE TYPE order_products_type AS OBJECT (
     product     NUMBER,
     quantity    NUMBER
 );
 /
 
-CREATE TYPE warehouse_obj AS OBJECT (
-    name        VARCHAR2(100),
-    address     VARCHAR2(100)
+CREATE TYPE category_type AS OBJECT (
+    category    VARCHAR2(100)
 );
 /
 
-CREATE TYPE review_obj AS OBJECT (
+CREATE TYPE customer_type AS OBJECT (
+    firstname       VARCHAR2(100),
+    lastname        VARCHAR2(100),
+    email           VARCHAR2(100),
+    address         VARCHAR2(100),
+    password        VARCHAR2(100)
+);
+/
+
+CREATE TYPE product_type AS OBJECT (
+    name        VARCHAR2(100),
+    category    NUMBER
+);
+/
+
+CREATE TYPE review_type AS OBJECT (
     customer        NUMBER,
     product         NUMBER,
+    flags           NUMBER,
     rating          NUMBER,
     description     VARCHAR2(100)
 );
 /
 
-CREATE TYPE products_obj AS OBJECT (
-    prodid      NUMBER,
-    catid       NUMBER,
-    pname       VARCHAR(100)
+CREATE TYPE store_type AS OBJECT (
+    name    VARCHAR2(100)
 );
 /
 
-CREATE TYPE admin_obj AS OBJECT (
-    id          NUMBER,
-    password    VARCHAR2(100)
+CREATE TYPE warehouse_type AS OBJECT (
+    name        VARCHAR2(100),
+    address     VARCHAR2(100)
 );
 /
-/*******************************************************************************
-PACKAGES
-*******************************************************************************/
-CREATE OR REPLACE PACKAGE admin_pkg AS
-    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN;
+
+CREATE TYPE admin_type AS OBJECT (
+    id  NUMBER,
+    password VARCHAR2(100)
+);
+/
+
+--/*******************************************************************************
+--PACKAGES
+--*******************************************************************************/
+CREATE PACKAGE admin_pkg AS 
+    FUNCTION login(admin IN admin_type) RETURN BOOLEAN;
 END admin_pkg;
 /
-
-CREATE OR REPLACE PACKAGE BODY admin_pkg AS 
-    FUNCTION login (admin_v admin_obj) RETURN BOOLEAN AS 
-        pword VARCHAR2(100);
+CREATE PACKAGE BODY admin_pkg AS 
+    PROCEDURE check_if_admin_exists(id IN NUMBER) AS 
+        count_admin  NUMBER;
     BEGIN 
-        SELECT password INTO pword FROM admins WHERE admin_id = admin_v.id;
-        IF admin_v.password = pword THEN
-            RETURN TRUE;
-        ELSE 
-            RETURN FALSE;
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20004, 'Customer id cannot be null');
         END IF;
-        EXCEPTION 
-            WHEN no_data_found THEN 
-                    DBMS_OUTPUT.PUT_LINE('admin not found');
+        SELECT COUNT(*) INTO count_admin FROM admins WHERE admin_id = id;
+        IF count_admin = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20004, 'Admin does not exist');
+        END IF;
+    END;
+    
+    FUNCTION login(admin IN admin_type) RETURN BOOLEAN AS 
+        vpassword VARCHAR2(100);
+    BEGIN 
+        admin_pkg.check_if_admin_exists(admin.id);
+        SELECT password INTO vpassword FROM admins WHERE admin_id = admin.id;
+        RETURN vpassword = admin.password;
     END;
 END admin_pkg;
 /
 
-CREATE OR REPLACE PACKAGE order_pkg AS 
+CREATE PACKAGE category_pkg AS 
+    invalid_category EXCEPTION;
+    PRAGMA EXCEPTION_INIT(invalid_category, -20006);
+    PROCEDURE check_if_category_exists(id IN NUMBER);
+    PROCEDURE create_category(category IN category_type);
+    PROCEDURE update_category(id IN NUMBER, vcategory IN VARCHAR2);
+    PROCEDURE delete_category(id IN NUMBER);
+    FUNCTION get_category(id IN NUMBER) RETURN category_type;
+    FUNCTION get_categories RETURN number_array;
+END category_pkg;
+/
+CREATE PACKAGE BODY category_pkg AS 
+    PROCEDURE check_if_category_exists(id IN NUMBER) AS 
+        count_category NUMBER;
+    BEGIN 
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20006, 'Category id cannot be null');
+        END IF;
+        
+        SELECT COUNT(*) INTO count_category FROM categories 
+        WHERE category_id = id;
+        
+        IF count_category = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20006, 'Category does not exist');
+        END IF;
+    END;
+
+    PROCEDURE create_category(category IN category_type) AS 
+    BEGIN
+        IF category.category IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20006, 'Category cannot be null');
+        END IF;
+        
+        INSERT INTO categories (category) VALUES (category.category);
+    END;
+    
+    PROCEDURE update_category(id IN NUMBER, vcategory IN VARCHAR2) AS
+    BEGIN 
+        category_pkg.check_if_category_exists(id);
+        
+        IF vcategory IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20006, 'Category cannot be null');
+        END IF;
+        
+        UPDATE categories SET category = vcategory 
+        WHERE category_id = id;
+    END;
+    
+    PROCEDURE delete_category(id IN NUMBER) AS
+    BEGIN 
+        category_pkg.check_if_category_exists(id);
+        DELETE FROM categories WHERE category_id = id;
+    END;
+    
+    FUNCTION get_categories RETURN number_array AS
+        count_category NUMBER;
+        categorie_arr number_array;
+    BEGIN 
+        categorie_arr := number_array();
+        SELECT category_id BULK COLLECT INTO categorie_arr FROM categories;
+        IF categorie_arr.COUNT = 0 THEN  
+            RAISE_APPLICATION_ERROR(-20006, 'No categories to find !');
+        END IF;
+        RETURN categorie_arr;
+    END;
+    
+    FUNCTION get_category (id IN NUMBER) RETURN category_type AS
+        vcategory VARCHAR2(100);
+    BEGIN 
+        category_pkg.check_if_category_exists(id);
+        SELECT category INTO vcategory FROM categories WHERE category_id = id;
+        RETURN category_type(vcategory);
+    END;
+END category_pkg;
+/
+
+CREATE PACKAGE customer_pkg AS 
+    invalid_customer EXCEPTION;
+    PRAGMA EXCEPTION_INIT(invalid_customer, -20004);
+    PROCEDURE check_if_customer_exists(id IN NUMBER);
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN;
+END customer_pkg;
+/
+CREATE PACKAGE BODY customer_pkg AS 
+    PROCEDURE check_if_customer_exists(id IN NUMBER) AS 
+        count_cust  NUMBER;
+    BEGIN 
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20004, 'Customer id cannot be null');
+        END IF;
+        
+        SELECT COUNT(*) INTO count_cust FROM customers WHERE customer_id = id;
+        
+        IF count_cust = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20004, 'Customer does not exist');
+        END IF;
+    END;
+    
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN AS 
+        vpassword VARCHAR2(100);
+    BEGIN 
+        customer_pkg.check_if_customer_exists(id);
+        SELECT password INTO vpassword FROM customers 
+        WHERE customer_id = id;
+        
+        RETURN password = vpassword;
+    END;
+
+END customer_pkg;
+/
+
+CREATE PACKAGE product_pkg AS 
+    invalid_product EXCEPTION;
+    PRAGMA EXCEPTION_INIT(invalid_product, -20005);    
+    PROCEDURE check_if_product_exists(id IN NUMBER);
+    PROCEDURE create_product(product IN product_type);
+    PROCEDURE update_product(id IN NUMBER, product IN product_type);
+    PROCEDURE delete_product(id IN NUMBER);
+    FUNCTION get_product(id IN NUMBER) RETURN product_type;
+    FUNCTION get_products RETURN number_array;
+END product_pkg;
+/
+CREATE PACKAGE BODY product_pkg AS 
+    PROCEDURE check_if_product_exists(id IN NUMBER) AS
+        count_prod  NUMBER;
+    BEGIN 
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20005, 'Product id cannot be null');
+        END IF;
+        
+        SELECT COUNT(*) INTO count_prod FROM products WHERE product_id = id;
+        
+        IF count_prod = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20005, 'Product does not exist');
+        END IF;
+    END;
+    
+    PROCEDURE create_product(product IN product_type) AS 
+    BEGIN 
+        category_pkg.check_if_category_exists(product.category);
+        
+        IF product.name IS NULL THEN
+            RAISE_APPLICATION_ERROR(-20005, 'Product name cannot be null');
+        END IF;
+        
+        IF LENGTH(product.name) NOT BETWEEN 1 AND 100 THEN 
+            RAISE_APPLICATION_ERROR(-20005, 'Product name must be between 1 and 100 characters');
+        END IF;
+        
+        INSERT INTO products (name, category_id) VALUES (product.name, product.category);
+    END;
+    
+    PROCEDURE update_product(id IN NUMBER, product IN product_type) AS 
+    BEGIN 
+        product_pkg.check_if_product_exists(id);
+        category_pkg.check_if_category_exists(product.category);
+        
+        IF product.name IS NULL THEN
+            RAISE_APPLICATION_ERROR(-20005, 'Product name cannot be null');
+        END IF;
+        
+        IF LENGTH(product.name) NOT BETWEEN 1 AND 100 THEN 
+            RAISE_APPLICATION_ERROR(-20005, 'Product name must be between 1 and 100 characters');
+        END IF;
+        
+        UPDATE products SET name = product.name, category_id = product.category 
+        WHERE product_id = id;
+    END;
+    
+    PROCEDURE delete_product(id IN NUMBER) AS
+    BEGIN 
+        product_pkg.check_if_product_exists(id);
+        DELETE FROM products WHERE product_id = id;
+    END;
+
+    FUNCTION get_product(id IN NUMBER) RETURN product_type AS 
+        vname NUMBER;
+        category NUMBER;
+    BEGIN 
+        product_pkg.check_if_product_exists(id);
+        
+        SELECT name, category_id INTO vname, category FROM products 
+        WHERE product_id = id;
+        
+        RETURN product_type(vname, category);
+    END;
+    
+    FUNCTION get_products RETURN number_array AS
+        products number_array;
+        count_prod NUMBER;
+    BEGIN 
+        products := number_array();
+        SELECT COUNT(*) INTO count_prod FROM products;
+        IF count_prod = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20005, 'No products to fetch !');
+        END IF;
+        SELECT product_id BULK COLLECT INTO products FROM products;
+        RETURN products;
+    END;
+END product_pkg;
+/
+
+CREATE PACKAGE store_pkg AS 
+    invalid_store EXCEPTION;
+    PRAGMA EXCEPTION_INIT(invalid_store, -20003);    
+    PROCEDURE check_if_store_exists(id IN NUMBER);
+    PROCEDURE create_store(store IN store_type);
+    PROCEDURE update_store(id IN NUMBER, vname IN VARCHAR2);
+    PROCEDURE delete_store(id IN NUMBER);
+    PROCEDURE create_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER);
+    PROCEDURE update_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER);
+    FUNCTION get_prices_of_product(id IN NUMBER) RETURN number_array;
+    FUNCTION get_store(vstoreid IN NUMBER) RETURN store_type;
+    FUNCTION get_stores RETURN number_array;
+END store_pkg;
+/
+CREATE PACKAGE BODY store_pkg AS 
+    PROCEDURE check_if_store_exists(id IN NUMBER) AS 
+        count_store NUMBER;
+    BEGIN 
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Store id cannot be null');
+        END IF;
+        
+        SELECT COUNT(*) INTO count_store FROM stores WHERE store_id = id;
+        
+        IF count_store = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Store does not exist');
+        END IF;
+    END;
+    
+    PROCEDURE create_store(store IN store_type) AS 
+    BEGIN 
+        IF store.name IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Store name cannot be null');
+        END IF;
+        
+        IF LENGTH(store.name) NOT BETWEEN 1 AND 100 THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Name of store must be between 1 and 100 characters');
+        END IF;
+        
+        INSERT INTO stores (name) VALUES (store.name);
+    END;
+    
+    PROCEDURE update_store(id IN NUMBER, vname IN VARCHAR2) AS
+    BEGIN 
+        store_pkg.check_if_store_exists(id);
+        
+        IF vname IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Store name cannot be null');
+        END IF;
+        
+        IF LENGTH(vname) NOT BETWEEN 1 AND 100 THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Name of store must be between 1 and 100 characters');
+        END IF;
+        
+        UPDATE stores SET name = vname WHERE store_id = id;
+    END;
+    
+    PROCEDURE delete_store(id IN NUMBER) AS
+    BEGIN 
+        store_pkg.check_if_store_exists(id);
+        DELETE FROM stores WHERE store_id = id;
+    END;
+    
+    PROCEDURE create_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER) AS
+    BEGIN 
+        store_pkg.check_if_store_exists(vstoreid);
+        product_pkg.check_if_product_exists(vproductid);
+        
+        IF vprice <= 0 THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Price cannot be equal to or lower than 0');
+        END IF;
+        
+        INSERT INTO products_stores (store_id, product_id, price) VALUES (vstoreid, vproductid, vprice);
+        
+        EXCEPTION 
+            WHEN value_error THEN 
+                RAISE_APPLICATION_ERROR(-20003, 'Price is invalid, try another number');
+    END;
+        
+    PROCEDURE update_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER) AS
+    BEGIN 
+        store_pkg.check_if_store_exists(vstoreid);
+        product_pkg.check_if_product_exists(vproductid);
+        
+        IF vprice <= 0 THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'Price cannot be equal to or lower than 0');
+        END IF;
+        
+        UPDATE products_stores SET price = vprice 
+        WHERE store_id = vstoreid AND product_id = vproductid;
+        
+        EXCEPTION 
+            WHEN value_error THEN 
+                RAISE_APPLICATION_ERROR(-20003, 'Price is invalid, try another number');
+    END;
+
+    FUNCTION get_prices_of_product(id IN NUMBER) RETURN number_array AS
+        prices number_array;
+    BEGIN 
+        prices := number_array();
+        product_pkg.check_if_product_exists(id);
+        SELECT price BULK COLLECT INTO prices FROM products_stores 
+        WHERE product_id = id ORDER BY store_id ASC;
+        RETURN prices;
+    END;
+
+    FUNCTION get_store(vstoreid IN NUMBER) RETURN store_type AS 
+        vname VARCHAR2(100);
+        store store_type;
+    BEGIN 
+        store_pkg.check_if_store_exists(vstoreid);
+        SELECT name INTO vname FROM stores WHERE store_id = vstoreid;
+        RETURN store_type(vname);
+    END;
+    
+    FUNCTION get_stores RETURN number_array AS
+        stores_arr number_array;
+        count_stores NUMBER;
+    BEGIN 
+        stores_arr := number_array();
+        SELECT COUNT(*) INTO count_stores FROM stores;
+        IF count_stores = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'No stores to fetch !');
+        END IF;
+        SELECT store_id BULK COLLECT INTO stores_arr FROM stores;
+        RETURN stores_arr;
+    END;
+END store_pkg;
+/
+
+CREATE PACKAGE order_pkg AS 
     depleted_stock EXCEPTION;
-    TYPE order_array IS VARRAY(100) OF order_obj;
-    PROCEDURE create_order(customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_array, v_order_id OUT NUMBER);
-    PROCEDURE delete_order(v_order_id IN NUMBER, out_id OUT NUMBER);
-    FUNCTION total_spent(customer NUMBER) RETURN NUMBER;
+    invalid_order EXCEPTION;
+    PRAGMA EXCEPTION_INIT(invalid_order, -20002);
+    TYPE products IS VARRAY(100) OF order_products_type;
+    TYPE orders IS VARRAY(100) OF order_type;    
+    PROCEDURE check_if_order_exists(id IN NUMBER);
+    PROCEDURE create_order (vorder IN order_type, products IN order_pkg.products);
+    PROCEDURE delete_order (id IN NUMBER);
+    FUNCTION get_all_orders RETURN order_pkg.orders;
+    FUNCTION get_all_orders_by_customer(vcustomer_id IN NUMBER) RETURN number_array;
+    FUNCTION get_order_details(vorder_id IN NUMBER) RETURN number_array;
     FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
 END order_pkg;
 /
-
-CREATE OR REPLACE PACKAGE BODY order_pkg AS 
-    -- creates an order and updates stock in the warehouse by removing the product from the least populous warehouse
-    -- customer is the customer id
-    -- store is the store id
-    -- products is an array of order_obj which we'll loop through
-    PROCEDURE create_order (customer IN NUMBER, store IN NUMBER, products IN order_pkg.order_array, v_order_id OUT NUMBER) AS 
-        warehouse_with_least_stock NUMBER;
+CREATE PACKAGE BODY order_pkg AS 
+    PROCEDURE check_if_order_exists(id IN NUMBER) AS 
+        count_order NUMBER;
+    BEGIN
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20002, 'Order id cannot be null');
+        END IF;
+        
+        SELECT COUNT(*) INTO count_order FROM orders WHERE order_id = id;
+        
+        IF count_order = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20002, 'Order does not exists');
+        END IF;
+    END;
+    
+    PROCEDURE create_order (vorder IN order_type, products IN order_pkg.products) AS 
+        vorder_id   NUMBER;
     BEGIN 
-        INSERT INTO orders (customer_id, store_id) VALUES (customer, store) RETURNING order_id INTO v_order_id;
-        FOR  i IN 1 .. products.COUNT LOOP
-            INSERT INTO orders_products (order_id, product_id, quantity) VALUES (v_order_id, products(i).product, products(i).quantity);
+        customer_pkg.check_if_customer_exists(vorder.customer);
+        store_pkg.check_if_store_exists(vorder.store);
+        
+        FOR i in 1 .. products.COUNT LOOP
+            product_pkg.check_if_product_exists(products(i).product);
+            IF products(i).quantity <= 0 THEN 
+                RAISE_APPLICATION_ERROR(-20002, 'Quantity cannot be negative');
+            END IF;
         END LOOP;
-    EXCEPTION 
-        WHEN order_pkg.depleted_stock THEN 
-            DBMS_OUTPUT.PUT_LINE('One of the items is out of stock');
-            ROLLBACK;
-    END;
-     
-    -- Delete an order
-    -- v_order_id is the id of the order to be deleted
-    PROCEDURE delete_order (v_order_id IN NUMBER, out_id OUT NUMBER) AS
-    BEGIN 
-        DELETE FROM orders WHERE order_id = v_order_id RETURNING order_id INTO out_id;
-    END;
-    
-    -- Total spent on orders by a customer
-    -- customer is the customer id
-    FUNCTION total_spent(customer NUMBER) RETURN NUMBER AS
-        total_spent NUMBER;
-    BEGIN 
-        SELECT SUM(ps.price * op.quantity) INTO total_spent FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id
-        INNER JOIN orders_products op ON o.order_id = op.order_id 
-        INNER JOIN products p ON op.product_id = p.product_id
-        INNER JOIN products_stores ps ON p.product_id = ps.product_id
-        WHERE c.customer_id = customer;
-        RETURN total_spent;
+        
+        INSERT INTO orders (customer_id, store_id) 
+        VALUES (vorder.customer, vorder.store) RETURNING order_id INTO vorder_id;
+        
+        FOR i IN 1 .. products.COUNT LOOP 
+            INSERT INTO orders_products (order_id, product_id, quantity) 
+            VALUES (vorder_id, products(i).product, products(i).quantity);
+        END LOOP;
+        
+        EXCEPTION 
+            WHEN order_pkg.depleted_stock THEN 
+                RAISE_APPLICATION_ERROR(-20002, 'Not enough stock for all items');
+                ROLLBACK;
     END;
     
-    -- Returns total price of an order
-    -- order_number is the order for which we will calculate the total
+    PROCEDURE delete_order (id IN NUMBER) AS BEGIN 
+        order_pkg.check_if_order_exists(id);
+        DELETE FROM orders WHERE order_id = id;
+    END;
+    
+    FUNCTION get_all_orders RETURN order_pkg.orders AS
+        custid  NUMBER;
+        storeid NUMBER;
+        o_date  DATE;
+        count_order NUMBER;
+        order_arr order_pkg.orders;
+    BEGIN 
+        order_arr := order_pkg.orders();
+        
+        SELECT COUNT(*) INTO count_order FROM orders;
+        
+        IF count_order = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20002, 'No orders to get');
+        END IF;
+        
+        FOR i IN 1 .. count_order LOOP
+            SELECT customer_id, store_id, order_date
+            INTO custid, storeid, o_date FROM orders 
+            WHERE order_id = i;
+            order_arr.EXTEND;
+            order_arr(i) := order_type(custid, storeid, o_date);
+        END LOOP;
+        
+        RETURN order_arr;
+    END;
+    
+    FUNCTION get_all_orders_by_customer(vcustomer_id IN NUMBER) RETURN number_array AS
+        orders_arr number_array;
+    BEGIN 
+        customer_pkg.check_if_customer_exists(vcustomer_id);
+        orders_arr := number_array();
+        SELECT COUNT(*) BULK COLLECT INTO orders_arr FROM orders
+        WHERE customer_id = vcustomer_id;
+        RETURN orders_arr; 
+    END;
+    
+    FUNCTION get_order_details(vorder_id IN NUMBER) RETURN number_array AS
+        product_ids number_array;
+    BEGIN 
+        product_ids := number_array();        
+        order_pkg.check_if_order_exists(vorder_id);
+        SELECT product_id BULK COLLECT INTO product_ids FROM orders_products 
+        WHERE order_id = vorder_id;
+        RETURN product_ids;
+    END;
+    
     FUNCTION price_order(order_number NUMBER) RETURN NUMBER AS 
         spent NUMBER;
     BEGIN 
+        order_pkg.check_if_order_exists(order_number);
         SELECT SUM(ps.price * op.quantity) INTO spent FROM orders o
         INNER JOIN orders_products op ON o.order_id = op.order_id 
         INNER JOIN products p ON op.product_id = p.product_id
@@ -467,150 +863,277 @@ CREATE OR REPLACE PACKAGE BODY order_pkg AS
 END order_pkg;
 /
 
-CREATE OR REPLACE PACKAGE warehouse_pkg AS 
-    PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
-    PROCEDURE update_warehouse (id IN NUMBER, warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER);
-    PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER);
-END warehouse_pkg;
-/
-
-CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
-    -- creates a new warehouse
-    -- warehouse: object contains name and address
-    -- warehouse_id_p: id of newly created warehouse
-    PROCEDURE create_warehouse (warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
-    BEGIN 
-        INSERT INTO warehouses (name, address) VALUES (warehouse.name, warehouse.address) RETURNING warehouse_id INTO warehouse_id_p;
-    END;
-    
-    -- updates a  warehouse
-    -- id: id of warehouse to update
-    -- warehouse: object contains name and address
-    -- warehouse_id_p: id of newly created warehouse
-    PROCEDURE update_warehouse (id IN NUMBER, warehouse IN warehouse_obj, warehouse_id_p OUT NUMBER) AS 
-    BEGIN 
-        UPDATE warehouses SET name = warehouse.name, address = warehouse.address 
-        WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
-    END;
-    
-    -- deletes a warehouse
-    -- id: id of warehouse to delete
-    -- warehouse_id_p: id of deleted warehouse
-    PROCEDURE delete_warehouse (id IN NUMBER, warehouse_id_p OUT NUMBER) AS 
-    BEGIN 
-        DELETE warehouses WHERE warehouse_id = id RETURNING warehouse_id INTO warehouse_id_p;
-    END;
-END warehouse_pkg;
-/
-
-CREATE OR REPLACE PACKAGE products_pckg AS
-    PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER);
-    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER);
-    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER);
-END products_pckg;
-/
-
-CREATE OR REPLACE PACKAGE BODY products_pckg AS
-
-     PROCEDURE add_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
-        BEGIN
-            INSERT INTO products(category_id, name)
-            VALUES(vproducts.catid, vproducts.pname)
-            RETURNING product_id INTO products_id_o;
-        END;
-
-    PROCEDURE delete_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
-        BEGIN
-            DELETE FROM products WHERE category_id=vproducts.catid AND name=vproducts.pname 
-            RETURNING product_id INTO products_id_o;
-        END;
-    PROCEDURE update_product(vproducts IN products_obj, products_id_o OUT NUMBER) IS
-        BEGIN
-            UPDATE products SET name=vproducts.pname WHERE product_id=vproducts.prodid 
-            RETURNING product_id INTO products_id_o;
-        END;
-END products_pckg;
-/
-
-CREATE OR REPLACE PACKAGE review_pkg AS
-    TYPE flagged IS VARRAY(1000) OF NUMBER;
-    PROCEDURE create_review(review IN review_obj, id OUT NUMBER);
-    PROCEDURE flag_review(id IN NUMBER);
-    PROCEDURE update_review (rev_id IN OUT NUMBER, review IN review_obj);
+CREATE PACKAGE review_pkg AS
+    invalid_review EXCEPTION;
+    PRAGMA EXCEPTION_INIT(invalid_review, -20000);    
+    PROCEDURE check_if_review_exists(id IN NUMBER);
+    PROCEDURE create_review(review IN review_type);
+    PROCEDURE update_review(id IN NUMBER, vrating IN NUMBER, vdescription IN VARCHAR2);
     PROCEDURE delete_review(id IN NUMBER);
-    PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER);
-    FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged;
+    PROCEDURE delete_flagged_reviews;
+    FUNCTION get_review(id IN NUMBER) RETURN review_type;
+    FUNCTION get_all_reviews RETURN number_array;
+    FUNCTION get_flagged_reviews RETURN number_array;
 END review_pkg;
 /
-
-CREATE OR REPLACE PACKAGE BODY review_pkg AS 
-    -- creates a review
-    -- review: object with customer, product, rating, and description
-    -- id: id of created review
-    PROCEDURE create_review(review IN review_obj, id OUT NUMBER) AS
+CREATE PACKAGE BODY review_pkg AS 
+    PROCEDURE check_if_review_exists(id IN NUMBER) AS 
+        count_review   NUMBER;
     BEGIN 
-        INSERT INTO reviews (customer_id, product_id, rating, description)
-        VALUES (review.customer, review.product, review.rating, review.description)
-        RETURNING review_id INTO id;
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'Review id cannot be null');
+        END IF;
+        SELECT COUNT(*) INTO count_review FROM reviews WHERE review_id = id;
+        IF count_review = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'Review not found');
+        END IF;
     END;
 
-    -- flags a review
-    -- id: id of the review to flag
-    PROCEDURE flag_review (id IN NUMBER) AS 
+    PROCEDURE check_null(review IN review_type) AS 
     BEGIN 
-        UPDATE reviews SET flags = flags + 1 WHERE review_id = id;
+        IF review.customer IS NULL OR review.product IS NULL 
+                OR review.rating IS NULL
+                OR review.description IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'Review cannot have null values');
+        END IF;
     END;
-
-    -- updates a review
-    -- rev_id: id of review to update
-    -- review: object with customer, product, rating and description
-    PROCEDURE update_review (rev_id IN OUT NUMBER, review IN review_obj) AS 
-    BEGIN 
-        UPDATE reviews SET rating = review.rating, description = review.description 
-        WHERE review_id = rev_id RETURNING review_id INTO rev_id;
-        EXCEPTION 
-            WHEN no_data_found THEN 
-                DBMS_OUTPUT.PUT_LINE('Review id does not exist');
-    END;
-
-    -- deletes a review
-    -- id: id of review to delete
-    PROCEDURE delete_review(id IN NUMBER) AS 
+    
+    PROCEDURE validate_rating(vrating IN NUMBER) AS
     BEGIN
+        IF vrating NOT BETWEEN 1 AND 5 THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'Rating must be between 1 and 5');
+        END IF;
+    END;
+    
+    PROCEDURE validate_description(vdescription IN VARCHAR2) AS
+    BEGIN 
+        IF LENGTH(vdescription) > 30 THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'Description is 30 characters max');
+        END IF;
+    END;
+    
+    PROCEDURE create_review(review IN review_type) AS
+        count_cust      NUMBER;
+        count_prod      NUMBER;
+    BEGIN 
+        customer_pkg.check_if_customer_exists(review.customer);
+        product_pkg.check_if_product_exists(review.product);
+        
+        review_pkg.check_null(review);
+        review_pkg.validate_rating(review.rating);
+        review_pkg.validate_description(review.description);
+              
+        INSERT INTO reviews (customer_id, product_id, rating, description)
+        VALUES (review.customer, review.product, review.rating, 
+            review.description);
+    END;
+    
+    PROCEDURE update_review(id IN NUMBER, vrating IN NUMBER, vdescription IN VARCHAR2) AS
+        count_rev      NUMBER;
+    BEGIN 
+        review_pkg.check_if_review_exists(id);
+        review_pkg.validate_rating(vrating);
+        review_pkg.validate_description(vdescription);
+        
+        UPDATE reviews SET rating = vrating, description = vdescription
+        WHERE review_id = id;
+        
+        EXCEPTION 
+            WHEN others THEN 
+                RAISE_APPLICATION_ERROR(-20000, 'Cannot update review');
+    END;
+    
+    PROCEDURE delete_review(id IN NUMBER) AS 
+    BEGIN 
+        review_pkg.check_if_review_exists(id);
         DELETE FROM reviews WHERE review_id = id;
     END;
-
-    -- Returns array of review id's that are considered flagged 3 times
-    FUNCTION get_array_of_flagged_reviews RETURN review_pkg.flagged  AS
-        flagged_reviews review_pkg.flagged;
-    BEGIN
-        flagged_reviews := review_pkg.flagged();
-        SELECT review_id BULK COLLECT INTO flagged_reviews FROM reviews
-        WHERE flags > 3;
-        RETURN flagged_reviews;
-        EXCEPTION 
-            WHEN no_data_found THEN 
-                DBMS_OUTPUT.PUT_LINE('No flagged reviews were found');
+    
+    PROCEDURE delete_flagged_reviews AS 
+    BEGIN 
+        DELETE FROM reviews WHERE flags > 2;
     END;
-
-    -- Deletes all flagged (3+) reviews
-    -- flagged_reviews: array of flagged review ids 
-    -- num_deleted: number of rows deleted
-    PROCEDURE delete_flagged_reviews(flagged_reviews IN review_pkg.flagged, num_deleted OUT NUMBER) AS
-    BEGIN
-        num_deleted := flagged_reviews.COUNT;
-        FOR i IN 1 .. flagged_reviews.COUNT LOOP
-            DELETE FROM reviews WHERE review_id = flagged_reviews(i);
-        END LOOP;
+    
+    FUNCTION get_review(id IN NUMBER) RETURN review_type AS 
+        review          review_type;
+        count_rev       NUMBER;
+        custid          NUMBER;
+        prodid          NUMBER;
+        vflags          NUMBER;
+        vrating         NUMBER;
+        vdesc           VARCHAR2(30);
+    BEGIN 
+        review_pkg.check_if_review_exists(id);
+        SELECT customer_id, product_id, flags, rating, description 
+        INTO custid, prodid, vflags, vrating, vdesc 
+        FROM reviews WHERE review_id = id;
+        review := review_type(custid, prodid, vflags, vrating, vdesc);
+        RETURN review;
+    END;
+    
+    FUNCTION get_all_reviews RETURN number_array AS 
+        reviews_arr number_array;
+        num_reviews NUMBER;
+    BEGIN 
+        reviews_arr := number_array();
+        SELECT review_id BULK COLLECT INTO reviews_arr FROM reviews;
+        IF reviews_arr.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'No reviews to get !');
+        END IF;
+        RETURN reviews_arr;
+    END;
+    
+    FUNCTION get_flagged_reviews RETURN number_array AS
+        reviews_arr number_array;
+    BEGIN 
+        reviews_arr := number_array();        
+        SELECT review_id BULK COLLECT INTO reviews_arr FROM reviews WHERE flags > 2;
+        IF reviews_arr.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'No flagged reviews to be found');
+        END IF;
+        RETURN reviews_arr;
     END;
 END review_pkg;
+/
+
+CREATE PACKAGE warehouse_pkg AS 
+    invalid_warehouse EXCEPTION;
+    PRAGMA EXCEPTION_INIT(invalid_warehouse, -20001);    
+    PROCEDURE check_if_warehouse_exists(id IN NUMBER);
+    PROCEDURE create_warehouse(warehouse IN warehouse_type);
+    PROCEDURE update_warehouse(id IN NUMBER, warehouse IN warehouse_type);
+    PROCEDURE delete_warehouse(id IN NUMBER);
+    PROCEDURE update_stock(vwarehouseid IN NUMBER, vproductid IN NUMBER, vquantity IN NUMBER);
+    PROCEDURE insert_product_into_warehouse(vwarehouseid IN NUMBER, vproductid IN NUMBER, initial_quant IN NUMBER);
+    FUNCTION get_warehouse(id IN NUMBER) RETURN warehouse_type;
+    FUNCTION get_all_warehouses RETURN number_array;
+    FUNCTION get_stock(id IN NUMBER) RETURN NUMBER;
+END warehouse_pkg;
+/
+CREATE PACKAGE BODY warehouse_pkg AS
+    PROCEDURE check_if_warehouse_exists(id IN NUMBER) AS
+         count_warehouse     NUMBER;
+    BEGIN 
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Id cannot be null');
+        END IF;
+        SELECT COUNT(*) INTO count_warehouse FROM warehouses 
+        WHERE warehouse_id = id;
+        IF count_warehouse = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Warehouse does not exist');
+        END IF;
+    END;
+    
+    PROCEDURE check_null(warehouse IN warehouse_type) AS 
+    BEGIN 
+        IF warehouse.name IS NULL OR warehouse.address IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Warehouse fields cannot be null');
+        END IF;
+    END;
+    
+    PROCEDURE check_len(warehouse IN warehouse_type) AS 
+    BEGIN 
+        IF LENGTH(warehouse.name)       NOT BETWEEN 1 AND 100 OR
+           LENGTH(warehouse.address)    NOT BETWEEN 1 AND 100 
+           THEN RAISE_APPLICATION_ERROR(
+                -20001, 'Name/address must be between 1 and 100 charecters');
+        END IF;
+    END;
+    
+    PROCEDURE create_warehouse(warehouse IN warehouse_type) AS 
+    BEGIN 
+        warehouse_pkg.check_null(warehouse);
+        warehouse_pkg.check_len(warehouse);
+        INSERT INTO warehouses (name, address) 
+        VALUES (warehouse.name, warehouse.address);
+    END;
+    
+    PROCEDURE update_warehouse(id IN NUMBER, warehouse IN warehouse_type) AS
+    BEGIN 
+        warehouse_pkg.check_if_warehouse_exists(id);
+        warehouse_pkg.check_null(warehouse);
+        warehouse_pkg.check_len(warehouse);
+        UPDATE warehouses SET name = warehouse.name, address = warehouse.address 
+        WHERE warehouse_id = id;
+    END;
+    
+    PROCEDURE delete_warehouse(id IN NUMBER) AS 
+    BEGIN 
+        warehouse_pkg.check_if_warehouse_exists(id);
+        DELETE FROM warehouses WHERE warehouse_id = id;
+    END;
+    
+    FUNCTION get_warehouse(id IN NUMBER) RETURN warehouse_type AS 
+        warehouse           warehouse_type;
+        vname               VARCHAR2(30);
+        vaddress            VARCHAR2(30);
+    BEGIN 
+        warehouse_pkg.check_if_warehouse_exists(id);
+        SELECT name, address INTO vname, vaddress FROM warehouses
+        WHERE warehouse_id = id;
+        warehouse := warehouse_type(vname, vaddress);
+        RETURN warehouse;
+    END;
+    
+    PROCEDURE insert_product_into_warehouse(vwarehouseid IN NUMBER, vproductid IN NUMBER, initial_quant IN NUMBER) AS
+        count_prod NUMBER;
+    BEGIN 
+        warehouse_pkg.check_if_warehouse_exists(vwarehouseid);
+        product_pkg.check_if_product_exists(vproductid);
+        IF initial_quant < 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Initial quantity must not be negative');
+        END IF;
+        SELECT COUNT(*) INTO count_prod FROM products_warehouses 
+        WHERE product_id = vproductid;
+        IF count_prod > 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Product already in warehouse');
+        END IF;
+        INSERT INTO products_warehouses (warehouse_id, product_id, quantity) 
+        VALUES (vwarehouseid, vproductid, initial_quant);
+    END;
+
+    
+    PROCEDURE update_stock(vwarehouseid IN NUMBER, vproductid IN NUMBER, vquantity IN NUMBER) AS
+    BEGIN 
+        warehouse_pkg.check_if_warehouse_exists(vwarehouseid);
+        product_pkg.check_if_product_exists(vproductid);
+        IF vquantity < 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Quantity cannot be negative');
+        END IF;
+        UPDATE products_warehouses SET quantity = vquantity 
+        WHERE warehouse_id = vwarehouseid AND product_id = vproductid;
+        EXCEPTION 
+            WHEN value_error THEN 
+                RAISE_APPLICATION_ERROR(-20001, 'Invalid quantity, try another number');
+    END;
+
+    
+    FUNCTION get_all_warehouses RETURN number_array AS 
+        warehouses_arr number_array;
+    BEGIN 
+        warehouses_arr := number_array();
+        SELECT warehouse_id BULK COLLECT INTO warehouses_arr FROM warehouses;
+        IF warehouses_arr.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'No warehouses to find');
+        END IF;
+        RETURN warehouses_arr;
+    END;
+    
+    FUNCTION get_stock(id IN NUMBER) RETURN NUMBER AS
+        stock NUMBER;
+    BEGIN 
+        product_pkg.check_if_product_exists(id);
+        SELECT SUM(quantity) INTO stock FROM products_warehouses 
+        WHERE product_id = id;
+        RETURN stock;
+    END;
+END warehouse_pkg;
 /
 
 /*******************************************************************************
 SPECIAL TRIGGERS
-*******************************************************************************/
--- Checks if the item we want to order is in stock and removes it if it is
-CREATE OR REPLACE TRIGGER validate_stock
+********************************************************************************/
+CREATE TRIGGER validate_stock
 BEFORE INSERT OR UPDATE 
 ON orders_products
 FOR EACH ROW
@@ -622,14 +1145,13 @@ BEGIN
     IF :NEW.quantity > stock THEN 
         RAISE order_pkg.depleted_stock;
     END IF;
-    UPDATE products_warehouses SET quantity = quantity - :NEW.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :NEW.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
+    UPDATE products_warehouses SET quantity = quantity - :NEW.quantity WHERE warehouse_id = 
+        (SELECT warehouse_id FROM products_warehouses WHERE product_id = :NEW.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
     AND product_id = :NEW.product_id;
 END;
 /
 
--- Once an order is deleted, we simply replenish the warehouse with the 
--- least amount of stock of a product
-CREATE OR REPLACE TRIGGER replenish_stock 
+CREATE TRIGGER replenish_stock 
 BEFORE DELETE 
 ON orders_products 
 FOR EACH ROW 
@@ -638,8 +1160,6 @@ BEGIN
     AND product_id = :OLD.product_id;
 END;
 /
-
-
 
 /*******************************************************************************
 TEST DATA

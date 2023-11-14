@@ -1,13 +1,11 @@
 DROP PACKAGE admin_pkg;
-DROP PACKAGE review_pkg;
-DROP PACKAGE warehouse_pkg;
+DROP PACKAGE category_pkg;
+DROP PACKAGE customer_pkg;
 DROP PACKAGE order_pkg;
-
-DROP TYPE admin_obj;
-DROP TYPE products_obj;
-DROP TYPE review_obj;
-DROP TYPE warehouse_obj;
-DROP TYPE order_obj;
+DROP PACKAGE product_pkg;
+DROP PACKAGE review_pkg;
+DROP PACKAGE store_pkg;
+DROP PACKAGE warehouse_pkg;
 
 DROP TRIGGER replenish_stock;
 DROP TRIGGER validate_stock;
@@ -46,3 +44,14 @@ DROP TABLE warehouses;
 DROP TABLE categories;
 DROP TABLE customers;
 DROP TABLE admins;
+
+DROP TYPE number_array FORCE;
+DROP TYPE order_type;
+DROP TYPE category_type;
+DROP TYPE customer_type;
+DROP TYPE product_type;
+DROP TYPE review_type ;
+DROP TYPE store_type;
+DROP TYPE warehouse_type FORCE;
+DROP TYPE order_products_type;
+DROP TYPE admin_type;

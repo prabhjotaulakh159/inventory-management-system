@@ -1,4 +1,4 @@
-package prabhjot.safin.connection;
+package prabhjot.safin.retail.connection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,7 +16,7 @@ public class ConnectionProvider {
      * @param password Password for connection
      */
     public ConnectionProvider() throws SQLException {
-        this.connection = DriverManager.getConnection("jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca", Credentials.USERNAME, Credentials.PASSWORD);
+        this.connection = DriverManager.getConnection("jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca", "A2034747", "Jagdish123");
         this.connection.setAutoCommit(false);
     }
 
@@ -26,5 +26,12 @@ public class ConnectionProvider {
      */
     public Connection getConnection() {
         return this.connection;
-    }    
+    }
+    
+    /**
+     * Kills the connection
+     */
+    public void kill() throws SQLException {
+        this.connection.close();
+    }
 }
