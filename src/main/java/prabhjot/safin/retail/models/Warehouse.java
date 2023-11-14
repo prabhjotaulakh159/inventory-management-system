@@ -14,6 +14,10 @@ public class Warehouse implements SQLData {
     private String address;
     private String type = "WAREHOUSE_TYPE";
 
+    public Warehouse() {
+
+    }
+
     public Warehouse(String name, String address) {
         this.name = name;
         this.address = address;

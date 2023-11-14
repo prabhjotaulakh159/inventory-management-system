@@ -1,12 +1,3 @@
-DROP TYPE order_type;
-DROP TYPE category_type;
-DROP TYPE customer_type;
-DROP TYPE product_type;
-DROP TYPE review_type ;
-DROP TYPE store_type;
-DROP TYPE warehouse_type;
-DROP TYPE order_products_type;
-
 DROP PACKAGE admin_pkg;
 DROP PACKAGE category_pkg;
 DROP PACKAGE customer_pkg;
@@ -53,3 +44,14 @@ DROP TABLE warehouses;
 DROP TABLE categories;
 DROP TABLE customers;
 DROP TABLE admins;
+
+DROP TYPE number_array FORCE;
+DROP TYPE order_type;
+DROP TYPE category_type;
+DROP TYPE customer_type;
+DROP TYPE product_type;
+DROP TYPE review_type ;
+DROP TYPE store_type;
+DROP TYPE warehouse_type FORCE;
+DROP TYPE order_products_type;
+DROP TYPE admin_type;

@@ -2,8 +2,10 @@ package prabhjot.safin.retail.services;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,40 +41,43 @@ public class WarehouseService {
         CallableStatement callableStatement = connection.prepareCall(SQL);
         callableStatement.setObject(1, warehouse);
         callableStatement.execute();
+        connection.commit();
     }
 
      /**
      * Updates an existing warehouse entry in a database using the provided Connection.
-     * @param connection An active database connection.
-     * @param name The warehouse name with updated information.
-     * @param address The warehouse address with updated information
+     * @param warehouseId Id of the warehouse to be updated in the database
+     * @param warehouse The warehouse object to be updated in the database.
      * @throws SQLException If an SQL exception occurs during the database operation.
      */
-    public void update(int id, String name, String address) throws SQLException {
-        String SQL = "{call warehouse_pkg.update_warehouse(?, ?, ?)}";
+    public void update(int warehouseId, Warehouse warehouse) throws SQLException, ClassNotFoundException {
+        Map<String, Class<?>> map = this.connection.getTypeMap();
+        this.connection.setTypeMap(map);
+        map.put(warehouse.getSQLTypeName(), Class.forName("prabhjot.safin.retail.models.Warehouse"));
+        String SQL = "{call warehouse_pkg.update_warehouse(?, ?)}";
         CallableStatement callableStatement = connection.prepareCall(SQL);
-        callableStatement.setInt(1, id);
-        callableStatement.setString(2, name);
-        callableStatement.setString(3, address);
+        callableStatement.setInt(1, warehouseId);
+        callableStatement.setObject(2, warehouse);
         callableStatement.execute();
+        connection.commit();
     }
 
     /**
      * Deletes an existing warehouse entry from the database based on the provided ID.
      * @param connection An active database connection.
-     * @param id The ID of the warehouse to be deleted from the database.
+     * @param warehouseId The warehouseId of the warehouse to be deleted from the database.
      * @throws SQLException If an SQL exception occurs during the database operation.
      */
-    public void delete(int id) throws SQLException {
+    public void delete(int warehouseId) throws SQLException {
         String SQL = "{call warehouse_pkg.delete_warehouse(?)}";
         CallableStatement callableStatement = connection.prepareCall(SQL);
-        callableStatement.setInt(1, id);
+        callableStatement.setInt(1, warehouseId);
         callableStatement.execute();
+        connection.commit();
     }
 
     /**
      * Updates the stock quantity of a product in a specific warehouse in the database.
-     * @param connection An active database connection.
      * @param warehouseId The ID of the warehouse where the product stock is being updated.
      * @param productId The ID of the product whose stock is being updated.
      * @param quantity The quantity by which to update the stock (can be positive or negative).
@@ -85,11 +90,11 @@ public class WarehouseService {
         callableStatement.setInt(2, productId);
         callableStatement.setInt(3, quantity);
         callableStatement.execute();
+        connection.commit();
     }
 
     /**
      * Inserts a product into a specific warehouse in the database.
-     * @param connection An active database connection.
      * @param warehouseId The ID of the warehouse where the product is being inserted.
      * @param productId The ID of the product to be inserted.
      * @param quantity The initial quantity of the product in the warehouse.
@@ -102,6 +107,7 @@ public class WarehouseService {
         callableStatement.setInt(2, productId);
         callableStatement.setInt(3, quantity);
         callableStatement.execute();
+        connection.commit();
     }
 
     /**
@@ -110,8 +116,12 @@ public class WarehouseService {
      * @param warehouseId The ID of the warehouse to retrieve.
      * @return The Warehouse object corresponding to the given ID.
      * @throws SQLException If an SQL exception occurs during the database operation.
+     * @throws ClassNotFoundException
      */
-    public Warehouse getWarehouse(int warehouseId) throws SQLException {
+    public Warehouse getWarehouse(int warehouseId) throws SQLException, ClassNotFoundException {
+        Map<String, Class<?>> map = this.connection.getTypeMap();
+        this.connection.setTypeMap(map);
+        map.put("WAREHOUSE_TYPE", Class.forName("prabhjot.safin.retail.models.Warehouse"));
         String SQL = "{? = call warehouse_pkg.get_warehouse(?)}";
         CallableStatement callableStatement = connection.prepareCall(SQL);
         callableStatement.registerOutParameter(1, Types.STRUCT, "WAREHOUSE_TYPE");
@@ -126,9 +136,19 @@ public class WarehouseService {
      * @param connection An active database connection.
      * @return A list of Warehouse objects representing all warehouses in the database.
      * @throws SQLException If an SQL exception occurs during the database operation.
+     * @throws ClassNotFoundException
      */
-    public List<Warehouse> getWarehouses() throws SQLException {
-        throw new UnsupportedOperationException("Did not figure out how to return array of warehouses");
+    public List<Warehouse> getWarehouses() throws SQLException, ClassNotFoundException {
+        List<Warehouse> warehouses = new ArrayList<Warehouse>();
+        String SQL = "{? = call warehouse_pkg.get_all_warehouses()}";
+        CallableStatement callableStatement = connection.prepareCall(SQL);
+        callableStatement.registerOutParameter(1, Types.ARRAY, "ID_ARRAY");
+        callableStatement.execute();
+        ResultSet resultSet = callableStatement.getArray(1).getResultSet();
+        while (resultSet.next()) {
+            warehouses.add(this.getWarehouse(resultSet.getInt(1)));
+        }
+        return warehouses;
     }
 
     /**
