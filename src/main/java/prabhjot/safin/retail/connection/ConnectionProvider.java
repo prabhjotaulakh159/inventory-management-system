@@ -16,7 +16,7 @@ public class ConnectionProvider {
      * @param password Password for connection
      */
     public ConnectionProvider() throws SQLException {
-        this.connection = DriverManager.getConnection("jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca", "A2034747", "Jagdish123");
+        this.connection = DriverManager.getConnection("jdbc:oracle:thin:@198.168.52.211:1521/pdbora19c.dawsoncollege.qc.ca", Credentials.USERNAME, Credentials.PASSWORD);
         this.connection.setAutoCommit(false);
     }
 
