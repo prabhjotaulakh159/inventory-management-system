@@ -142,7 +142,7 @@ public class WarehouseService {
         List<Warehouse> warehouses = new ArrayList<Warehouse>();
         String SQL = "{? = call warehouse_pkg.get_all_warehouses()}";
         CallableStatement callableStatement = connection.prepareCall(SQL);
-        callableStatement.registerOutParameter(1, Types.ARRAY, "ID_ARRAY");
+        callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
