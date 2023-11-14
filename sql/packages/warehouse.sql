@@ -94,12 +94,20 @@ CREATE OR REPLACE PACKAGE BODY warehouse_pkg AS
     END;
     
     PROCEDURE insert_product_into_warehouse(vwarehouseid IN NUMBER, vproductid IN NUMBER, initial_quant IN NUMBER) AS
+        count_prod NUMBER;
     BEGIN 
         warehouse_pkg.check_if_warehouse_exists(vwarehouseid);
         product_pkg.check_if_product_exists(vproductid);
         
         IF initial_quant < 0 THEN 
             RAISE_APPLICATION_ERROR(-20001, 'Initial quantity must not be negative');
+        END IF;
+        
+        SELECT COUNT(*) INTO count_prod FROM products_warehouses 
+        WHERE product_id = vproductid;
+        
+        IF count_prod > 0 THEN 
+            RAISE_APPLICATION_ERROR(-20001, 'Product already in warehouse');
         END IF;
         
         INSERT INTO products_warehouses (warehouse_id, product_id, quantity) 
