@@ -2,8 +2,10 @@ package prabhjot.safin.retail.services;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.Map;
 
 import prabhjot.safin.retail.models.Product;
@@ -63,5 +65,19 @@ public class ProductService {
         Product product = (Product) callableStatement.getObject(1);
 
         return product;
+    }
+
+    public Map<Integer, Product> getProducts() throws SQLException, ClassNotFoundException{
+        Map<Integer, Product> products= new HashMap<Integer, Product>();
+        String sql = "{? = call product_pkg.get_products()}";
+        CallableStatement callableStatement = connection.prepareCall(sql);
+        callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
+        callableStatement.execute();
+        ResultSet resultSet = callableStatement.getArray(1).getResultSet();
+        while(resultSet.next()){
+            products.put(resultSet.getInt(1), this.getProduct(resultSet.getInt(1)));
+        }
+
+        return products;
     }
 }

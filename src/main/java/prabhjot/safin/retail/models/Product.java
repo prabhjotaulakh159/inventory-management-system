@@ -66,17 +66,5 @@ public class Product implements SQLData{
     public void setCategory_id(int category_id) {
         this.category_id = category_id;
     }
-
-
-
-    public String getType() {
-        return type;
-    }
-
-
-
-    public void setType(String type) {
-        this.type = type;
-    }
     
 }
