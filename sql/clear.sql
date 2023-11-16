@@ -54,4 +54,3 @@ DROP TYPE review_type ;
 DROP TYPE store_type;
 DROP TYPE warehouse_type FORCE;
 DROP TYPE order_products_type;
-DROP TYPE admin_type;

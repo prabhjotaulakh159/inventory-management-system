@@ -373,17 +373,11 @@ CREATE TYPE warehouse_type AS OBJECT (
 );
 /
 
-CREATE TYPE admin_type AS OBJECT (
-    id  NUMBER,
-    password VARCHAR2(100)
-);
-/
-
 --/*******************************************************************************
 --PACKAGES
 --*******************************************************************************/
 CREATE PACKAGE admin_pkg AS 
-    FUNCTION login(admin IN admin_type) RETURN BOOLEAN;
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN;
 END admin_pkg;
 /
 CREATE PACKAGE BODY admin_pkg AS 
@@ -399,12 +393,12 @@ CREATE PACKAGE BODY admin_pkg AS
         END IF;
     END;
     
-    FUNCTION login(admin IN admin_type) RETURN BOOLEAN AS 
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN AS
         vpassword VARCHAR2(100);
     BEGIN 
-        admin_pkg.check_if_admin_exists(admin.id);
-        SELECT password INTO vpassword FROM admins WHERE admin_id = admin.id;
-        RETURN vpassword = admin.password;
+        admin_pkg.check_if_admin_exists(id);
+        SELECT password INTO vpassword FROM admins WHERE admin_id = id;
+        RETURN vpassword = password;
     END;
 END admin_pkg;
 /
