@@ -373,17 +373,11 @@ CREATE TYPE warehouse_type AS OBJECT (
 );
 /
 
-CREATE TYPE admin_type AS OBJECT (
-    id  NUMBER,
-    password VARCHAR2(100)
-);
-/
-
 --/*******************************************************************************
 --PACKAGES
 --*******************************************************************************/
 CREATE PACKAGE admin_pkg AS 
-    FUNCTION login(admin IN admin_type) RETURN BOOLEAN;
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN;
 END admin_pkg;
 /
 CREATE PACKAGE BODY admin_pkg AS 
@@ -399,12 +393,12 @@ CREATE PACKAGE BODY admin_pkg AS
         END IF;
     END;
     
-    FUNCTION login(admin IN admin_type) RETURN BOOLEAN AS 
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN AS
         vpassword VARCHAR2(100);
     BEGIN 
-        admin_pkg.check_if_admin_exists(admin.id);
-        SELECT password INTO vpassword FROM admins WHERE admin_id = admin.id;
-        RETURN vpassword = admin.password;
+        admin_pkg.check_if_admin_exists(id);
+        SELECT password INTO vpassword FROM admins WHERE admin_id = id;
+        RETURN vpassword = password;
     END;
 END admin_pkg;
 /
@@ -489,7 +483,7 @@ CREATE PACKAGE customer_pkg AS
     invalid_customer EXCEPTION;
     PRAGMA EXCEPTION_INIT(invalid_customer, -20004);
     PROCEDURE check_if_customer_exists(id IN NUMBER);
-    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN;
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN customer_type;
 END customer_pkg;
 /
 CREATE PACKAGE BODY customer_pkg AS 
@@ -507,14 +501,21 @@ CREATE PACKAGE BODY customer_pkg AS
         END IF;
     END;
     
-    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN BOOLEAN AS 
+    FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN customer_type AS 
+        fn  VARCHAR2(100);
+        ln  VARCHAR2(100);
+        vemail VARCHAR2(100);
+        vaddr VARCHAR2(100);
         vpassword VARCHAR2(100);
     BEGIN 
         customer_pkg.check_if_customer_exists(id);
-        SELECT password INTO vpassword FROM customers 
-        WHERE customer_id = id;
-        
-        RETURN password = vpassword;
+        SELECT firstname, lastname, email, address, password 
+        INTO fn, ln, vemail, vaddr, vpassword
+        FROM customers WHERE customer_id = id;
+        IF password <> vpassword THEN 
+            RAISE_APPLICATION_ERROR(-20004, 'Wrong password');
+        END IF; 
+        RETURN customer_type(fn, ln, vemail, vaddr, vpassword);
     END;
 
 END customer_pkg;
@@ -874,6 +875,7 @@ CREATE PACKAGE review_pkg AS
     FUNCTION get_review(id IN NUMBER) RETURN review_type;
     FUNCTION get_all_reviews RETURN number_array;
     FUNCTION get_flagged_reviews RETURN number_array;
+    FUNCTION get_review_for_product(id IN NUMBER) RETURN number_array;
 END review_pkg;
 /
 CREATE PACKAGE BODY review_pkg AS 
@@ -993,6 +995,20 @@ CREATE PACKAGE BODY review_pkg AS
         END IF;
         RETURN reviews_arr;
     END;
+    
+    FUNCTION get_review_for_product(id IN NUMBER) RETURN number_array AS 
+        review_arr number_array;
+    BEGIN 
+        review_arr := number_array();
+        product_pkg.check_if_product_exists(id);
+        SELECT review_id BULK COLLECT INTO review_arr FROM reviews 
+        WHERE product_id = id;
+        IF review_arr.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'No reviews for that product !');
+        END IF;
+        RETURN review_arr;
+    END;
+
 END review_pkg;
 /
 
