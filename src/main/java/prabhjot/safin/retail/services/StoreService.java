@@ -32,10 +32,7 @@ public class StoreService {
     connection.commit();
   }
 
-  public void updateStore(int id, String name) throws SQLException, ClassNotFoundException {
-    Map<String, Class<?>> map = this.connection.getTypeMap();
-    this.connection.setTypeMap(map);
-    map.put("STORE_TYPE", Class.forName("prabhjot.safin.retail.models.Store"));
+  public void updateStore(int id, String name) throws SQLException {
     String sql= "{call store_pkg.create_store(?, ?)}";
     CallableStatement callableStatement= connection.prepareCall(sql);
     callableStatement.setInt(1, id);
@@ -72,20 +69,17 @@ public class StoreService {
     connection.commit();
   }
 
-  public List<Integer> getProductPrices(int id) throws SQLException, ClassNotFoundException {
-    List<Integer> prices= new ArrayList<Integer>();
-    Map<String, Class<?>> map = this.connection.getTypeMap();
-    this.connection.setTypeMap(map);
-    map.put("STORE_TYPE", Class.forName("prabhjot.safin.retail.models.Store"));
+  public Map<Integer, Store> getProductPrices(int id) throws SQLException, ClassNotFoundException {
+    Map<Integer, Store> prices= new HashMap<Integer, Store>();
     String sql= "{? = call store_pkg.get_prices_of_product(?)}";
     CallableStatement callableStatement= connection.prepareCall(sql);
-    callableStatement.registerOutParameter(1, Types.ARRAY, "NUM_ARRAY");
+    callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
     callableStatement.setInt(2, id);
     callableStatement.execute();
     ResultSet resultSet= callableStatement.getArray(1).getResultSet();
 
     while(resultSet.next()){
-      prices.add(resultSet.getInt(1));
+      prices.put(resultSet.getInt(1), this.getStore(resultSet.getInt(1)));
     }
 
     return prices;
@@ -109,7 +103,7 @@ public class StoreService {
     Map<Integer, Store> stores= new HashMap<Integer, Store>();
     String sql= "{?= call store_pkg.get_stores()}";
     CallableStatement callableStatement = connection.prepareCall(sql);
-    callableStatement.registerOutParameter(1, Types.ARRAY, "NUM_ARRAY");
+    callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
     callableStatement.execute();
     ResultSet resultSet = callableStatement.getArray(1).getResultSet();
     while(resultSet.next()){
