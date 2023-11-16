@@ -5,8 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import prabhjot.safin.retail.models.Category;
@@ -18,6 +17,13 @@ public class CategoryService {
         this.connection = connection;
     }
 
+    /**
+     * Creates a new category in the database.
+     *
+     * @param category The Category object representing the category to be created.
+     * @throws SQLException            If a database access error occurs.
+     * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
+     */
     public void createCategory(Category category) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
@@ -26,18 +32,31 @@ public class CategoryService {
         CallableStatement callableStatement = connection.prepareCall(SQL);
         callableStatement.setObject(1, category);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
     }
 
+    /**
+     * Updates an existing category in the database.
+     *
+     * @param categoryId The ID of the category to be updated.
+     * @param category   The updated category name.
+     * @throws SQLException If a database access error occurs.
+     */
     public void updateCategory(int categoryId, String category) throws SQLException {
         String SQL = "{call category_pkg.update_category(?, ?)}";
         CallableStatement callableStatement = connection.prepareCall(SQL);
         callableStatement.setInt(1, categoryId);
         callableStatement.setString(2, category);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
     }
 
+    /**
+     * Deletes a category from the database based on its ID.
+     *
+     * @param categoryId The ID of the category to be deleted.
+     * @throws SQLException If a database access error occurs.
+     */
     public void deleteCategory(int categoryId) throws SQLException {
         String SQL = "{call category_pkg.delete_category(?)}";
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
@@ -46,6 +65,14 @@ public class CategoryService {
         this.connection.commit();
     }
 
+    /**
+     * Retrieves a category from the database based on its ID.
+     *
+     * @param categoryId The ID of the category to be retrieved.
+     * @return The Category object representing the retrieved category.
+     * @throws SQLException            If a database access error occurs.
+     * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
+     */
     public Category getCategory(int categoryId) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
@@ -59,15 +86,22 @@ public class CategoryService {
         return category;  
     }
 
-    public List<Category> getCategories() throws SQLException, ClassNotFoundException {
-        List<Category> categories = new ArrayList<Category>();
+    /**
+     * Retrieves all categories from the database and returns them as a Map.
+     *
+     * @return A Map where keys are category IDs and values are Category objects.
+     * @throws SQLException            If a database access error occurs.
+     * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
+     */
+    public Map<Integer, Category> getCategories() throws SQLException, ClassNotFoundException {
+        Map<Integer, Category> categories = new HashMap<Integer, Category>();
         String SQL = "{? = call category_pkg.get_categories()}";
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
         callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
-            categories.add(this.getCategory(resultSet.getInt(1)));
+            categories.put(resultSet.getInt(1), this.getCategory(resultSet.getInt(1)));
         }
         return categories;
     }

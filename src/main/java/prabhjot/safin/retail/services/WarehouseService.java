@@ -5,8 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import prabhjot.safin.retail.models.Warehouse;
@@ -31,7 +30,7 @@ public class WarehouseService {
      * @param connection An active database connection.
      * @param warehouse The warehouse object to be created in the database.
      * @throws SQLException If an SQL exception occurs during the database operation.
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException If class cannot be found
      */
     public void create(Warehouse warehouse) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
@@ -49,6 +48,7 @@ public class WarehouseService {
      * @param warehouseId Id of the warehouse to be updated in the database
      * @param warehouse The warehouse object to be updated in the database.
      * @throws SQLException If an SQL exception occurs during the database operation.
+     * @throws ClassNotFoundException If class cannot be found
      */
     public void update(int warehouseId, Warehouse warehouse) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
@@ -138,15 +138,15 @@ public class WarehouseService {
      * @throws SQLException If an SQL exception occurs during the database operation.
      * @throws ClassNotFoundException
      */
-    public List<Warehouse> getWarehouses() throws SQLException, ClassNotFoundException {
-        List<Warehouse> warehouses = new ArrayList<Warehouse>();
+    public Map<Integer, Warehouse> getWarehouses() throws SQLException, ClassNotFoundException {
+        Map<Integer, Warehouse> warehouses = new HashMap<Integer, Warehouse>();
         String SQL = "{? = call warehouse_pkg.get_all_warehouses()}";
         CallableStatement callableStatement = connection.prepareCall(SQL);
         callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
-            warehouses.add(this.getWarehouse(resultSet.getInt(1)));
+            warehouses.put(resultSet.getInt(1), this.getWarehouse(resultSet.getInt(1)));
         }
         return warehouses;
     }
@@ -167,4 +167,4 @@ public class WarehouseService {
         int stock = callableStatement.getInt(1);
         return stock;
     }
-}
+} 
