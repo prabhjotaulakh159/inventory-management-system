@@ -167,4 +167,4 @@ public class WarehouseService {
         int stock = callableStatement.getInt(1);
         return stock;
     }
-}
+} 
