@@ -874,6 +874,7 @@ CREATE PACKAGE review_pkg AS
     FUNCTION get_review(id IN NUMBER) RETURN review_type;
     FUNCTION get_all_reviews RETURN number_array;
     FUNCTION get_flagged_reviews RETURN number_array;
+    FUNCTION get_review_for_product(id IN NUMBER) RETURN number_array;
 END review_pkg;
 /
 CREATE PACKAGE BODY review_pkg AS 
@@ -993,6 +994,20 @@ CREATE PACKAGE BODY review_pkg AS
         END IF;
         RETURN reviews_arr;
     END;
+    
+    FUNCTION get_review_for_product(id IN NUMBER) RETURN number_array AS 
+        review_arr number_array;
+    BEGIN 
+        review_arr := number_array();
+        product_pkg.check_if_product_exists(id);
+        SELECT review_id BULK COLLECT INTO review_arr FROM reviews 
+        WHERE product_id = id;
+        IF review_arr.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20000, 'No reviews for that product !');
+        END IF;
+        RETURN review_arr;
+    END;
+
 END review_pkg;
 /
 
