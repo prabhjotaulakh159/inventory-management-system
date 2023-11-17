@@ -39,4 +39,12 @@ public class OrderService {
         this.connection.commit();
         return orderId;
     }
+
+    public void deleteOrder(int orderId) throws SQLException {
+        String SQL = "{call order_pkg.delete_order(?)}"
+        CallableStatement callableStatement = this.connection.prepareCall();
+        callableStatement.setInt(1, orderId);
+        callableStatement.execute();
+        this.connection.commit();
+    }
 }
