@@ -322,14 +322,7 @@ CREATE TYPE number_array IS VARRAY(100) OF NUMBER;
 
 CREATE TYPE order_type AS OBJECT (
     customer    NUMBER,
-    store       NUMBER,
-    order_date  DATE
-);
-/
-
-CREATE TYPE order_products_type AS OBJECT (
-    product     NUMBER,
-    quantity    NUMBER
+    store       NUMBER
 );
 /
 
