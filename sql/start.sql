@@ -322,7 +322,8 @@ CREATE TYPE number_array IS VARRAY(100) OF NUMBER;
 
 CREATE TYPE order_type AS OBJECT (
     customer    NUMBER,
-    store       NUMBER
+    store       NUMBER,
+    order_date  DATE
 );
 /
 
@@ -743,10 +744,11 @@ CREATE PACKAGE order_pkg AS
     PROCEDURE create_order (vorder IN order_type, vorder_id OUT NUMBER);
     PROCEDURE insert_product_into_order(vorderid IN NUMBER, vprodid IN NUMBER, vquantity IN NUMBER);
     PROCEDURE delete_order (id IN NUMBER);
-    FUNCTION get_all_orders RETURN number_array;
-    FUNCTION get_all_orders_by_customer(vcustomer_id IN NUMBER) RETURN number_array;
-    FUNCTION get_order_details(vorder_id IN NUMBER) RETURN number_array;
-    FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
+    FUNCTION get_order(id IN NUMBER) RETURN order_type; 
+    FUNCTION get_customer_orders(id IN NUMBER) RETURN number_array;
+    FUNCTION get_order_products(id IN NUMBER) RETURN number_array;
+    FUNCTION get_order_product_quantity(vorderid IN NUMBER, vproductid IN NUMBER) RETURN NUMBER;
+    FUNCTION price_order(order_number NUMBER) RETURN NUMBER;
 END order_pkg;
 /
 CREATE PACKAGE BODY order_pkg AS 
@@ -795,37 +797,49 @@ CREATE PACKAGE BODY order_pkg AS
         DELETE FROM orders WHERE order_id = id;
     END;
     
-    FUNCTION get_all_orders RETURN number_array AS
+    FUNCTION get_order(id IN NUMBER) RETURN order_type AS 
+        cust    NUMBER;
+        store   NUMBER;
+        odate   DATE;
+    BEGIN 
+        order_pkg.check_if_order_exists(id);
+        SELECT customer_id, store_id, order_date 
+        INTO cust, store, odate FROM orders WHERE order_id = id;
+        RETURN order_type(cust, store, odate);
+    END;
+    
+    FUNCTION get_customer_orders(id IN NUMBER) RETURN number_array 
+    AS 
         order_arr number_array;
     BEGIN 
+        customer_pkg.check_if_customer_exists(id);
         order_arr := number_array();
-        SELECT order_id BULK COLLECT INTO order_arr FROM orders;
+        SELECT order_id BULK COLLECT INTO order_arr FROM orders 
+        WHERE customer_id = id;
         IF order_arr.COUNT = 0 THEN 
-            RAISE_APPLICATION_ERROR(-20002, 'No orders to be found !');
+            RAISE_APPLICATION_ERROR(-20002, 'No order for this customer');
         END IF;
         RETURN order_arr;
     END;
     
-    FUNCTION get_all_orders_by_customer(vcustomer_id IN NUMBER) RETURN number_array AS
-        orders_arr number_array;
+    FUNCTION get_order_products(id IN NUMBER) RETURN number_array AS
+        prod_arr number_array;
     BEGIN 
-        customer_pkg.check_if_customer_exists(vcustomer_id);
-        orders_arr := number_array();
-        SELECT COUNT(*) BULK COLLECT INTO orders_arr FROM orders
-        WHERE customer_id = vcustomer_id;
-        RETURN orders_arr; 
+        prod_arr := number_array();
+        order_pkg.check_if_order_exists(id);
+        SELECT product_id BULK COLLECT INTO prod_arr FROM orders_products 
+        WHERE order_id = id;
+        RETURN prod_arr;
     END;
-    
-    FUNCTION get_order_details(vorder_id IN NUMBER) RETURN number_array AS
-        product_ids number_array;
+
+    FUNCTION get_order_product_quantity(vorderid IN NUMBER, vproductid IN NUMBER) RETURN NUMBER AS 
+        quant NUMBER;
     BEGIN 
-        product_ids := number_array();        
-        order_pkg.check_if_order_exists(vorder_id);
-        SELECT product_id BULK COLLECT INTO product_ids FROM orders_products 
-        WHERE order_id = vorder_id;
-        RETURN product_ids;
+        SELECT quantity INTO quant FROM orders_products WHERE 
+        order_id = vorderid AND product_id = vproductid;
     END;
-    
+
+        
     FUNCTION price_order(order_number NUMBER) RETURN NUMBER AS 
         spent NUMBER;
     BEGIN 
