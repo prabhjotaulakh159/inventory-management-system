@@ -745,13 +745,12 @@ END store_pkg;
 CREATE PACKAGE order_pkg AS 
     depleted_stock EXCEPTION;
     invalid_order EXCEPTION;
-    PRAGMA EXCEPTION_INIT(invalid_order, -20002);
-    TYPE products IS VARRAY(100) OF order_products_type;
-    TYPE orders IS VARRAY(100) OF order_type;    
+    PRAGMA EXCEPTION_INIT(invalid_order, -20002);   
     PROCEDURE check_if_order_exists(id IN NUMBER);
-    PROCEDURE create_order (vorder IN order_type, products IN order_pkg.products);
+    PROCEDURE create_order (vorder IN order_type, vorder_id OUT NUMBER);
+    PROCEDURE insert_product_into_order(vorderid IN NUMBER, vprodid IN NUMBER, vquantity IN NUMBER);
     PROCEDURE delete_order (id IN NUMBER);
-    FUNCTION get_all_orders RETURN order_pkg.orders;
+    FUNCTION get_all_orders RETURN number_array;
     FUNCTION get_all_orders_by_customer(vcustomer_id IN NUMBER) RETURN number_array;
     FUNCTION get_order_details(vorder_id IN NUMBER) RETURN number_array;
     FUNCTION price_order(order_number IN NUMBER) RETURN NUMBER;
@@ -772,61 +771,45 @@ CREATE PACKAGE BODY order_pkg AS
         END IF;
     END;
     
-    PROCEDURE create_order (vorder IN order_type, products IN order_pkg.products) AS 
-        vorder_id   NUMBER;
+    PROCEDURE create_order (vorder IN order_type, vorder_id OUT NUMBER) AS 
     BEGIN 
         customer_pkg.check_if_customer_exists(vorder.customer);
         store_pkg.check_if_store_exists(vorder.store);
-        
-        FOR i in 1 .. products.COUNT LOOP
-            product_pkg.check_if_product_exists(products(i).product);
-            IF products(i).quantity <= 0 THEN 
-                RAISE_APPLICATION_ERROR(-20002, 'Quantity cannot be negative');
-            END IF;
-        END LOOP;
-        
         INSERT INTO orders (customer_id, store_id) 
-        VALUES (vorder.customer, vorder.store) RETURNING order_id INTO vorder_id;
-        
-        FOR i IN 1 .. products.COUNT LOOP 
-            INSERT INTO orders_products (order_id, product_id, quantity) 
-            VALUES (vorder_id, products(i).product, products(i).quantity);
-        END LOOP;
+        VALUES (vorder.customer, vorder.store) 
+        RETURNING order_id INTO vorder_id;        
+    END;
+    
+    PROCEDURE insert_product_into_order(vorderid IN NUMBER, vprodid IN NUMBER, vquantity IN NUMBER) AS 
+    BEGIN 
+        order_pkg.check_if_order_exists(vorderid);
+        product_pkg.check_if_product_exists(vprodid);
+        IF vquantity <= 0 THEN 
+            RAISE_APPLICATION_ERROR(-20002, 'Quantity cannot be negative');
+        END IF;
+        INSERT INTO orders_products (order_id, product_id, quantity) 
+        VALUES (vorderid, vprodid, vquantity);
         
         EXCEPTION 
             WHEN order_pkg.depleted_stock THEN 
-                RAISE_APPLICATION_ERROR(-20002, 'Not enough stock for all items');
+                RAISE_APPLICATION_ERROR(-20002, 'This item is out of stock');
                 ROLLBACK;
     END;
+
     
     PROCEDURE delete_order (id IN NUMBER) AS BEGIN 
         order_pkg.check_if_order_exists(id);
         DELETE FROM orders WHERE order_id = id;
     END;
     
-    FUNCTION get_all_orders RETURN order_pkg.orders AS
-        custid  NUMBER;
-        storeid NUMBER;
-        o_date  DATE;
-        count_order NUMBER;
-        order_arr order_pkg.orders;
+    FUNCTION get_all_orders RETURN number_array AS
+        order_arr number_array;
     BEGIN 
-        order_arr := order_pkg.orders();
-        
-        SELECT COUNT(*) INTO count_order FROM orders;
-        
-        IF count_order = 0 THEN 
-            RAISE_APPLICATION_ERROR(-20002, 'No orders to get');
+        order_arr := number_array();
+        SELECT order_id BULK COLLECT INTO order_arr FROM orders;
+        IF order_arr.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20002, 'No orders to be found !');
         END IF;
-        
-        FOR i IN 1 .. count_order LOOP
-            SELECT customer_id, store_id, order_date
-            INTO custid, storeid, o_date FROM orders 
-            WHERE order_id = i;
-            order_arr.EXTEND;
-            order_arr(i) := order_type(custid, storeid, o_date);
-        END LOOP;
-        
         RETURN order_arr;
     END;
     
