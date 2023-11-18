@@ -2,8 +2,10 @@ package prabhjot.safin.retail.services;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
 import java.util.Map;
 
 import prabhjot.safin.retail.models.Order;
@@ -41,8 +43,8 @@ public class OrderService {
     }
 
     public void deleteOrder(int orderId) throws SQLException {
-        String SQL = "{call order_pkg.delete_order(?)}"
-        CallableStatement callableStatement = this.connection.prepareCall();
+        String SQL = "{call order_pkg.delete_order(?)}";
+        CallableStatement callableStatement = this.connection.prepareCall(SQL);
         callableStatement.setInt(1, orderId);
         callableStatement.execute();
         this.connection.commit();
@@ -70,7 +72,7 @@ public class OrderService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while(resultSet.next()) {
-            orders.put(result.getInt(1), this.getOrder(resultSet.getInt(1)));
+            orders.put(resultSet.getInt(1), this.getOrder(resultSet.getInt(1)));
         }
         return orders;
     }
@@ -89,8 +91,8 @@ public class OrderService {
             String quantitySql = "{? = order_pkg.get_order_product_quantity(?,?)}";
             CallableStatement quantityStatement = this.connection.prepareCall(quantitySql);
             quantityStatement.registerOutParameter(1, Types.INTEGER);
-            quantityStatement.setInt(1, orderId);
-            quantityStatement.setInt(2, resultSet.getInt(1));
+            quantityStatement.setInt(2, orderId);
+            quantityStatement.setInt(3, products.getInt(1));
             quantityStatement.execute();
             int quantity = quantityStatement.getInt(1);
             productQuantityMapping.put(productName, quantity);
