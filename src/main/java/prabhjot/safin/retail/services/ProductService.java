@@ -63,7 +63,6 @@ public class ProductService {
         callableStatement.setInt(2, id);
         callableStatement.execute();
         Product product = (Product) callableStatement.getObject(1);
-
         return product;
     }
 

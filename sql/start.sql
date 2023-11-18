@@ -837,6 +837,7 @@ CREATE PACKAGE BODY order_pkg AS
     BEGIN 
         SELECT quantity INTO quant FROM orders_products WHERE 
         order_id = vorderid AND product_id = vproductid;
+        RETURN quant;
     END;
 
         
