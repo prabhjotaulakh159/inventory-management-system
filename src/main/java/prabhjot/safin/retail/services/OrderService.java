@@ -47,4 +47,17 @@ public class OrderService {
         callableStatement.execute();
         this.connection.commit();
     }
+
+    public Order getOrder(int orderId) throws SQLException, ClassNotFoundException {
+        Map<String, Class<?>> map = this.connection.getTypeMap();
+        this.connection.setTypeMap(map);
+        map.put("ORDER_TYPE", Class.forName("prabhjot.safin.retail.models.Order"));
+        String SQL = "{? = call order_pkg.get_order(?)}";
+        CallableStatement callableStatement = this.connection.prepareCall(SQL);
+        callableStatement.registerOutParameter(1, Types.STRUCT, "ORDER_TYPE");
+        callableStatement.setInt(2, orderId);
+        callableStatement.execute();
+        Order order = (Order) callableStatement.getObject(1);
+        return order;
+    }
 }
