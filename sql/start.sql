@@ -1162,16 +1162,6 @@ BEGIN
 END;
 /
 
-CREATE TRIGGER replenish_stock 
-BEFORE DELETE 
-ON orders_products 
-FOR EACH ROW 
-BEGIN 
-    UPDATE products_warehouses SET quantity = quantity + :OLD.quantity WHERE warehouse_id = (SELECT warehouse_id FROM products_warehouses WHERE product_id = :OLD.product_id ORDER BY quantity ASC FETCH FIRST ROW ONLY)
-    AND product_id = :OLD.product_id;
-END;
-/
-
 /*******************************************************************************
 TEST DATA
 *******************************************************************************/
@@ -1201,7 +1191,7 @@ INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (2, 
 
 INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 1, 5, 'Nice ! Might order');
 INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 2, 5, 'Amazing !');
-INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 3, 1, 'It was rotten :(');
+INSERT INTO reviews (customer_id, product_id, rating, flags, description) VALUES (1, 3, 1, 5, 'It was rotten :(');
 
 INSERT INTO orders (customer_id, store_id) VALUES (1, 1);
 INSERT INTO orders (customer_id, store_id) VALUES (1, 1);

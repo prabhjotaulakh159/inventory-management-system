@@ -112,7 +112,7 @@ public class ReviewService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
-            reviews.put(resultSet.getInt(1), this.getReview(resultSet.getInt(1)));
+            reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
         return reviews;
     }
@@ -132,7 +132,7 @@ public class ReviewService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
-            reviews.put(resultSet.getInt(1), this.getReview(resultSet.getInt(1)));
+            reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
         return reviews;
     }
@@ -166,7 +166,7 @@ public class ReviewService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
-            reviews.put(resultSet.getInt(1), this.getReview(resultSet.getInt(1)));
+            reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
         return reviews;
     }

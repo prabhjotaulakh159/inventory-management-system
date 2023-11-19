@@ -73,8 +73,8 @@ public class ProductService {
         callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
-        while(resultSet.next()){
-            products.put(resultSet.getInt(1), this.getProduct(resultSet.getInt(1)));
+        while(resultSet.next()) {
+            products.put(resultSet.getInt(2), this.getProduct(resultSet.getInt(2)));
         }
         return products;
     }

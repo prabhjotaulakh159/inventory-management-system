@@ -101,7 +101,7 @@ public class CategoryService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
-            categories.put(resultSet.getInt(1), this.getCategory(resultSet.getInt(1)));
+            categories.put(resultSet.getInt(2), this.getCategory(resultSet.getInt(2)));
         }
         return categories;
     }
