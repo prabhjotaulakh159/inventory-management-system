@@ -3,6 +3,7 @@ package prabhjot.safin.retail.services;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import oracle.jdbc.OracleTypes;
 import prabhjot.safin.retail.models.Admin;
@@ -25,14 +26,14 @@ public class AdminService {
      * @return True if authentication is successful, otherwise false.
      * @throws SQLException            If a database access error occurs.
      */
-    public boolean login(Admin admin) throws SQLException, ClassNotFoundException {
-        String SQL = "{? = call admin_pkg.login(?, ?)}";
+    public int login(Admin admin) throws SQLException, ClassNotFoundException {
+        String SQL = "{? = call admin_pkg.login (?, ?)}";
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
-        callableStatement.registerOutParameter(1, OracleTypes.BOOLEAN);
+        callableStatement.registerOutParameter(1, Types.INTEGER);
         callableStatement.setInt(2, admin.getId());
         callableStatement.setString(3, admin.getPassword());
         callableStatement.execute();
-        boolean result = callableStatement.getBoolean(1);
-        return result;
+        int status = callableStatement.getInt(1);
+        return status;
     }
 }

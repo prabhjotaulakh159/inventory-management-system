@@ -3,7 +3,6 @@ package prabhjot.safin.retail;
 import java.io.Console;
 import java.io.IOError;
 import java.sql.SQLException;
-import java.util.InputMismatchException;
 
 import prabhjot.safin.retail.connection.ConnectionProvider;
 import prabhjot.safin.retail.models.Admin;
@@ -40,12 +39,15 @@ public class AdminApp {
                 char[] passwordInput = console.readPassword();
                 for (char c : passwordInput) password += c;
                 Admin admin = new Admin(id, password);
-                boolean success = adminService.login(admin);
-                if (success) {
+                int status = adminService.login(admin);
+                if (status == 0) {
                     System.out.println("Hello admin #" + admin.getId());
                     break;
+                } else {
+                    System.out.println("Login failed !");
                 }
             } catch (SQLException e) {
+                e.printStackTrace();
                 System.out.println(e.getMessage());
             } catch (IOError e) {
                 System.out.println("Please enter valid data");
