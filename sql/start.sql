@@ -619,7 +619,7 @@ CREATE PACKAGE store_pkg AS
     PROCEDURE delete_store(id IN NUMBER);
     PROCEDURE create_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER);
     PROCEDURE update_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER);
-    FUNCTION get_prices_of_product(id IN NUMBER) RETURN number_array;
+    FUNCTION get_price_of_product(prodid IN NUMBER, storeid IN NUMBER) RETURN NUMBER;
     FUNCTION get_store(vstoreid IN NUMBER) RETURN store_type;
     FUNCTION get_stores RETURN number_array;
 END store_pkg;
@@ -706,14 +706,14 @@ CREATE PACKAGE BODY store_pkg AS
                 RAISE_APPLICATION_ERROR(-20003, 'Price is invalid, try another number');
     END;
 
-    FUNCTION get_prices_of_product(id IN NUMBER) RETURN number_array AS
-        prices number_array;
+    FUNCTION get_price_of_product(prodid IN NUMBER, storeid IN NUMBER) RETURN NUMBER AS
+        vprice NUMBER;
     BEGIN 
-        prices := number_array();
-        product_pkg.check_if_product_exists(id);
-        SELECT price BULK COLLECT INTO prices FROM products_stores 
-        WHERE product_id = id ORDER BY store_id ASC;
-        RETURN prices;
+        product_pkg.check_if_product_exists(prodid);
+        store_pkg.check_if_store_exists(storeid);
+        SELECT price INTO vprice FROM products_stores ps
+        WHERE ps.product_id = prodid AND ps.store_id = storeid;
+        RETURN vprice;
     END;
 
     FUNCTION get_store(vstoreid IN NUMBER) RETURN store_type AS 
