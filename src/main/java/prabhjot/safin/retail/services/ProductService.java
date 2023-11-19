@@ -30,7 +30,7 @@ public class ProductService {
         CallableStatement callableStatement= connection.prepareCall(sql);
         callableStatement.setObject(1, product);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
     }
 
     public void updateProduct(int id, Product product) throws SQLException, ClassNotFoundException {
@@ -46,7 +46,7 @@ public class ProductService {
     }
 
     public void deleteProduct(int id)throws SQLException {
-        String sql = "{call product_pkg.detele_product(?)}";
+        String sql = "{call product_pkg.delete_product(?)}";
         CallableStatement callableStatement= connection.prepareCall(sql);
         callableStatement.setInt(1, id);
         callableStatement.execute();
@@ -57,8 +57,8 @@ public class ProductService {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
         map.put("PRODUCT_TYPE", Class.forName("prabhjot.safin.retail.models.Product"));
-        String sql= "{? = call product_pkg.get_product(?)}";
-        CallableStatement callableStatement= connection.prepareCall(sql);
+        String sql = "{? = call product_pkg.get_product(?)}";
+        CallableStatement callableStatement = connection.prepareCall(sql);
         callableStatement.registerOutParameter(1, Types.STRUCT , "PRODUCT_TYPE");
         callableStatement.setInt(2, id);
         callableStatement.execute();
@@ -76,7 +76,6 @@ public class ProductService {
         while(resultSet.next()){
             products.put(resultSet.getInt(1), this.getProduct(resultSet.getInt(1)));
         }
-
         return products;
     }
 }

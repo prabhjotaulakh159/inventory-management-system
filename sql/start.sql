@@ -584,7 +584,7 @@ CREATE PACKAGE BODY product_pkg AS
     END;
 
     FUNCTION get_product(id IN NUMBER) RETURN product_type AS 
-        vname NUMBER;
+        vname VARCHAR2(100);
         category NUMBER;
     BEGIN 
         product_pkg.check_if_product_exists(id);
@@ -596,16 +596,16 @@ CREATE PACKAGE BODY product_pkg AS
     END;
     
     FUNCTION get_products RETURN number_array AS
-        products number_array;
+        product_arr number_array;
         count_prod NUMBER;
     BEGIN 
-        products := number_array();
+        product_arr := number_array();
         SELECT COUNT(*) INTO count_prod FROM products;
         IF count_prod = 0 THEN 
             RAISE_APPLICATION_ERROR(-20005, 'No products to fetch !');
         END IF;
-        SELECT product_id BULK COLLECT INTO products FROM products;
-        RETURN products;
+        SELECT product_id BULK COLLECT INTO product_arr FROM products;
+        RETURN product_arr;
     END;
 END product_pkg;
 /

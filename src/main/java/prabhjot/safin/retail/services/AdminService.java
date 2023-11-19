@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import oracle.jdbc.OracleTypes;
 import prabhjot.safin.retail.models.Admin;
 
 /**
