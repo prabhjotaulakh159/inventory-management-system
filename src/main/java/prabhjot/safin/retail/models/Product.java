@@ -10,20 +10,18 @@ import java.sql.SQLOutput;
  * @author Prabhjot Aulakh, Safin Haque
  */
 public class Product implements SQLData{
-        private String name;
-        private int category_id;
-        private String type= "PRODUCT_TYPE";
-        
-        public Product(){
+    private String name;
+    private int category_id;
+    private String type= "PRODUCT_TYPE";
+    
+    public Product(){
 
-        }
-        
-        public Product(String name, int category_id){
-            this.name= name;
-            this.category_id= category_id;
-        }
-
-        
+    }
+    
+    public Product(String name, int category_id){
+        this.name= name;
+        this.category_id= category_id;
+    }
 
     @Override
     public String getSQLTypeName() throws SQLException {
@@ -43,28 +41,24 @@ public class Product implements SQLData{
         stream.writeInt(this.category_id);
     }
 
-
-
     public String getName() {
         return name;
     }
-
-
 
     public void setName(String name) {
         this.name = name;
     }
 
-
-
     public int getCategory_id() {
         return category_id;
     }
 
-
-
     public void setCategory_id(int category_id) {
         this.category_id = category_id;
     }
-    
+
+    @Override
+    public String toString() {
+        return "Product Name: " + this.name;
+    }
 }

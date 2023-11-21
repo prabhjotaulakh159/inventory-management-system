@@ -130,4 +130,9 @@ public class Customer implements SQLData {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return "Firstname: " + this.firstname + ", Lastname: " + this.lastname + ", Email: " + this.email + ", Address: " + this.address;
+    }
 }

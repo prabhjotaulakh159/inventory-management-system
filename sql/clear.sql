@@ -7,7 +7,6 @@ DROP PACKAGE review_pkg;
 DROP PACKAGE store_pkg;
 DROP PACKAGE warehouse_pkg;
 
-DROP TRIGGER replenish_stock;
 DROP TRIGGER validate_stock;
 DROP TRIGGER reviews_audit_log;
 DROP TRIGGER orders_products_audit_log;

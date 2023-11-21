@@ -49,7 +49,7 @@ public class StoreService {
      * @throws SQLException If a database error occurs
      */
     public void updateStore(int id, String name) throws SQLException {
-        String sql= "{call store_pkg.create_store(?, ?)}";
+        String sql= "{call store_pkg.update_store(?, ?)}";
         CallableStatement callableStatement= connection.prepareCall(sql);
         callableStatement.setInt(1, id);
         callableStatement.setString(2, name);
@@ -111,18 +111,15 @@ public class StoreService {
      * @throws SQLException If a database error occurs
      * @throws ClassNotFoundException If the mapped class cannot be found
      */
-    public Map<Integer, Store> getProductPrices(int id) throws SQLException, ClassNotFoundException {
-        Map<Integer, Store> prices= new HashMap<Integer, Store>();
-        String sql= "{? = call store_pkg.get_prices_of_product(?)}";
-        CallableStatement callableStatement= connection.prepareCall(sql);
-        callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
-        callableStatement.setInt(2, id);
+    public int getProductPrice(int productId, int storeId) throws SQLException, ClassNotFoundException {
+        String SQL = "{? = call store_pkg.get_price_of_product(?, ?)}";
+        CallableStatement callableStatement = this.connection.prepareCall(SQL);
+        callableStatement.registerOutParameter(1, Types.INTEGER);
+        callableStatement.setInt(2, productId);
+        callableStatement.setInt(3, storeId);
         callableStatement.execute();
-        ResultSet resultSet= callableStatement.getArray(1).getResultSet();
-        while(resultSet.next()){
-            prices.put(resultSet.getInt(1), this.getStore(resultSet.getInt(1)));
-        }
-        return prices;
+        int price = callableStatement.getInt(1);
+        return price;
     }
     
     /**
@@ -159,7 +156,7 @@ public class StoreService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while(resultSet.next()){
-            stores.put(resultSet.getInt(1), this.getStore(resultSet.getInt(1)));
+            stores.put(resultSet.getInt(2), this.getStore(resultSet.getInt(2)));
         }
         return stores;
     }

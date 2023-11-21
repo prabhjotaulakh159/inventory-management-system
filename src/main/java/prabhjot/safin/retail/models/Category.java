@@ -52,4 +52,9 @@ public class Category implements SQLData {
     public void setCategory(String category) {
         this.category = category;
     }
+
+    @Override
+    public String toString() {
+        return "Category: " + this.category;
+    }
 }
