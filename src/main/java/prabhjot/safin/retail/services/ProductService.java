@@ -21,7 +21,12 @@ public class ProductService {
         this.connection = connection;
     }
 
-
+    /**
+     * Creates a product
+     * @param product Product to create
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void createProduct(Product product) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
@@ -33,6 +38,13 @@ public class ProductService {
         this.connection.commit();
     }
 
+    /**
+     * Updates a product by id 
+     * @param id Id of the product to update
+     * @param product New product information
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void updateProduct(int id, Product product) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
@@ -45,7 +57,13 @@ public class ProductService {
         connection.commit();
     }
 
-    public void deleteProduct(int id)throws SQLException {
+    /**
+     * Deletes a product by id 
+     * @param id Id of the product to delete
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public void deleteProduct(int id) throws SQLException {
         String sql = "{call product_pkg.delete_product(?)}";
         CallableStatement callableStatement= connection.prepareCall(sql);
         callableStatement.setInt(1, id);
@@ -53,7 +71,14 @@ public class ProductService {
         connection.commit();
     }
 
-    public Product getProduct(int id)throws SQLException, ClassNotFoundException{
+    /**
+     * Retrives a product
+     * @param id Id of product to retrieve
+     * @return Product with id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public Product getProduct(int id) throws SQLException, ClassNotFoundException{
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
         map.put("PRODUCT_TYPE", Class.forName("prabhjot.safin.retail.models.Product"));
@@ -66,6 +91,12 @@ public class ProductService {
         return product;
     }
 
+    /**
+     * Gets all products
+     * @return Mapping of product id and product object
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public Map<Integer, Product> getProducts() throws SQLException, ClassNotFoundException{
         Map<Integer, Product> products= new HashMap<Integer, Product>();
         String sql = "{? = call product_pkg.get_products()}";
