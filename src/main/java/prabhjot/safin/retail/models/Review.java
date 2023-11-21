@@ -151,4 +151,9 @@ public class Review implements SQLData {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        return "Customer Id: " + this.customerId + ", Product Id: " + this.productId + ", Flags: " + this.flags + ", Rating: " + this.rating + ", Description: " + this.description; 
+    }
 }

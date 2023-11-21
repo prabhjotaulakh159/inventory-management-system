@@ -72,4 +72,9 @@ public class Warehouse implements SQLData {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        return "Address: " + this.address + ", Name: " + this.name;
+    }
 }

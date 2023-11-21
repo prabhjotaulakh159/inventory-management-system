@@ -482,6 +482,8 @@ CREATE PACKAGE customer_pkg AS
     PRAGMA EXCEPTION_INIT(invalid_customer, -20004);
     PROCEDURE check_if_customer_exists(id IN NUMBER);
     FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN customer_type;
+    FUNCTION get_customers RETURN number_array;
+    FUNCTION get_customer_by_id(id IN NUMBER) RETURN customer_type;
 END customer_pkg;
 /
 CREATE PACKAGE BODY customer_pkg AS 
@@ -516,6 +518,29 @@ CREATE PACKAGE BODY customer_pkg AS
         RETURN customer_type(fn, ln, vemail, vaddr, vpassword);
     END;
 
+    FUNCTION get_customers RETURN number_array AS
+        cust_ids number_array;
+    BEGIN 
+        cust_ids := number_array();
+        SELECT customer_id BULK COLLECT INTO cust_ids FROM customers;
+        IF cust_ids.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20004, 'No customers to be found');
+        END IF;
+        RETURN cust_ids;
+    END;
+
+    FUNCTION get_customer_by_id(id IN NUMBER) RETURN customer_type AS 
+        vfname      VARCHAR2(100);
+        vlname      VARCHAR2(100);
+        vemail      VARCHAR2(100);
+        vaddress    VARCHAR2(100); 
+    BEGIN 
+        customer_pkg.check_if_customer_exists(id);
+        SELECT firstname, lastname, email, address 
+        INTO vfname, vlname, vemail, vaddress FROM customers
+        WHERE customer_id = id;
+        RETURN customer_type(vfname, vlname, vemail, vaddress, '');
+    END;
 END customer_pkg;
 /
 
@@ -1167,38 +1192,156 @@ TEST DATA
 *******************************************************************************/
 INSERT INTO admins (password) VALUES ('admin');
 
-INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('Prabhjot', 'Aulakh', 'prabhjot@email.com', 'Dawson College', 'customer');
-
-INSERT INTO categories (category) VALUES ('Toys');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('alex', 'brown', 'alex@gmail.com', '090 boul saint laurent, montreal, quebec, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('Amanda', 'Harry', 'am.harry@yahioo.com', '100 boul saint laurent, montreal, quebec, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('daneil', 'hanne', 'daneil@yahoo.com', '100 atwater street, toronto, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('Jack', 'Jonhson', 'johnson.a@gmail.com', 'Calgary, Alberta, Canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('John', 'belle', 'abcd@yahoo.com', '105 Young street, toronto, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('John', 'boura', 'bdoura@gmail.com', '100 Young street, toronto, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('mahsa', 'sadeghi', 'msadeghi@dawsoncollege.qc.ca', 'dawson college, montreal, quebec, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('martin', 'Li', 'm.li@gmail.com', '87 boul saint laurent, montreal, quebec, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('martin', 'alexandre', 'marting@yahoo.com', 'brossard, quebec, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('Noah', 'Garcia', 'g.noah@yahoo.com', '22222 happy street, Laval, quebec, canada', 'password');
+INSERT INTO customers (firstname, lastname, email, address, password) VALUES ('olivia', 'smith', 'smith@hotmail.com', '76 boul decalthon, laval, quebec, canada', 'password');
+--
+INSERT INTO categories (category) VALUES ('Beauty');
+INSERT INTO categories (category) VALUES ('Cars');
+INSERT INTO categories (category) VALUES ('DVD');
+INSERT INTO categories (category) VALUES ('Electronics');
 INSERT INTO categories (category) VALUES ('Grocery');
+INSERT INTO categories (category) VALUES ('Health');
+INSERT INTO categories (category) VALUES ('Toys');
+INSERT INTO categories (category) VALUES ('Vehicle');
+INSERT INTO categories (category) VALUES ('Video Games');
+--
+INSERT INTO warehouses (name, address) VALUES ('Warehouse A','100 rue William, saint laurent, Quebec, Canada');
+INSERT INTO warehouses (name, address) VALUES ('Warehouse B', '304 Rue Fran�ois-Perrault, Villera Saint-Michel, Montr�al, QC');
+INSERT INTO warehouses (name, address) VALUES ('Warehouse C', '86700 Weston Rd, Toronto, Canada');
+INSERT INTO warehouses (name, address) VALUES ('Warehouse D', '170  Sideroad, Quebec City, Canada');
+INSERT INTO warehouses (name, address) VALUES ('Warehouse E', '1231 Trudea road, Ottawa, Canada ');
+INSERT INTO warehouses (name, address) VALUES ('Warehouse F', '16  Whitlock Rd, Alberta, Canada');
 
-INSERT INTO stores (name) VALUES ('Marche Atwater');
-
-INSERT INTO products (category_id, name) VALUES (1, 'Lego Batman');
-INSERT INTO products (category_id, name) VALUES (1, 'Lego Superman');
-INSERT INTO products (category_id, name) VALUES (2, 'Apple');
-
-INSERT INTO products_stores (product_id, store_id, price) VALUES (1, 1, 20);
-INSERT INTO products_stores (product_id, store_id, price) VALUES (2, 1, 25);
-INSERT INTO products_stores (product_id, store_id, price) VALUES (3, 1, 5);
-
-INSERT INTO warehouses (name, address) VALUES ('Warehouse A', 'Brossard, Quebec');
-INSERT INTO warehouses (name, address) VALUES ('Warehouse B', 'Terrbonne, Quebec');
-
-INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 1, 20);
-INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 2, 25);
-INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (2, 3, 10);
-
-INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 1, 5, 'Nice ! Might order');
-INSERT INTO reviews (customer_id, product_id, rating, description) VALUES (1, 2, 5, 'Amazing !');
-INSERT INTO reviews (customer_id, product_id, rating, flags, description) VALUES (1, 3, 1, 5, 'It was rotten :(');
-
-INSERT INTO orders (customer_id, store_id) VALUES (1, 1);
-INSERT INTO orders (customer_id, store_id) VALUES (1, 1);
-
-INSERT INTO orders_products (order_id, product_id, quantity) VALUES (1, 1, 10);
-INSERT INTO orders_products (order_id, product_id, quantity) VALUES (1, 2, 10);
+INSERT INTO products (category_id, name) VALUES (1, 'paper towel'); -- 1
+INSERT INTO products (category_id, name) VALUES (2, 'BMW i6'); -- 2
+INSERT INTO products (category_id, name) VALUES (3, 'Barbie Movie'); -- 3
+INSERT INTO products (category_id, name) VALUES (4, 'laptop ASUS 104S'); -- 4
+INSERT INTO products (category_id, name) VALUES (4, 'PS5'); -- 5
+INSERT INTO products (category_id, name) VALUES (5, 'apple'); -- 6
+INSERT INTO products (category_id, name) VALUES (5, 'chicken'); -- 7
+INSERT INTO products (category_id, name) VALUES (5, 'orange'); -- 8
+INSERT INTO products (category_id, name) VALUES (5, 'pasta'); -- 9
+INSERT INTO products (category_id, name) VALUES (5, 'plum'); -- 10
+INSERT INTO products (category_id, name) VALUES (6, 'L`Oreal Normal Hair'); -- 11
+INSERT INTO products (category_id, name) VALUES (7, 'BMW iX Lego'); -- 12
+INSERT INTO products (category_id, name) VALUES (7, 'Lamborghini Lego'); -- 13
+INSERT INTO products (category_id, name) VALUES (8, 'Truck 500c'); -- 14
+INSERT INTO products (category_id, name) VALUES (9, 'SIMS CD'); -- 15
+--
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 2, 6);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 13, 10);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 4, 1000);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (1, 9, 2132);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (2, 6, 24980);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (2, 1, 39484);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (3, 11, 43242);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (3, 15, 103);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (4, 8, 35405);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (4, 11, 6579);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (4, 5, 123);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (5, 3, 40);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (5, 14, 98765);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (5, 15, 1000);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (6, 7, 43523);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (6, 12, 450);
+INSERT INTO products_warehouses (warehouse_id, product_id, quantity) VALUES (6, 1, 3532);
+--
+INSERT INTO stores (name) VALUES ('dawson store');
+INSERT INTO stores (name) VALUES ('dealer montreal');
+INSERT INTO stores (name) VALUES ('Dealer one'); 
+INSERT INTO stores (name) VALUES ('marche adonis'); 
+INSERT INTO stores (name) VALUES ('marche atwater'); 
+INSERT INTO stores (name) VALUES ('movie start'); 
+INSERT INTO stores (name) VALUES ('movie store');
+INSERT INTO stores (name) VALUES ('star store'); 
+INSERT INTO stores (name) VALUES ('store magic'); 
+INSERT INTO stores (name) VALUES ('super rue champlain'); 
+INSERT INTO stores (name) VALUES ('toy r us'); 
+--
+INSERT INTO products_stores (product_id, store_id, price) VALUES (1, 6, 50);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (2, 3, 50000);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (3, 7, 30);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (3, 11, 45);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (4, 4, 970);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (5, 8, 200);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (6, 5, 10);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (7, 4, 9.5);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (8, 9, 2);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (9, 5, 13.5);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (9, 9, 15);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (10, 5, 10);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (11, 10, 10);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (12, 11, 40);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (13, 11, 40);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (14, 2, 856600);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (15, 1, 50);
+INSERT INTO products_stores (product_id, store_id, price) VALUES (15, 7, 16);
+--
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (1, 11, TO_DATE('10/02/2023', 'MM/DD/YYYY')); -- 1
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (1, 7, TO_DATE('10/23/2023', 'MM/DD/YYYY')); --2
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (2, 6, TO_DATE('10/11/2023', 'MM/DD/YYYY')); -- 3
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (3, 9, TO_DATE('10/23/2023', 'MM/DD/YYYY')); -- 4
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (4, 5, TO_DATE('05/06/2023', 'MM/DD/YYYY')); -- 5
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (5, 3, TO_DATE('08/10/2023', 'MM/DD/YYYY')); -- 6
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (6, 3, TO_DATE('10/10/2023', 'MM/DD/YYYY')); -- 7
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (7, 11, TO_DATE('10/11/2023', 'MM/DD/YYYY')); -- 8
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (7, 5, TO_DATE('05/06/2023', 'MM/DD/YYYY')); -- 9
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (7, 4, TO_DATE('04/21/2023', 'MM/DD/YYYY')); -- 10
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (7, 11, TO_DATE('10/07/2023', 'MM/DD/YYYY')); -- 11
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (8, 4, TO_DATE('04/03/2023', 'MM/DD/YYYY')); -- 12
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (9, 10, TO_DATE('10/10/2023', 'MM/DD/YYYY')); -- 13 
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (9, 10, TO_DATE('09/12/2019', 'MM/DD/YYYY')); -- 14
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (9, 1, TO_DATE('10/01/2023', 'MM/DD/YYYY')); -- 15
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (10, 8, TO_DATE('01/20/2020', 'MM/DD/YYYY')); -- 16
+INSERT INTO orders (customer_id, store_id, order_date) VALUES (11, 9, TO_DATE('12/29/2021', 'MM/DD/YYYY')); -- 17
+--
 INSERT INTO orders_products (order_id, product_id, quantity) VALUES (1, 3, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (2, 6, 2);
 INSERT INTO orders_products (order_id, product_id, quantity) VALUES (2, 3, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (2, 15, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (3, 1, 3);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (4, 8, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (5, 10, 6);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (6, 2, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (7, 2, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (8, 13, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (8, 12, 2);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (9, 10, 7);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (10, 4, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (11, 13, 2);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (12, 7, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (13, 11, 3);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (14, 15, 3);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (15, 11, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (16, 5, 1);
+INSERT INTO orders_products (order_id, product_id, quantity) VALUES (17, 9, 6);
+--
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (1, 6, 0, 3, 'Not good');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (1, 3, 0, 1, 'Hated it');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (1, 15, 0, 1, 'sucks');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (2, 1, 0, 5, 'good !');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (3, 8, 0, 5, 'delicious');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (4, 10, 0, 4, 'yum!');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (5, 2, 1, 5, 'women love it');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (6, 2, 1, 5, 'trash');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (7, 4, 0, 4, 'it was affordable');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (7, 12, 0, 1, 'missing pieces');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (7, 13, 0, 1, 'again missing pieces');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (7, 10, 0, 4, 'good!');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (8, 5, 0, 4, 'good quality');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (9, 15, 1, 2, 'terrible');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (9, 11, 0, 1, 'not worth the price');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (10, 5, 0, 5, 'awesome!');
+INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES (11, 9, 0, 5, 'good!');
+
 COMMIT;
 /
