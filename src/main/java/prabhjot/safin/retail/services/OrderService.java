@@ -21,6 +21,14 @@ public class OrderService {
         this.connection = connection;
     }
 
+    /**
+     * Creates an order
+     * @param order Holds basic order information like customer and store
+     * @param products A mapping, where the keys are the product id and values are the desired quantity
+     * @return The order id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public int createOrder(Order order, Map<Integer, Integer> products) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
@@ -42,6 +50,11 @@ public class OrderService {
         return orderId;
     }
 
+    /**
+     * Deletes an order
+     * @param orderId Id of the order to delete
+     * @throws SQLException
+     */
     public void deleteOrder(int orderId) throws SQLException {
         String SQL = "{call order_pkg.delete_order(?)}";
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
@@ -50,6 +63,13 @@ public class OrderService {
         this.connection.commit();
     }
 
+    /**
+     * Retrives information about an order
+     * @param orderId Id of the order
+     * @return Order object with customer id, store id and order date
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public Order getOrder(int orderId) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
@@ -63,6 +83,13 @@ public class OrderService {
         return order;
     }
 
+    /**
+     * Retrives the list of all orders made by a customer
+     * @param customerId Customer whom orders we want to retrieve
+     * @return Mapping of order id and order object
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public Map<Integer, Order> getOrdersByCustomer(int customerId) throws SQLException, ClassNotFoundException {
         Map<Integer, Order> orders = new HashMap<Integer, Order>();
         String SQL = "{? = call order_pkg.get_customer_orders(?)}";
@@ -72,11 +99,18 @@ public class OrderService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while(resultSet.next()) {
-            orders.put(resultSet.getInt(1), this.getOrder(resultSet.getInt(1)));
+            orders.put(resultSet.getInt(2), this.getOrder(resultSet.getInt(2)));
         }
         return orders;
     }
 
+    /**
+     * Retrives a mapping of products names and their quantites for a particular order
+     * @param orderId Id of the order
+     * @return Mapping of products names and their quantites for a particular order
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public Map<String, Integer> getOrderDetails(int orderId) throws SQLException, ClassNotFoundException {
         ProductService productService = new ProductService(this.connection);
         Map<String, Integer> productQuantityMapping = new HashMap<String, Integer>();
@@ -87,7 +121,7 @@ public class OrderService {
         callableStatement.execute();
         ResultSet products = callableStatement.getArray(1).getResultSet();
         while (products.next()) {
-            String productName = productService.getProduct(products.getInt(1)).getName();
+            String productName = productService.getProduct(products.getInt(2)).getName();
             String quantitySql = "{? = order_pkg.get_order_product_quantity(?,?)}";
             CallableStatement quantityStatement = this.connection.prepareCall(quantitySql);
             quantityStatement.registerOutParameter(1, Types.INTEGER);

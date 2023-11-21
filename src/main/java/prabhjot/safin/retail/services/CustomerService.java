@@ -23,7 +23,6 @@ public class CustomerService {
 
     /**
      * Authenticates a customer based on customer ID and password.
-     *
      * @param customerId The ID of the customer.
      * @param password   The password for authentication.
      * @return The Customer object if authentication is successful, otherwise null.
@@ -44,6 +43,12 @@ public class CustomerService {
         return customer;
     }
 
+    /**
+     * Retrives a customer by id
+     * @param id Id of the customer
+     * @throws SQLException If database error occurs
+     * @throws ClassNotFoundException If the mapping fails
+     */
     public Customer getCustomer(int id) throws SQLException, ClassNotFoundException {
         Map<String, Class<?>> map = this.connection.getTypeMap();
         this.connection.setTypeMap(map);
@@ -57,6 +62,12 @@ public class CustomerService {
         return customer;
     }
     
+    /**
+     * Retrives all customers from the database
+     * @return Mapping of customers id and customer type
+     * @throws SQLException If database error occurs
+     * @throws ClassNotFoundException If mapping fails
+     */
     public Map<Integer, Customer> getAllCustomers() throws SQLException, ClassNotFoundException {
         Map<Integer, Customer> customers = new HashMap<Integer, Customer>();
         String SQL = "{? = call customer_pkg.get_customers()}";

@@ -146,7 +146,7 @@ public class WarehouseService {
         callableStatement.execute();
         ResultSet resultSet = callableStatement.getArray(1).getResultSet();
         while (resultSet.next()) {
-            warehouses.put(resultSet.getInt(1), this.getWarehouse(resultSet.getInt(1)));
+            warehouses.put(resultSet.getInt(2), this.getWarehouse(resultSet.getInt(2)));
         }
         return warehouses;
     }
