@@ -410,6 +410,7 @@ CREATE PACKAGE category_pkg AS
     PROCEDURE delete_category(id IN NUMBER);
     FUNCTION get_category(id IN NUMBER) RETURN category_type;
     FUNCTION get_categories RETURN number_array;
+    PROCEDURE customer_update_info(vcustomer IN customer_pkg, id in NUMBER)
 END category_pkg;
 /
 CREATE PACKAGE BODY category_pkg AS 
