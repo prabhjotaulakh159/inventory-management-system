@@ -1,6 +1,3 @@
--- For all documentation on package procedures/functions
--- Please refer to the packages folder within this directory
-
 /*******************************************************************************
 REGULAR TABLES 
 *******************************************************************************/
@@ -314,9 +311,9 @@ BEGIN
 END;
 /
 
---/*******************************************************************************
---OBJECTS/TYPES
---*******************************************************************************/
+/*******************************************************************************
+OBJECTS/TYPES
+*******************************************************************************/
 CREATE TYPE number_array IS VARRAY(100) OF NUMBER;
 /
 
@@ -375,6 +372,8 @@ CREATE PACKAGE admin_pkg AS
 END admin_pkg;
 /
 CREATE PACKAGE BODY admin_pkg AS 
+    -- Throws an error if an admin does not exist 
+    -- id -> id of admin to look for
     PROCEDURE check_if_admin_exists(id IN NUMBER) AS 
         count_admin  NUMBER;
     BEGIN 
@@ -387,6 +386,10 @@ CREATE PACKAGE BODY admin_pkg AS
         END IF;
     END;
     
+    -- Logs in an admin    
+    -- id -> id of admin
+    -- password -> password of admin 
+    -- return -> 0 if login was successful, else 1
     FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN NUMBER AS
         vpassword VARCHAR2(100);
     BEGIN 
@@ -413,48 +416,54 @@ CREATE PACKAGE category_pkg AS
 END category_pkg;
 /
 CREATE PACKAGE BODY category_pkg AS 
+    -- Checks if a category exists, else raise an exception
+    -- id -> id of the category to find
     PROCEDURE check_if_category_exists(id IN NUMBER) AS 
         count_category NUMBER;
     BEGIN 
         IF id IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20006, 'Category id cannot be null');
         END IF;
-        
         SELECT COUNT(*) INTO count_category FROM categories 
         WHERE category_id = id;
-        
         IF count_category = 0 THEN 
             RAISE_APPLICATION_ERROR(-20006, 'Category does not exist');
         END IF;
     END;
 
+    -- Creates a new category
+    -- category -> object with category info
     PROCEDURE create_category(category IN category_type) AS 
     BEGIN
         IF category.category IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20006, 'Category cannot be null');
         END IF;
-        
         INSERT INTO categories (category) VALUES (category.category);
     END;
     
+    -- updates a category
+    -- id -> id of the category to update
+    -- vcategory -> new category name 
     PROCEDURE update_category(id IN NUMBER, vcategory IN VARCHAR2) AS
     BEGIN 
         category_pkg.check_if_category_exists(id);
-        
         IF vcategory IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20006, 'Category cannot be null');
         END IF;
-        
         UPDATE categories SET category = vcategory 
         WHERE category_id = id;
     END;
     
+    -- deletes a category
+    -- id -> id of category to delete
     PROCEDURE delete_category(id IN NUMBER) AS
     BEGIN 
         category_pkg.check_if_category_exists(id);
         DELETE FROM categories WHERE category_id = id;
     END;
     
+    -- gets all the categories
+    -- return -> id of each category
     FUNCTION get_categories RETURN number_array AS
         count_category NUMBER;
         categorie_arr number_array;
@@ -467,6 +476,9 @@ CREATE PACKAGE BODY category_pkg AS
         RETURN categorie_arr;
     END;
     
+    -- gets a category
+    -- id -> id of category to get
+    -- return -> category object
     FUNCTION get_category (id IN NUMBER) RETURN category_type AS
         vcategory VARCHAR2(100);
     BEGIN 
@@ -487,20 +499,24 @@ CREATE PACKAGE customer_pkg AS
 END customer_pkg;
 /
 CREATE PACKAGE BODY customer_pkg AS 
+    -- raises error is customer does not exist
+    -- id -> id of customer to check
     PROCEDURE check_if_customer_exists(id IN NUMBER) AS 
         count_cust  NUMBER;
     BEGIN 
         IF id IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20004, 'Customer id cannot be null');
         END IF;
-        
         SELECT COUNT(*) INTO count_cust FROM customers WHERE customer_id = id;
-        
         IF count_cust = 0 THEN 
             RAISE_APPLICATION_ERROR(-20004, 'Customer does not exist');
         END IF;
     END;
     
+    -- logs in a customer
+    -- id -> id of customer
+    -- password -> password of customer
+    -- return -> customer object
     FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN customer_type AS 
         fn  VARCHAR2(100);
         ln  VARCHAR2(100);
@@ -518,6 +534,8 @@ CREATE PACKAGE BODY customer_pkg AS
         RETURN customer_type(fn, ln, vemail, vaddr, vpassword);
     END;
 
+    -- gets all customers
+    -- return -> all id's of customers
     FUNCTION get_customers RETURN number_array AS
         cust_ids number_array;
     BEGIN 
@@ -529,6 +547,9 @@ CREATE PACKAGE BODY customer_pkg AS
         RETURN cust_ids;
     END;
 
+    -- gets customer by id
+    -- id -> id of customer to get
+    -- return -> customer object
     FUNCTION get_customer_by_id(id IN NUMBER) RETURN customer_type AS 
         vfname      VARCHAR2(100);
         vlname      VARCHAR2(100);
@@ -542,14 +563,16 @@ CREATE PACKAGE BODY customer_pkg AS
         RETURN customer_type(vfname, vlname, vemail, vaddress, '');
     END;
 
-    PROCEDURE customer_update_info(vcustomer IN customer_pkg, id in NUMBER) AS
+    -- updates a customer
+    -- vcustomer -> customer object with new info
+    -- id -> id of customer to update
+    PROCEDURE customer_update_info(vcustomer IN customer_type, id in NUMBER) AS
     BEGIN
         IF id IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20004, 'Customer id cannot be null');
         END IF;
-
-        UPDATE customers SET password = vcustomer.password, firstname= vproduct.firstname,
-        lastname = vproduct.lastname, email= vcustomer.email, address = vcustomer.address
+        UPDATE customers SET password = vcustomer.password, firstname= vcustomer.firstname,
+        lastname = vcustomer.lastname, email= vcustomer.email, address = vcustomer.address
         WHERE customer_id= id;    
     END;        
 END customer_pkg;
@@ -567,70 +590,74 @@ CREATE PACKAGE product_pkg AS
 END product_pkg;
 /
 CREATE PACKAGE BODY product_pkg AS 
+    -- checks if product exists, else raise exception
+    -- id -> id of product to check
     PROCEDURE check_if_product_exists(id IN NUMBER) AS
         count_prod  NUMBER;
     BEGIN 
         IF id IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20005, 'Product id cannot be null');
         END IF;
-        
         SELECT COUNT(*) INTO count_prod FROM products WHERE product_id = id;
-        
         IF count_prod = 0 THEN 
             RAISE_APPLICATION_ERROR(-20005, 'Product does not exist');
         END IF;
     END;
     
+    -- creates a product
+    -- product -> product object
     PROCEDURE create_product(product IN product_type) AS 
     BEGIN 
         category_pkg.check_if_category_exists(product.category);
-        
         IF product.name IS NULL THEN
             RAISE_APPLICATION_ERROR(-20005, 'Product name cannot be null');
         END IF;
-        
         IF LENGTH(product.name) NOT BETWEEN 1 AND 100 THEN 
             RAISE_APPLICATION_ERROR(-20005, 'Product name must be between 1 and 100 characters');
         END IF;
-        
         INSERT INTO products (name, category_id) VALUES (product.name, product.category);
     END;
     
+    -- updates a product
+    -- id -> id of product to update
+    -- product -> product object
     PROCEDURE update_product(id IN NUMBER, product IN product_type) AS 
     BEGIN 
         product_pkg.check_if_product_exists(id);
         category_pkg.check_if_category_exists(product.category);
-        
         IF product.name IS NULL THEN
             RAISE_APPLICATION_ERROR(-20005, 'Product name cannot be null');
         END IF;
-        
         IF LENGTH(product.name) NOT BETWEEN 1 AND 100 THEN 
             RAISE_APPLICATION_ERROR(-20005, 'Product name must be between 1 and 100 characters');
         END IF;
-        
         UPDATE products SET name = product.name, category_id = product.category 
         WHERE product_id = id;
     END;
     
+    -- deletes a product 
+    -- id -> id of product to delete
     PROCEDURE delete_product(id IN NUMBER) AS
     BEGIN 
         product_pkg.check_if_product_exists(id);
         DELETE FROM products WHERE product_id = id;
     END;
 
+    -- gets a product by id
+    -- id -> id of product to get
+    -- return -> product object
     FUNCTION get_product(id IN NUMBER) RETURN product_type AS 
         vname VARCHAR2(100);
         category NUMBER;
     BEGIN 
         product_pkg.check_if_product_exists(id);
-        
         SELECT name, category_id INTO vname, category FROM products 
         WHERE product_id = id;
-        
         RETURN product_type(vname, category);
     END;
     
+    -- gets all products
+    -- return -> all id's of products
     FUNCTION get_products RETURN number_array AS
         product_arr number_array;
         count_prod NUMBER;
@@ -661,87 +688,91 @@ CREATE PACKAGE store_pkg AS
 END store_pkg;
 /
 CREATE PACKAGE BODY store_pkg AS 
+    -- check if store exist
+    -- id -> id of store to check
     PROCEDURE check_if_store_exists(id IN NUMBER) AS 
         count_store NUMBER;
     BEGIN 
         IF id IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Store id cannot be null');
         END IF;
-        
         SELECT COUNT(*) INTO count_store FROM stores WHERE store_id = id;
-        
         IF count_store = 0 THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Store does not exist');
         END IF;
     END;
     
+    -- creates a store
+    -- store -> store object
     PROCEDURE create_store(store IN store_type) AS 
     BEGIN 
         IF store.name IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Store name cannot be null');
         END IF;
-        
         IF LENGTH(store.name) NOT BETWEEN 1 AND 100 THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Name of store must be between 1 and 100 characters');
         END IF;
-        
         INSERT INTO stores (name) VALUES (store.name);
     END;
     
+    -- updates a store
+    -- id -> id of store to update
+    -- vname -> new name of store
     PROCEDURE update_store(id IN NUMBER, vname IN VARCHAR2) AS
     BEGIN 
         store_pkg.check_if_store_exists(id);
-        
         IF vname IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Store name cannot be null');
         END IF;
-        
         IF LENGTH(vname) NOT BETWEEN 1 AND 100 THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Name of store must be between 1 and 100 characters');
         END IF;
-        
         UPDATE stores SET name = vname WHERE store_id = id;
     END;
     
+    -- deletes a store
+    -- id -> id of store to delete
     PROCEDURE delete_store(id IN NUMBER) AS
     BEGIN 
         store_pkg.check_if_store_exists(id);
         DELETE FROM stores WHERE store_id = id;
     END;
     
+    -- creates the price of a product at a store
+    -- vstoreid -> id of store to insert product price
+    -- vproductid -> id of product to price
+    -- vprice => price of product at store
     PROCEDURE create_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER) AS
     BEGIN 
         store_pkg.check_if_store_exists(vstoreid);
         product_pkg.check_if_product_exists(vproductid);
-        
         IF vprice <= 0 THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Price cannot be equal to or lower than 0');
         END IF;
-        
         INSERT INTO products_stores (store_id, product_id, price) VALUES (vstoreid, vproductid, vprice);
-        
         EXCEPTION 
             WHEN value_error THEN 
                 RAISE_APPLICATION_ERROR(-20003, 'Price is invalid, try another number');
     END;
         
+    -- same as create_price, exception we update the price at a store for a product
     PROCEDURE update_price(vstoreid IN NUMBER, vproductid IN NUMBER, vprice IN NUMBER) AS
     BEGIN 
         store_pkg.check_if_store_exists(vstoreid);
         product_pkg.check_if_product_exists(vproductid);
-        
         IF vprice <= 0 THEN 
             RAISE_APPLICATION_ERROR(-20003, 'Price cannot be equal to or lower than 0');
         END IF;
-        
         UPDATE products_stores SET price = vprice 
         WHERE store_id = vstoreid AND product_id = vproductid;
-        
         EXCEPTION 
             WHEN value_error THEN 
                 RAISE_APPLICATION_ERROR(-20003, 'Price is invalid, try another number');
     END;
 
+    -- gets the price of a product at a store
+    -- prodid -> id of product to get price
+    -- storeid -> id of store to fetch price from
     FUNCTION get_price_of_product(prodid IN NUMBER, storeid IN NUMBER) RETURN NUMBER AS
         vprice NUMBER;
     BEGIN 
@@ -752,6 +783,9 @@ CREATE PACKAGE BODY store_pkg AS
         RETURN vprice;
     END;
 
+    -- fetches a store
+    -- vstoreid -> id of store
+    -- return -> store object
     FUNCTION get_store(vstoreid IN NUMBER) RETURN store_type AS 
         vname VARCHAR2(100);
         store store_type;
@@ -761,6 +795,8 @@ CREATE PACKAGE BODY store_pkg AS
         RETURN store_type(vname);
     END;
     
+    -- gets all stores
+    -- return -> id's of all stores
     FUNCTION get_stores RETURN number_array AS
         stores_arr number_array;
         count_stores NUMBER;
@@ -792,20 +828,23 @@ CREATE PACKAGE order_pkg AS
 END order_pkg;
 /
 CREATE PACKAGE BODY order_pkg AS 
+    -- checks if order exists
+    -- id -> order id to check
     PROCEDURE check_if_order_exists(id IN NUMBER) AS 
         count_order NUMBER;
     BEGIN
         IF id IS NULL THEN 
             RAISE_APPLICATION_ERROR(-20002, 'Order id cannot be null');
         END IF;
-        
         SELECT COUNT(*) INTO count_order FROM orders WHERE order_id = id;
-        
         IF count_order = 0 THEN 
             RAISE_APPLICATION_ERROR(-20002, 'Order does not exists');
         END IF;
     END;
     
+    -- creates a order entry
+    -- vorder -> order object
+    -- vorder_id -> order id to return
     PROCEDURE create_order (vorder IN order_type, vorder_id OUT NUMBER) AS 
     BEGIN 
         customer_pkg.check_if_customer_exists(vorder.customer);
@@ -815,6 +854,10 @@ CREATE PACKAGE BODY order_pkg AS
         RETURNING order_id INTO vorder_id;        
     END;
     
+    -- inserts a product and it's quantity into an order
+    -- vorderid -> order id to insert product into
+    -- vprodid -> prodduct id to insert
+    -- vquantity -> quantity of product
     PROCEDURE insert_product_into_order(vorderid IN NUMBER, vprodid IN NUMBER, vquantity IN NUMBER) AS 
     BEGIN 
         order_pkg.check_if_order_exists(vorderid);
@@ -824,19 +867,22 @@ CREATE PACKAGE BODY order_pkg AS
         END IF;
         INSERT INTO orders_products (order_id, product_id, quantity) 
         VALUES (vorderid, vprodid, vquantity);
-        
         EXCEPTION 
             WHEN order_pkg.depleted_stock THEN 
                 RAISE_APPLICATION_ERROR(-20002, 'This item is out of stock');
                 ROLLBACK;
     END;
 
-    
+    -- deletes an order
+    -- id -> id of order to delete
     PROCEDURE delete_order (id IN NUMBER) AS BEGIN 
         order_pkg.check_if_order_exists(id);
         DELETE FROM orders WHERE order_id = id;
     END;
     
+    -- gets an order
+    -- id -> id of order to get
+    -- return -> order object
     FUNCTION get_order(id IN NUMBER) RETURN order_type AS 
         cust    NUMBER;
         store   NUMBER;
@@ -848,6 +894,9 @@ CREATE PACKAGE BODY order_pkg AS
         RETURN order_type(cust, store, odate);
     END;
     
+    -- gets all orders of a customer
+    -- id -> customer id
+    -- return -> order id's of customer
     FUNCTION get_customer_orders(id IN NUMBER) RETURN number_array 
     AS 
         order_arr number_array;
@@ -862,6 +911,9 @@ CREATE PACKAGE BODY order_pkg AS
         RETURN order_arr;
     END;
     
+    -- gets products within an order
+    -- id -> order id
+    -- return -> id's of products for an order
     FUNCTION get_order_products(id IN NUMBER) RETURN number_array AS
         prod_arr number_array;
     BEGIN 
@@ -872,6 +924,10 @@ CREATE PACKAGE BODY order_pkg AS
         RETURN prod_arr;
     END;
 
+    -- get the quantity of a product for an order
+    -- vorderid -> order id 
+    -- vproductid -> product to get quantity of
+    -- return -> quantity of product in order
     FUNCTION get_order_product_quantity(vorderid IN NUMBER, vproductid IN NUMBER) RETURN NUMBER AS 
         quant NUMBER;
     BEGIN 
@@ -880,7 +936,8 @@ CREATE PACKAGE BODY order_pkg AS
         RETURN quant;
     END;
 
-        
+    -- gets total price of an order
+    -- order_number -> order id to get total price of 
     FUNCTION price_order(order_number NUMBER) RETURN NUMBER AS 
         spent NUMBER;
     BEGIN 
@@ -903,6 +960,7 @@ CREATE PACKAGE review_pkg AS
     PROCEDURE update_review(id IN NUMBER, vrating IN NUMBER, vdescription IN VARCHAR2);
     PROCEDURE delete_review(id IN NUMBER);
     PROCEDURE delete_flagged_reviews;
+    PROCEDURE flag_review(revid IN NUMBER);
     FUNCTION get_review(id IN NUMBER) RETURN review_type;
     FUNCTION get_all_reviews RETURN number_array;
     FUNCTION get_flagged_reviews RETURN number_array;
@@ -910,6 +968,8 @@ CREATE PACKAGE review_pkg AS
 END review_pkg;
 /
 CREATE PACKAGE BODY review_pkg AS 
+    -- Verifies the existence of a review with the specified ID.
+    -- id -> Review ID to be checked for existence
     PROCEDURE check_if_review_exists(id IN NUMBER) AS 
         count_review   NUMBER;
     BEGIN 
@@ -922,6 +982,8 @@ CREATE PACKAGE BODY review_pkg AS
         END IF;
     END;
 
+    -- Validates if the provided review is null.
+    -- review -> IN  - Review of type review_type to be checked for null.
     PROCEDURE check_null(review IN review_type) AS 
     BEGIN 
         IF review.customer IS NULL OR review.product IS NULL 
@@ -930,7 +992,9 @@ CREATE PACKAGE BODY review_pkg AS
             RAISE_APPLICATION_ERROR(-20000, 'Review cannot have null values');
         END IF;
     END;
-    
+
+    -- Validates the provided rating value.
+    -- vrating -> IN  - Rating value to be validated.
     PROCEDURE validate_rating(vrating IN NUMBER) AS
     BEGIN
         IF vrating NOT BETWEEN 1 AND 5 THEN 
@@ -938,6 +1002,8 @@ CREATE PACKAGE BODY review_pkg AS
         END IF;
     END;
     
+    -- Validates the provided description string.
+    -- vdescription -> IN  - Description string to be validated.
     PROCEDURE validate_description(vdescription IN VARCHAR2) AS
     BEGIN 
         IF LENGTH(vdescription) > 30 THEN 
@@ -945,48 +1011,65 @@ CREATE PACKAGE BODY review_pkg AS
         END IF;
     END;
     
+    -- Creates a new review based on the provided review data.
+    -- review -> IN  - Review data of type review_type to be created.
     PROCEDURE create_review(review IN review_type) AS
         count_cust      NUMBER;
         count_prod      NUMBER;
     BEGIN 
         customer_pkg.check_if_customer_exists(review.customer);
         product_pkg.check_if_product_exists(review.product);
-        
         review_pkg.check_null(review);
         review_pkg.validate_rating(review.rating);
         review_pkg.validate_description(review.description);
-              
         INSERT INTO reviews (customer_id, product_id, rating, description)
         VALUES (review.customer, review.product, review.rating, 
             review.description);
     END;
     
+    -- Updates an existing review with new rating and description values.
+    -- id           -> IN  - ID of the review to be updated.
+    -- vrating      -> IN  - New rating value for the review.
+    -- vdescription -> IN  - New description for the review.
     PROCEDURE update_review(id IN NUMBER, vrating IN NUMBER, vdescription IN VARCHAR2) AS
         count_rev      NUMBER;
     BEGIN 
         review_pkg.check_if_review_exists(id);
         review_pkg.validate_rating(vrating);
         review_pkg.validate_description(vdescription);
-        
         UPDATE reviews SET rating = vrating, description = vdescription
         WHERE review_id = id;
-        
         EXCEPTION 
             WHEN others THEN 
                 RAISE_APPLICATION_ERROR(-20000, 'Cannot update review');
     END;
     
+    -- Deletes a review with the specified ID.
+    -- id -> IN  - ID of the review to be deleted.
     PROCEDURE delete_review(id IN NUMBER) AS 
     BEGIN 
         review_pkg.check_if_review_exists(id);
         DELETE FROM reviews WHERE review_id = id;
     END;
     
+    -- Deletes flagged reviews
     PROCEDURE delete_flagged_reviews AS 
     BEGIN 
         DELETE FROM reviews WHERE flags > 2;
     END;
     
+    -- flags a review
+    -- revevid -> id of review to flag
+    PROCEDURE flag_review(revid IN NUMBER) AS
+    BEGIN 
+        review_pkg.check_if_review_exists(revid);
+        UPDATE reviews SET flags = flags + 1 WHERE review_id = revid;
+    END;
+
+    
+    -- Retrieves review data for the specified ID.
+    -- id -> IN  - ID of the review to be retrieved.
+    -- RETURN -> review_type - Data of type review_type for the specified review ID.
     FUNCTION get_review(id IN NUMBER) RETURN review_type AS 
         review          review_type;
         count_rev       NUMBER;
@@ -1004,6 +1087,8 @@ CREATE PACKAGE BODY review_pkg AS
         RETURN review;
     END;
     
+    -- Retrieves an array of all review IDs.
+    -- RETURN -> number_array - Array containing all review IDs.
     FUNCTION get_all_reviews RETURN number_array AS 
         reviews_arr number_array;
         num_reviews NUMBER;
@@ -1016,6 +1101,8 @@ CREATE PACKAGE BODY review_pkg AS
         RETURN reviews_arr;
     END;
     
+    -- Retrieves an array of IDs for flagged reviews.
+    -- RETURN -> number_array - Array containing IDs of flagged reviews.
     FUNCTION get_flagged_reviews RETURN number_array AS
         reviews_arr number_array;
     BEGIN 
@@ -1027,6 +1114,9 @@ CREATE PACKAGE BODY review_pkg AS
         RETURN reviews_arr;
     END;
     
+    -- Retrieves an array of review IDs for a specific product.
+    -- id -> IN  - ID of the product for which reviews are retrieved.
+    -- RETURN -> number_array - Array containing review IDs for the specified product.
     FUNCTION get_review_for_product(id IN NUMBER) RETURN number_array AS 
         review_arr number_array;
     BEGIN 
@@ -1039,7 +1129,6 @@ CREATE PACKAGE BODY review_pkg AS
         END IF;
         RETURN review_arr;
     END;
-
 END review_pkg;
 /
 
@@ -1058,6 +1147,8 @@ CREATE PACKAGE warehouse_pkg AS
 END warehouse_pkg;
 /
 CREATE PACKAGE BODY warehouse_pkg AS
+    -- Checks if a warehouse with the specified ID exists.
+    -- id -> IN  - Warehouse ID to be checked for existence.
     PROCEDURE check_if_warehouse_exists(id IN NUMBER) AS
          count_warehouse     NUMBER;
     BEGIN 
@@ -1087,6 +1178,8 @@ CREATE PACKAGE BODY warehouse_pkg AS
         END IF;
     END;
     
+    -- Creates a new warehouse based on the provided warehouse data.
+    -- warehouse -> IN  - Warehouse data of type warehouse_type to be created.
     PROCEDURE create_warehouse(warehouse IN warehouse_type) AS 
     BEGIN 
         warehouse_pkg.check_null(warehouse);
@@ -1095,6 +1188,9 @@ CREATE PACKAGE BODY warehouse_pkg AS
         VALUES (warehouse.name, warehouse.address);
     END;
     
+    -- Updates an existing warehouse with new data.
+    -- id        -> IN  - ID of the warehouse to be updated.
+    -- warehouse -> IN  - New warehouse data of type warehouse_type.
     PROCEDURE update_warehouse(id IN NUMBER, warehouse IN warehouse_type) AS
     BEGIN 
         warehouse_pkg.check_if_warehouse_exists(id);
@@ -1104,12 +1200,17 @@ CREATE PACKAGE BODY warehouse_pkg AS
         WHERE warehouse_id = id;
     END;
     
+    -- Deletes a warehouse with the specified ID.
+    -- id -> IN  - ID of the warehouse to be deleted.
     PROCEDURE delete_warehouse(id IN NUMBER) AS 
     BEGIN 
         warehouse_pkg.check_if_warehouse_exists(id);
         DELETE FROM warehouses WHERE warehouse_id = id;
     END;
     
+    -- Retrieves warehouse data for the specified ID.
+    -- id -> IN  - ID of the warehouse to be retrieved.
+    -- RETURN -> warehouse_type - Data of type warehouse_type for the specified warehouse ID.
     FUNCTION get_warehouse(id IN NUMBER) RETURN warehouse_type AS 
         warehouse           warehouse_type;
         vname               VARCHAR2(30);
@@ -1122,6 +1223,10 @@ CREATE PACKAGE BODY warehouse_pkg AS
         RETURN warehouse;
     END;
     
+    -- Inserts a new product into a warehouse with an initial quantity.
+    -- vwarehouseid  -> IN  - Warehouse ID where the product is inserted.
+    -- vproductid    -> IN  - Product ID to be inserted.
+    -- initial_quant -> IN  - Initial quantity of the product in the warehouse.
     PROCEDURE insert_product_into_warehouse(vwarehouseid IN NUMBER, vproductid IN NUMBER, initial_quant IN NUMBER) AS
         count_prod NUMBER;
     BEGIN 
@@ -1139,7 +1244,10 @@ CREATE PACKAGE BODY warehouse_pkg AS
         VALUES (vwarehouseid, vproductid, initial_quant);
     END;
 
-    
+    -- Updates the stock quantity for a product in a warehouse.
+    -- vwarehouseid -> IN  - Warehouse ID where the stock is updated.
+    -- vproductid   -> IN  - Product ID for which the stock is updated.
+    -- vquantity    -> IN  - New quantity of the product in the warehouse.
     PROCEDURE update_stock(vwarehouseid IN NUMBER, vproductid IN NUMBER, vquantity IN NUMBER) AS
     BEGIN 
         warehouse_pkg.check_if_warehouse_exists(vwarehouseid);
@@ -1154,7 +1262,8 @@ CREATE PACKAGE BODY warehouse_pkg AS
                 RAISE_APPLICATION_ERROR(-20001, 'Invalid quantity, try another number');
     END;
 
-    
+    -- Retrieves an array of all warehouse IDs.
+    -- RETURN -> number_array - Array containing all warehouse IDs.
     FUNCTION get_all_warehouses RETURN number_array AS 
         warehouses_arr number_array;
     BEGIN 
@@ -1166,6 +1275,9 @@ CREATE PACKAGE BODY warehouse_pkg AS
         RETURN warehouses_arr;
     END;
     
+    -- Retrieves the total stock quantity for the specified warehouse.
+    -- id -> IN  - ID of the warehouse for which stock quantity is retrieved.
+    -- RETURN -> NUMBER - Total stock quantity for the specified warehouse.
     FUNCTION get_stock(id IN NUMBER) RETURN NUMBER AS
         stock NUMBER;
     BEGIN 
