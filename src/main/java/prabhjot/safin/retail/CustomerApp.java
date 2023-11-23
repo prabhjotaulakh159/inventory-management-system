@@ -48,6 +48,13 @@ public class CustomerApp {
                 System.out.println("Press 5 to exit");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
+
+                if(input == 1) productCrud();
+                else if(input == 2) ordersOptions();
+                else if(input == 3) reviewsOptions();
+                else if(input == 4) storeOptions();
+                else if(input == 5) break;
+                else System.out.println("Invalid Option");
             }
         }catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -210,8 +217,11 @@ public class CustomerApp {
                 int input = sc.nextInt();
                 sc.nextLine();
 
-                if(input == 1)
-
+                if(input == 1)createReview();
+                else if(input == 2) deleteReview();
+                else if(input ==3) flagReview();
+                else if(input == 4) break;
+                else System.out.println("Invalid Option");
             }catch (SQLException e) {
                 System.out.println(e.getMessage());
             } catch (InputMismatchException e) {
@@ -234,7 +244,49 @@ public class CustomerApp {
         Review review = new Review(id, productId, 0, rating, description);
         reviewService.create(review);
         System.out.println("Review Created!");
-    }   
+    }
+    
+    private static void deleteReview() throws SQLException{
+        System.out.println("Enter the Review Id you want to delete");
+        int reviewId= sc.nextInt();
+        reviewService.delete(reviewId);
+        System.out.println("Review Removed!");
+    }
+
+    private static void flagReview() throws SQLException, ClassNotFoundException{
+        AdminApp.getReviewForProduct();
+        System.out.println("Which review Id do you want to flag?");
+        int review = sc.nextInt();
+        reviewService.flagReview(review);
+        System.out.println("Review has been flagged");
+    }
+    
+    private static void storeOptions(){
+        while(true){
+            try{
+                System.out.println("--------------------------------------");
+                System.out.println("Enter 1 to View all Stores");
+                System.out.println("Enter 2 to get a store by their ID");
+                System.out.println("Enter 3 to exit products");
+                System.out.println("--------------------------------------");
+                int input = sc.nextInt();
+                sc.nextLine();
+
+                if(input == 1) AdminApp.printStores();
+                else if (input == 2) AdminApp.getStoreById();
+                else if(input == 3) break;
+                else System.out.println("Invalid Option");
+
+            }catch (SQLException e) {
+                System.out.println(e.getMessage());
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid option entered !");
+                sc.next();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }
 

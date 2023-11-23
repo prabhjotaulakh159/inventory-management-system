@@ -318,7 +318,7 @@ public class AdminApp {
         System.out.println("Deleted flagged reviews !");
     }
 
-    private static void getReviewForProduct() throws SQLException, ClassNotFoundException {
+    public static void getReviewForProduct() throws SQLException, ClassNotFoundException {
         printProducts();
         System.out.println("Enter product id from above to get reviews on: ");
         int id = sc.nextInt();
@@ -373,7 +373,7 @@ public class AdminApp {
         }
     }
 
-    private static void getStoreById() throws SQLException, ClassNotFoundException {
+    public static void getStoreById() throws SQLException, ClassNotFoundException {
         System.out.println("Enter store id: ");
         int id = sc.nextInt();
         sc.nextLine();
