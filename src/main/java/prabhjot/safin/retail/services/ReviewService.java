@@ -174,11 +174,31 @@ public class ReviewService {
     /**
      * Flags a review
      * @param reviewId Id of review to flag
+     * @throws SQLException
      */
     public void flagReview(int reviewId) throws SQLException {
         CallableStatement callableStatement = this.connection.prepareCall("{call review_pkg.flag_review(?)}");
         callableStatement.setInt(1, reviewId);
         callableStatement.execute();
         this.connection.commit();
+    }
+
+    /**
+     * Gets all reviews from a customer
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public Map<Integer, Review> getReviewsForCustomer(int customerId) throws SQLException, ClassNotFoundException {
+        Map<Integer, Review> reviews = new HashMap<Integer, Review>();
+        String SQL = "{? = review_pkg.get_customer_reviews(?)}";
+        CallableStatement callableStatement = this.connection.prepareCall(SQL);
+        callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
+        callableStatement.setInt(2, customerId);
+        callableStatement.execute();
+        ResultSet resultSet = callableStatement.getArray(1).getResultSet();
+        while (resultSet.next()) {
+            reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
+        }
+        return reviews;
     }
 }
