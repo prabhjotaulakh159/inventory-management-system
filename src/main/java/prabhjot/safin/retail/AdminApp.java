@@ -43,7 +43,7 @@ public class AdminApp {
             storeService = new StoreService(connectionProvider.getConnection());
             warehouseService = new WarehouseService(connectionProvider.getConnection());
             customerService = new CustomerService(connectionProvider.getConnection());
-            login(adminService);
+            login();
             while (true) {
                 System.out.println("--------------------------------------");
                 System.out.println("Here are your options: ");
@@ -75,7 +75,7 @@ public class AdminApp {
         }
     }
 
-    private static void login(AdminService adminService) {
+    private static void login() {
         while (true) {
             try {
                 Console console = System.console();

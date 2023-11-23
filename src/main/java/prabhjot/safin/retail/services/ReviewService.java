@@ -170,4 +170,15 @@ public class ReviewService {
         }
         return reviews;
     }
+
+    /**
+     * Flags a review
+     * @param reviewId Id of review to flag
+     */
+    public void flagReview(int reviewId) throws SQLException {
+        CallableStatement callableStatement = this.connection.prepareCall("{call review_pkg.flag_review(?)}");
+        callableStatement.setInt(1, reviewId);
+        callableStatement.execute();
+        this.connection.commit();
+    }
 }
