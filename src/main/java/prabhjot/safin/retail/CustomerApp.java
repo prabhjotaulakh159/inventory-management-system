@@ -10,6 +10,7 @@ import java.util.Scanner;
 import prabhjot.safin.retail.connection.ConnectionProvider;
 import prabhjot.safin.retail.models.Customer;
 import prabhjot.safin.retail.models.Order;
+import prabhjot.safin.retail.models.Review;
 import prabhjot.safin.retail.models.Warehouse;
 import prabhjot.safin.retail.services.CustomerService;
 import prabhjot.safin.retail.services.OrderService;
@@ -25,6 +26,7 @@ public class CustomerApp {
     private static StoreService storeService;
     private static CustomerService customerService;
     private static ConnectionProvider connectionProv;
+    private static int id;
     public static void main(String[] args) {
         try{
             sc= new Scanner(System.in);
@@ -46,6 +48,13 @@ public class CustomerApp {
                 System.out.println("Press 5 to exit");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
+
+                if(input == 1) productCrud();
+                else if(input == 2) ordersOptions();
+                else if(input == 3) reviewsOptions();
+                else if(input == 4) storeOptions();
+                else if(input == 5) break;
+                else System.out.println("Invalid Option");
             }
         }catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -60,7 +69,7 @@ public class CustomerApp {
             try{
                 Console console = System.console();
                 System.out.println("Enter your customer ID: ");
-                int id=sc.nextInt();
+                id=sc.nextInt();
                 System.out.println("Enter your password: ");
                 String password = "";
                 char[] passwordInput = console.readPassword();
@@ -91,14 +100,16 @@ public class CustomerApp {
                 System.out.println("--------------------------------------");
                 System.out.println("Enter 1 to get all products");
                 System.out.println("Enter 2 to get a product by id");
-                System.out.println("Enter 3 to exit products");
+                System.out.println("Enter 3 to get the Reviews of a product");
+                System.out.println("Enter 4 to exit products");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
                 sc.nextLine();
 
                 if(input == 1) AdminApp.printProducts();
                 else if(input == 2) AdminApp.getProductById();
-                else if(input == 3) break;
+                else if(input == 3) getReviewOfProduct();
+                else if(input == 4) break;
                 else System.out.println("Invalid Option");
             }catch (SQLException e) {
                 System.out.println(e.getMessage());
@@ -111,8 +122,19 @@ public class CustomerApp {
         }
     }
 
+    private static void getReviewOfProduct() throws SQLException, ClassNotFoundException{
+        AdminApp.printProducts();
+        System.out.println("Type the product id you want to see reviews from:");
+        int productId= sc.nextInt();
+        Map<Integer, Review> reviews = reviewService.getReviewForProduct(productId);
+        System.out.println("Reviews:");
+        for(Integer prodId: reviews.keySet()){
+            System.out.println(reviews.get(prodId).getRating() + " | " + reviews.get(prodId).getDescription() + " | Flagged: " + reviews.get(prodId).getFlags());
+        }
+    }
+       
 
-    private static void ordersCrud(int id){
+    private static void ordersOptions(){
          while(true){
             try{
                 System.out.println("--------------------------------------");
@@ -123,8 +145,8 @@ public class CustomerApp {
                 int input = sc.nextInt();
                 sc.nextLine();
 
-                if(input == 1) createOrder(id);
-                else if(input == 2) delete_order(id);
+                if(input == 1) createOrder();
+                else if(input == 2) delete_order();
                 else if(input == 3) break;
                 else System.out.println("Invalid Option");
             }catch (SQLException e) {
@@ -138,7 +160,7 @@ public class CustomerApp {
         }
     }
 
-    private static int createOrder(int id) throws SQLException, ClassNotFoundException {
+    private static int createOrder() throws SQLException, ClassNotFoundException {
         AdminApp.printStores();
         System.out.println("Which store do you want to buy from? Enter the store Id:");
         int storeid= sc.nextInt();
@@ -171,7 +193,7 @@ public class CustomerApp {
         return orderId;
     }
 
-    private static void delete_order(int id) throws SQLException, ClassNotFoundException {
+    private static void delete_order() throws SQLException, ClassNotFoundException {
         Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
         for(Integer orderId : orders.keySet()){
             System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
@@ -180,6 +202,90 @@ public class CustomerApp {
         int deleteId= sc.nextInt();
         orderService.deleteOrder(deleteId);
         System.out.println("Order has been deleted!");
+    }
+
+
+    private static void reviewsOptions(){
+        while(true){
+            try{
+                System.out.println("--------------------------------------");
+                System.out.println("Enter 1 to Make a Review");
+                System.out.println("Enter 2 to delete a Review you made");
+                System.out.println("Enter 3 to Flag a Review");
+                System.out.println("Enter 4 to exit products");
+                System.out.println("--------------------------------------");
+                int input = sc.nextInt();
+                sc.nextLine();
+
+                if(input == 1)createReview();
+                else if(input == 2) deleteReview();
+                else if(input ==3) flagReview();
+                else if(input == 4) break;
+                else System.out.println("Invalid Option");
+            }catch (SQLException e) {
+                System.out.println(e.getMessage());
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid option entered !");
+                sc.next();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void createReview() throws SQLException, ClassNotFoundException{
+        AdminApp.printProducts();
+        System.out.println("Choose which product you want to review, enter id:");
+        int productId= sc.nextInt();
+        System.out.println("Enter your rating, it can be between 1 and 5");
+        int rating= sc.nextInt();
+        System.out.println("Give us a brief description on what you like/dislike:");
+        String description = sc.nextLine();
+        Review review = new Review(id, productId, 0, rating, description);
+        reviewService.create(review);
+        System.out.println("Review Created!");
+    }
+    
+    private static void deleteReview() throws SQLException{
+        System.out.println("Enter the Review Id you want to delete");
+        int reviewId= sc.nextInt();
+        reviewService.delete(reviewId);
+        System.out.println("Review Removed!");
+    }
+
+    private static void flagReview() throws SQLException, ClassNotFoundException{
+        AdminApp.getReviewForProduct();
+        System.out.println("Which review Id do you want to flag?");
+        int review = sc.nextInt();
+        reviewService.flagReview(review);
+        System.out.println("Review has been flagged");
+    }
+    
+    private static void storeOptions(){
+        while(true){
+            try{
+                System.out.println("--------------------------------------");
+                System.out.println("Enter 1 to View all Stores");
+                System.out.println("Enter 2 to get a store by their ID");
+                System.out.println("Enter 3 to exit products");
+                System.out.println("--------------------------------------");
+                int input = sc.nextInt();
+                sc.nextLine();
+
+                if(input == 1) AdminApp.printStores();
+                else if (input == 2) AdminApp.getStoreById();
+                else if(input == 3) break;
+                else System.out.println("Invalid Option");
+
+            }catch (SQLException e) {
+                System.out.println(e.getMessage());
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid option entered !");
+                sc.next();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
