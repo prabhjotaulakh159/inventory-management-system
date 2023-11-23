@@ -133,4 +133,18 @@ public class OrderService {
         }
         return productQuantityMapping;
     }
+
+    /**
+     * Gets total price of a order
+     * @param orderId Order to get total of
+     * @throws SQLException
+     */
+    public int getOrderTotal(int orderId) throws SQLException {
+        CallableStatement callableStatement = this.connection.prepareCall("{? = call order_pkg.price_order(?)}");
+        callableStatement.registerOutParameter(1, Types.INTEGER);
+        callableStatement.setInt(2, orderId);
+        callableStatement.execute();
+        int price = callableStatement.getInt(1);
+        return price;
+    }
 }
