@@ -541,6 +541,17 @@ CREATE PACKAGE BODY customer_pkg AS
         WHERE customer_id = id;
         RETURN customer_type(vfname, vlname, vemail, vaddress, '');
     END;
+
+    PROCEDURE customer_update_info(vcustomer IN customer_pkg, id in NUMBER) AS
+    BEGIN
+        IF id IS NULL THEN 
+            RAISE_APPLICATION_ERROR(-20004, 'Customer id cannot be null');
+        END IF;
+
+        UPDATE customers SET password = vcustomer.password, firstname= vproduct.firstname,
+        lastname = vproduct.lastname, email= vcustomer.email, address = vcustomer.address
+        WHERE customer_id= id;    
+    END;        
 END customer_pkg;
 /
 
