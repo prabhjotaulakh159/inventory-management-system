@@ -43,7 +43,7 @@ public class AdminApp {
             storeService = new StoreService(connectionProvider.getConnection());
             warehouseService = new WarehouseService(connectionProvider.getConnection());
             customerService = new CustomerService(connectionProvider.getConnection());
-            login(adminService);
+            login();
             while (true) {
                 System.out.println("--------------------------------------");
                 System.out.println("Here are your options: ");
@@ -75,7 +75,7 @@ public class AdminApp {
         }
     }
 
-    private static void login(AdminService adminService) {
+    private static void login() {
         while (true) {
             try {
                 Console console = System.console();
@@ -208,7 +208,7 @@ public class AdminApp {
         }
     }
 
-    private static void printProducts() throws SQLException, ClassNotFoundException {
+    public static void printProducts() throws SQLException, ClassNotFoundException {
         Map<Integer, Product> products = productService.getProducts();
         for (Integer id : products.keySet()) {
             Category category = categoryService.getCategory(products.get(id).getCategory_id());
@@ -216,7 +216,7 @@ public class AdminApp {
         }
     }
     
-    private static void getProductById() throws SQLException, ClassNotFoundException {
+    public static void getProductById() throws SQLException, ClassNotFoundException {
         System.out.println("Enter id of product: ");
         int id = sc.nextInt();
         sc.nextLine();
@@ -366,7 +366,7 @@ public class AdminApp {
         }
     }
 
-    private static void printStores() throws ClassNotFoundException, SQLException {
+    public static void printStores() throws ClassNotFoundException, SQLException {
         Map<Integer, Store> stores = storeService.getStores();
         for (Integer id : stores.keySet()) {
             System.out.println("Store Id: " + id + ", " + stores.get(id));
