@@ -1229,8 +1229,8 @@ CREATE PACKAGE BODY warehouse_pkg AS
     -- RETURN -> warehouse_type - Data of type warehouse_type for the specified warehouse ID.
     FUNCTION get_warehouse(id IN NUMBER) RETURN warehouse_type AS 
         warehouse           warehouse_type;
-        vname               VARCHAR2(30);
-        vaddress            VARCHAR2(30);
+        vname               VARCHAR2(100);
+        vaddress            VARCHAR2(100);
     BEGIN 
         warehouse_pkg.check_if_warehouse_exists(id);
         SELECT name, address INTO vname, vaddress FROM warehouses
