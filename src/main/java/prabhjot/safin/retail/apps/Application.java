@@ -109,4 +109,8 @@ public abstract class Application {
             System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
         }
     }
+
+    public void handleSQLException(String message){
+        System.out.println(message.split("\n")[0]);
+    }
 }

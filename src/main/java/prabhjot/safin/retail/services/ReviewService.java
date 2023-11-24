@@ -202,7 +202,7 @@ public class ReviewService {
      */
     public Map<Integer, Review> getReviewsForCustomer(int customerId) throws SQLException, ClassNotFoundException {
         Map<Integer, Review> reviews = new HashMap<Integer, Review>();
-        String SQL = "{? = review_pkg.get_customer_reviews(?)}";
+        String SQL = "{? = call review_pkg.get_customer_reviews(?)}";
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
         callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
         callableStatement.setInt(2, customerId);
