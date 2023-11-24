@@ -88,4 +88,23 @@ public class CustomerService {
         callableStatement.close();
         return customers;
     }
+
+    /**
+     * Updates a customer
+     * @param customer Customer information
+     * @param id Customer id to update
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public void updateCustomerInformation(Customer customer, int id) throws SQLException, ClassNotFoundException {
+        Map<String, Class<?>> map = this.connection.getTypeMap();
+        this.connection.setTypeMap(map);
+        map.put(customer.getSQLTypeName(), Class.forName("prabhjot.safin.retail.models.Customer"));
+        CallableStatement callableStatement = this.connection.prepareCall("{call customer_pkg.customer_update_info(?, ?)}");
+        callableStatement.setObject(1, customer);
+        callableStatement.setInt(2, id);
+        callableStatement.execute();
+        this.connection.commit();
+        callableStatement.close();
+    }
 }
