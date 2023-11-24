@@ -179,7 +179,6 @@ public class AdminApp extends Application {
         System.out.println("Enter id of category from above to delete: ");
         
         int id = sc.nextInt();
-        
         sc.nextLine();
         
         if (cancelIntegerOperation(id)) return;

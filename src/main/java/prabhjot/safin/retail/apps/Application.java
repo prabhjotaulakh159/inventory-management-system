@@ -106,10 +106,13 @@ public abstract class Application {
         if (cancelIntegerOperation(productId)) return;
 
         printStoresWithProduct(productId);
+        showCancelInteger();
         System.out.println("Please choose store id from above: ");
         
         int storeId = sc.nextInt();
         sc.nextLine();
+
+        if (cancelIntegerOperation(storeId)) return;
         
         int price = storeService.getProductPrice(productId, storeId);
         System.out.println("Price: " + price + "$");
