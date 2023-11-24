@@ -21,6 +21,7 @@ public class CustomerApp extends Application {
     }
 
     private int id;
+    private Customer current;
     
     @Override
     public void run() {
@@ -32,13 +33,15 @@ public class CustomerApp extends Application {
                 System.out.println("Press 1 for Products");
                 System.out.println("Press 2 for Orders");
                 System.out.println("Press 3 for Placing Reviews");
-                System.out.println("Press 4 to exit");
+                System.out.println("Press 4 to update your information");
+                System.out.println("Press 5 to exit");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
                 if     (input == 1) productCrud();
                 else if(input == 2) ordersOptions();
                 else if(input == 3) reviewsOptions();
-                else if(input == 4) break;
+                else if(input == 4) updateCustomer();
+                else if(input == 5) break;
                 else System.out.println("Invalid Option");
             }
             System.out.println("Goodbye !");
@@ -47,6 +50,8 @@ public class CustomerApp extends Application {
             System.out.println("Not a valid option !");
             sc.next();
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -64,9 +69,9 @@ public class CustomerApp extends Application {
                 String password = "";
                 char[] passwordInput = console.readPassword();
                 for (char c : passwordInput) password += c;
-                Customer customer= customerService.login(id, password);
-                if(customer != null){
-                    System.out.println("Welcome " + customer.getFirstname() + " " + customer.getLastname() + "!");
+                this.current = customerService.login(id, password);
+                if(current != null){
+                    System.out.println("Welcome " + current.getFirstname() + " " + current.getLastname() + "!");
                     break;
                 }
                 else{
@@ -425,6 +430,72 @@ public class CustomerApp extends Application {
 
         reviewService.update(reviewId, rating, description);
         System.out.println("Review has been Updated!");
+    }
+
+    /**
+     * Provides UI to update current customers information
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    private void updateCustomer() throws SQLException, ClassNotFoundException  {
+        while (true) {
+            try {
+                showCancelInteger();
+                System.out.println("What you want to update ?");
+                System.out.println("Enter 1 for firstname");
+                System.out.println("Enter 2 for lastname");
+                System.out.println("Enter 3 for email");
+                System.out.println("Enter 4 for address");
+                System.out.println("Enter 5 for password");
+                
+                int input = sc.nextInt();
+                sc.nextLine();
+                
+                if (cancelIntegerOperation(input)) return;
+
+                String info = null;
+
+                if (input == 1) {
+                    showCancelString();
+                    System.out.println("Enter new firstname: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setFirstname(info);
+                } else if (input == 2) {
+                    showCancelString();
+                    System.out.println("Enter new lastname: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setLastname(sc.nextLine());
+                } else if (input == 3) {
+                    showCancelString();
+                    System.out.println("Enter new email: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setEmail(sc.nextLine());
+                } else if (input == 4) {
+                    showCancelString();
+                    System.out.println("Enter new address: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setAddress(sc.nextLine());
+                } else if (input == 5) {
+                    showCancelString();
+                    System.out.println("Enter new password: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setPassword(sc.nextLine());
+                } else {
+                    throw new InputMismatchException();
+                }
+
+                customerService.updateCustomerInformation(this.current, this.id);
+                System.out.println("Customer information has been updated !");
+            } catch (InputMismatchException e) {
+                System.out.println("Not a valid option");
+                sc.next();
+            }
+        }
     }
 }
 
