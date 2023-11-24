@@ -11,7 +11,7 @@ public class AdminVersion {
             Application admin = new AdminApp();
             admin.run();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage().split(":")[0]);
         }
     }
 }

@@ -72,7 +72,7 @@ public class AdminApp extends Application {
                     System.out.println("Login failed !");
                 }
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
                 System.out.println("Please enter valid data");
                 sc.next();
@@ -103,7 +103,7 @@ public class AdminApp extends Application {
                 else if (input == 6) break;
                 else System.out.println("Invalid option");
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
                 System.out.println("Invalid option entered !");
                 sc.next();
@@ -176,7 +176,7 @@ public class AdminApp extends Application {
                 else if (input == 6) break;
                 else System.out.println("Invalid option");
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
                 System.out.println("Invalid option entered !");
                 sc.next();
@@ -242,7 +242,7 @@ public class AdminApp extends Application {
                 else if (input == 6) break;
                 else System.out.println("Invalid option");
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
                 System.out.println("Invalid option entered !");
                 sc.next();
@@ -306,7 +306,7 @@ public class AdminApp extends Application {
                 else if (input == 9) break;
                 else System.out.println("Invalid option");
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
                 System.out.println("Invalid option entered !");
                 sc.next();
@@ -400,7 +400,7 @@ public class AdminApp extends Application {
                 else if (input == 9) break;
                 else System.out.println("Invalid option");
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
                 System.out.println("Invalid option entered !");
                 sc.next();
@@ -499,7 +499,7 @@ public class AdminApp extends Application {
                 else if (input == 3) break;
                 else System.out.println("Invalid option");
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
                 System.out.println("Invalid option entered !");
                 sc.next();
