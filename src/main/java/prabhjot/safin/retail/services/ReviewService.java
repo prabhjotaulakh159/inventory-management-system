@@ -42,6 +42,7 @@ public class ReviewService {
         callableStatement.setObject(1, review);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -60,6 +61,7 @@ public class ReviewService {
         callableStatement.setString(3, description);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -74,6 +76,7 @@ public class ReviewService {
         callableStatement.setInt(1, reviewId);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -94,6 +97,7 @@ public class ReviewService {
         callableStatement.setInt(2, reviewId);
         callableStatement.execute();
         Review review = (Review) callableStatement.getObject(1);
+        callableStatement.close();
         return review;
     }
 
@@ -114,6 +118,8 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return reviews;
     }
 
@@ -134,6 +140,8 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return reviews;
     }
 
@@ -147,6 +155,7 @@ public class ReviewService {
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -168,6 +177,8 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return reviews;
     }
 
@@ -181,6 +192,7 @@ public class ReviewService {
         callableStatement.setInt(1, reviewId);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -199,6 +211,8 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return reviews;
     }
 }

@@ -39,10 +39,14 @@ public class CustomerApp extends Application {
                 else if(input == 5) break;
                 else System.out.println("Invalid Option");
             }
+            System.out.println("Goodbye !");
+            connectionProvider.kill();
         } catch (InputMismatchException e) {
             System.out.println("Not a valid option !");
             sc.next();
-        } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void login(){

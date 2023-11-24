@@ -40,6 +40,7 @@ public class CustomerService {
         callableStatement.setString(3, password);
         callableStatement.execute();
         Customer customer = (Customer) callableStatement.getObject(1);
+        callableStatement.close();
         return customer;
     }
 
@@ -59,6 +60,7 @@ public class CustomerService {
         callableStatement.setInt(2, id);
         callableStatement.execute();
         Customer customer = (Customer) callableStatement.getObject(1);
+        callableStatement.close();
         return customer;
     }
     
@@ -78,6 +80,7 @@ public class CustomerService {
         while (resultSet.next()) {
             customers.put(resultSet.getInt(2), this.getCustomer(resultSet.getInt(2)));
         }
+        resultSet.close();
         return customers;
     }
 }

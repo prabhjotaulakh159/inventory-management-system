@@ -41,6 +41,7 @@ public class WarehouseService {
         callableStatement.setObject(1, warehouse);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
      /**
@@ -60,6 +61,7 @@ public class WarehouseService {
         callableStatement.setObject(2, warehouse);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -74,6 +76,7 @@ public class WarehouseService {
         callableStatement.setInt(1, warehouseId);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -91,6 +94,7 @@ public class WarehouseService {
         callableStatement.setInt(3, quantity);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -108,6 +112,7 @@ public class WarehouseService {
         callableStatement.setInt(3, quantity);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -128,6 +133,7 @@ public class WarehouseService {
         callableStatement.setInt(2, warehouseId);
         callableStatement.execute();
         Warehouse warehouse = (Warehouse) callableStatement.getObject(1);
+        callableStatement.close();
         return warehouse;
     }
 
@@ -148,6 +154,8 @@ public class WarehouseService {
         while (resultSet.next()) {
             warehouses.put(resultSet.getInt(2), this.getWarehouse(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return warehouses;
     }
 
@@ -165,6 +173,7 @@ public class WarehouseService {
         callableStatement.setInt(2, productId);
         callableStatement.execute();
         int stock = callableStatement.getInt(1);
+        callableStatement.close();
         return stock;
     }
 } 
