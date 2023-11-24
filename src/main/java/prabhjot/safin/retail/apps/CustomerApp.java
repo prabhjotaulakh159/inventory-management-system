@@ -1,43 +1,26 @@
-package prabhjot.safin.retail;
+package prabhjot.safin.retail.apps;
 
 import java.io.Console;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
-import java.util.Scanner;
 
-import prabhjot.safin.retail.connection.ConnectionProvider;
 import prabhjot.safin.retail.models.Customer;
 import prabhjot.safin.retail.models.Order;
 import prabhjot.safin.retail.models.Review;
-import prabhjot.safin.retail.models.Warehouse;
-import prabhjot.safin.retail.services.CustomerService;
-import prabhjot.safin.retail.services.OrderService;
-import prabhjot.safin.retail.services.ProductService;
-import prabhjot.safin.retail.services.ReviewService;
-import prabhjot.safin.retail.services.StoreService;
 
-public class CustomerApp {
-    private static Scanner sc;
-    private static OrderService orderService;
-    private static ProductService productService;
-    private static ReviewService reviewService;
-    private static StoreService storeService;
-    private static CustomerService customerService;
-    private static ConnectionProvider connectionProv;
-    private static int id;
-    public static void main(String[] args) {
+public class CustomerApp extends Application {
+    public CustomerApp() throws SQLException {
+        super();
+    }
+
+    private int id;
+    @Override
+    public void run() {
         try{
-            sc= new Scanner(System.in);
-            connectionProv = new ConnectionProvider();
-            orderService = new OrderService(connectionProv.getConnection());
-            productService = new ProductService(connectionProv.getConnection());
-            reviewService = new ReviewService(connectionProv.getConnection());
-            storeService = new StoreService(connectionProv.getConnection());
-            customerService = new CustomerService(connectionProv.getConnection());
-            login(customerService);
-
+            login();
             while(true){
                 System.out.println("--------------------------------------");
                 System.out.println("Here are your options: ");
@@ -56,15 +39,13 @@ public class CustomerApp {
                 else if(input == 5) break;
                 else System.out.println("Invalid Option");
             }
-        }catch (SQLException e) {
-            System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("Not a valid option !");
             sc.next();
         } 
     }
 
-    private static void login(CustomerService cs){
+    private void login(){
         while(true){
             try{
                 Console console = System.console();
@@ -74,7 +55,7 @@ public class CustomerApp {
                 String password = "";
                 char[] passwordInput = console.readPassword();
                 for (char c : passwordInput) password += c;
-                Customer customer= cs.login(id, password);
+                Customer customer= customerService.login(id, password);
                 if(customer != null){
                     System.out.println("Welcome " + customer.getFirstname() + " " + customer.getLastname() + "!");
                     break;
@@ -94,22 +75,24 @@ public class CustomerApp {
 
     }
 
-    private static void productCrud(){
+    private void productCrud(){
         while(true){
             try{
                 System.out.println("--------------------------------------");
                 System.out.println("Enter 1 to get all products");
                 System.out.println("Enter 2 to get a product by id");
                 System.out.println("Enter 3 to get the Reviews of a product");
-                System.out.println("Enter 4 to exit products");
+                System.out.println("Enter 4 to get product price at store");
+                System.out.println("Enter 5 to exit products");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
                 sc.nextLine();
 
-                if(input == 1) AdminApp.printProducts();
-                else if(input == 2) AdminApp.getProductById();
+                if(input == 1) printProducts();
+                else if(input == 2) getProductById();
                 else if(input == 3) getReviewOfProduct();
-                else if(input == 4) break;
+                else if(input == 4) getPriceAtStore();
+                else if (input == 5) break;
                 else System.out.println("Invalid Option");
             }catch (SQLException e) {
                 System.out.println(e.getMessage());
@@ -122,19 +105,19 @@ public class CustomerApp {
         }
     }
 
-    private static void getReviewOfProduct() throws SQLException, ClassNotFoundException{
-        AdminApp.printProducts();
+    private void getReviewOfProduct() throws SQLException, ClassNotFoundException{
+        printProducts();
         System.out.println("Type the product id you want to see reviews from:");
         int productId= sc.nextInt();
         Map<Integer, Review> reviews = reviewService.getReviewForProduct(productId);
         System.out.println("Reviews:");
-        for(Integer prodId: reviews.keySet()){
-            System.out.println(reviews.get(prodId).getRating() + " | " + reviews.get(prodId).getDescription() + " | Flagged: " + reviews.get(prodId).getFlags());
+        for(Integer id: reviews.keySet()){
+            System.out.println(reviews.get(id));
         }
     }
        
 
-    private static void ordersOptions(){
+    private void ordersOptions(){
          while(true){
             try{
                 System.out.println("--------------------------------------");
@@ -147,7 +130,7 @@ public class CustomerApp {
 
                 if(input == 1) createOrder();
                 else if(input == 2) delete_order();
-                else if(input == 3) break;
+                else if(input == 3) getOrderDetails();
                 else System.out.println("Invalid Option");
             }catch (SQLException e) {
                 System.out.println(e.getMessage());
@@ -160,19 +143,20 @@ public class CustomerApp {
         }
     }
 
-    private static int createOrder() throws SQLException, ClassNotFoundException {
-        AdminApp.printStores();
+    private void createOrder() throws SQLException, ClassNotFoundException {
+        printStores();
         System.out.println("Which store do you want to buy from? Enter the store Id:");
         int storeid= sc.nextInt();
-        Order order = new Order(id, storeid);
+        Order order = new Order(id, storeid, new Date(System.currentTimeMillis()));
         Map<Integer, Integer> products= new HashMap<>();
         while(true){
+            System.out.println("Enter 0 to quit");
             try{
-                AdminApp.printProducts();
+                printProducts();
                 System.out.println("choose which product you'd like to buy");
                 int productId=sc.nextInt();
                 System.out.println("How many would you like to buy?");
-                int quantity= sc.nextInt();
+                int quantity= sc.nextInt(); sc.nextLine();
                 products.put(productId, quantity);
                 System.out.println("Are you done picking your products? y/n");
                 String ans= sc.nextLine();
@@ -190,10 +174,10 @@ public class CustomerApp {
             }
         }
         int orderId= orderService.createOrder(order, products);
-        return orderId;
+        System.out.println("Here is your order id: " + orderId);
     }
 
-    private static void delete_order() throws SQLException, ClassNotFoundException {
+    private void delete_order() throws SQLException, ClassNotFoundException {
         Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
         for(Integer orderId : orders.keySet()){
             System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
@@ -203,9 +187,22 @@ public class CustomerApp {
         orderService.deleteOrder(deleteId);
         System.out.println("Order has been deleted!");
     }
+    
+    private void getOrderDetails() throws SQLException, ClassNotFoundException {
+        Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
+        for(Integer orderId : orders.keySet()){
+            System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
+        }
+        System.out.println("Choose order to get details on: ");
+        int orderId = sc.nextInt();
+        Map<String, Integer> details = orderService.getOrderDetails(orderId);
+        for (String name : details.keySet()) {
+            System.out.println("Product: " + name + ", Quantity: " + details.get(name) + ", Price: " + orderService.getOrderTotal(orderId));
+        }
+    }
 
 
-    private static void reviewsOptions(){
+    private void reviewsOptions(){
         while(true){
             try{
                 System.out.println("--------------------------------------");
@@ -233,8 +230,8 @@ public class CustomerApp {
         }
     }
 
-    private static void createReview() throws SQLException, ClassNotFoundException{
-        AdminApp.printProducts();
+    private void createReview() throws SQLException, ClassNotFoundException{
+        printProducts();
         System.out.println("Choose which product you want to review, enter id:");
         int productId= sc.nextInt();
         System.out.println("Enter your rating, it can be between 1 and 5");
@@ -246,22 +243,22 @@ public class CustomerApp {
         System.out.println("Review Created!");
     }
     
-    private static void deleteReview() throws SQLException{
+    private void deleteReview() throws SQLException{
         System.out.println("Enter the Review Id you want to delete");
         int reviewId= sc.nextInt();
         reviewService.delete(reviewId);
         System.out.println("Review Removed!");
     }
 
-    private static void flagReview() throws SQLException, ClassNotFoundException{
-        AdminApp.getReviewForProduct();
+    private void flagReview() throws SQLException, ClassNotFoundException{
+        getReviewForProduct();
         System.out.println("Which review Id do you want to flag?");
         int review = sc.nextInt();
         reviewService.flagReview(review);
         System.out.println("Review has been flagged");
     }
     
-    private static void storeOptions(){
+    private void storeOptions(){
         while(true){
             try{
                 System.out.println("--------------------------------------");
@@ -272,8 +269,8 @@ public class CustomerApp {
                 int input = sc.nextInt();
                 sc.nextLine();
 
-                if(input == 1) AdminApp.printStores();
-                else if (input == 2) AdminApp.getStoreById();
+                if(input == 1) printStores();
+                else if (input == 2) getStoreById();
                 else if(input == 3) break;
                 else System.out.println("Invalid Option");
 

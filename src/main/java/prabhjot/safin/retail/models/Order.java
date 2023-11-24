@@ -25,10 +25,10 @@ public class Order implements SQLData {
      * @param customerId Id of the customer
      * @param storeId Id of the store
      */
-    public Order(int customerId, int storeId) {
+    public Order(int customerId, int storeId, Date date) {
         this.customerId = customerId;
         this.storeId = storeId;
-        this.orderDate = null;
+        this.orderDate = date;
     }
 
     @Override
@@ -40,6 +40,7 @@ public class Order implements SQLData {
     public void readSQL(SQLInput stream, String typeName) throws SQLException {
         this.customerId = stream.readInt();
         this.storeId = stream.readInt();
+        this.orderDate = stream.readDate();
         this.type = typeName;
     }
 
@@ -47,6 +48,7 @@ public class Order implements SQLData {
     public void writeSQL(SQLOutput stream) throws SQLException {
         stream.writeInt(this.customerId);
         stream.writeInt(this.storeId);
+        stream.writeDate(this.orderDate);
     }
 
     public int getCustomerId() {
@@ -79,5 +81,10 @@ public class Order implements SQLData {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer id: " + this.customerId + ", Store id: " + this.storeId + ", Date ordered: " + this.orderDate; 
     }
 }

@@ -36,8 +36,8 @@ public class CustomerService {
         String sql = "{? = call customer_pkg.login(?,?)}";
         CallableStatement callableStatement = this.connection.prepareCall(sql);
         callableStatement.registerOutParameter(1, Types.STRUCT, "CUSTOMER_TYPE");
-        callableStatement.setInt(1, customerId);
-        callableStatement.setString(2, password);
+        callableStatement.setInt(2, customerId);
+        callableStatement.setString(3, password);
         callableStatement.execute();
         Customer customer = (Customer) callableStatement.getObject(1);
         return customer;

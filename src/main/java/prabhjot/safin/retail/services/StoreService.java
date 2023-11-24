@@ -160,4 +160,24 @@ public class StoreService {
         }
         return stores;
     }
+
+    /**
+     * Gets all the stores in the database that have a product
+     * @return List of stores mapped to their id that have the product
+     * @throws SQLException If a database error occurs
+     * @throws ClassNotFoundException If the mapped class cannot be found
+     */
+    public Map<Integer, Store> getStoresWithProduct(int productId) throws SQLException, ClassNotFoundException{
+        Map<Integer, Store> stores= new HashMap<Integer, Store>();
+        String sql= "{?= call store_pkg.get_stores_with_product(?)}";
+        CallableStatement callableStatement = connection.prepareCall(sql);
+        callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
+        callableStatement.setInt(2, productId);
+        callableStatement.execute();
+        ResultSet resultSet = callableStatement.getArray(1).getResultSet();
+        while(resultSet.next()){
+            stores.put(resultSet.getInt(2), this.getStore(resultSet.getInt(2)));
+        }
+        return stores;
+    }
 }

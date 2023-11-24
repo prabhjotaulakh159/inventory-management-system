@@ -1,12 +1,10 @@
-package prabhjot.safin.retail;
+package prabhjot.safin.retail.apps;
 
 import java.io.Console;
 import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.Map;
-import java.util.Scanner;
 
-import prabhjot.safin.retail.connection.ConnectionProvider;
 import prabhjot.safin.retail.models.Admin;
 import prabhjot.safin.retail.models.Category;
 import prabhjot.safin.retail.models.Customer;
@@ -14,35 +12,15 @@ import prabhjot.safin.retail.models.Product;
 import prabhjot.safin.retail.models.Review;
 import prabhjot.safin.retail.models.Store;
 import prabhjot.safin.retail.models.Warehouse;
-import prabhjot.safin.retail.services.AdminService;
-import prabhjot.safin.retail.services.CategoryService;
-import prabhjot.safin.retail.services.CustomerService;
-import prabhjot.safin.retail.services.ProductService;
-import prabhjot.safin.retail.services.ReviewService;
-import prabhjot.safin.retail.services.StoreService;
-import prabhjot.safin.retail.services.WarehouseService;
 
-public class AdminApp {
-    private static Scanner sc;
-    private static ConnectionProvider connectionProvider;
-    private static AdminService adminService;
-    private static CategoryService categoryService;
-    private static ProductService productService;
-    private static ReviewService reviewService;
-    private static StoreService storeService;
-    private static WarehouseService warehouseService;
-    private static CustomerService customerService;
-    public static void main(String[] args) {
+public class AdminApp extends Application {
+    public AdminApp() throws SQLException {
+        super();
+    }
+
+    @Override
+    public void run() {
         try {
-            sc = new Scanner(System.in);
-            connectionProvider = new ConnectionProvider();
-            adminService = new AdminService(connectionProvider.getConnection());
-            categoryService = new CategoryService(connectionProvider.getConnection());
-            productService = new ProductService(connectionProvider.getConnection());
-            reviewService = new ReviewService(connectionProvider.getConnection());
-            storeService = new StoreService(connectionProvider.getConnection());
-            warehouseService = new WarehouseService(connectionProvider.getConnection());
-            customerService = new CustomerService(connectionProvider.getConnection());
             login();
             while (true) {
                 System.out.println("--------------------------------------");
@@ -75,7 +53,7 @@ public class AdminApp {
         }
     }
 
-    private static void login() {
+    private void login() {
         while (true) {
             try {
                 Console console = System.console();
@@ -104,7 +82,7 @@ public class AdminApp {
         }
     }
 
-    private static void categoryCrud() {
+    private void categoryCrud() {
         while (true) {
             try {
                 System.out.println("--------------------------------------");
@@ -135,14 +113,14 @@ public class AdminApp {
         }
     }
 
-    private static void printCategories() throws ClassNotFoundException, SQLException {
+    private void printCategories() throws ClassNotFoundException, SQLException {
         Map<Integer, Category> categories = categoryService.getCategories();
         for (Integer id : categories.keySet()) { 
             System.out.println("Category Id: " + id + ", " + categories.get(id));
         }
     }
 
-    private static void getCategoryById() throws ClassNotFoundException, SQLException {
+    private void getCategoryById() throws ClassNotFoundException, SQLException {
         System.out.println("Enter id of category: ");
         int id = sc.nextInt();
         sc.nextLine();
@@ -150,14 +128,14 @@ public class AdminApp {
         System.out.println(category);
     }
 
-    private static void createCategory() throws SQLException, ClassNotFoundException {
+    private void createCategory() throws SQLException, ClassNotFoundException {
         System.out.println("Enter category name: ");
         String name = sc.nextLine();
         categoryService.createCategory(new Category(name));
         System.out.println("Successfully created category !");
     }
 
-    private static void updateCategory() throws ClassNotFoundException, SQLException {
+    private void updateCategory() throws ClassNotFoundException, SQLException {
         printCategories();
         System.out.println("Enter id of category from above to update: ");
         int id = sc.nextInt();
@@ -168,7 +146,7 @@ public class AdminApp {
         System.out.println("Successfully updated category !");
     }
 
-    private static void deleteCategory() throws ClassNotFoundException, SQLException {
+    private void deleteCategory() throws ClassNotFoundException, SQLException {
         printCategories();
         System.out.println("Enter id of category from above to delete: ");
         int id = sc.nextInt();
@@ -177,7 +155,7 @@ public class AdminApp {
         System.out.println("Successfully deleted category");
     }
 
-    private static void productCrud() {
+    private void productCrud() {
         while (true) {
             try {
                 System.out.println("--------------------------------------");
@@ -190,7 +168,7 @@ public class AdminApp {
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
                 sc.nextLine();
-                if      (input == 1) printProducts();
+                if      (input == 1) this.printProducts();
                 else if (input == 2) getProductById();
                 else if (input == 3) createProduct();
                 else if (input == 4) updateProduct();
@@ -207,25 +185,8 @@ public class AdminApp {
             }
         }
     }
-
-    public static void printProducts() throws SQLException, ClassNotFoundException {
-        Map<Integer, Product> products = productService.getProducts();
-        for (Integer id : products.keySet()) {
-            Category category = categoryService.getCategory(products.get(id).getCategory_id());
-            System.out.println("Product Id: " + id + ", " + products.get(id) + ", " + category);
-        }
-    }
     
-    public static void getProductById() throws SQLException, ClassNotFoundException {
-        System.out.println("Enter id of product: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-        Product product = productService.getProduct(id);
-        Category category = categoryService.getCategory(product.getCategory_id());
-        System.out.println(product + ", " + category);
-    }
-
-    private static void createProduct() throws ClassNotFoundException, SQLException {
+    private void createProduct() throws ClassNotFoundException, SQLException {
         System.out.println("Enter name of the product: ");
         String productName = sc.nextLine();
         printCategories();
@@ -236,7 +197,7 @@ public class AdminApp {
         System.out.println("Product created !");
     }
 
-    private static void updateProduct() throws SQLException, ClassNotFoundException {
+    private void updateProduct() throws SQLException, ClassNotFoundException {
         printProducts();
         System.out.println("Enter product id from above to update: ");
         int productId = sc.nextInt();
@@ -251,7 +212,7 @@ public class AdminApp {
         System.out.println("Updated product !");
     }
 
-    private static void deleteProduct() throws SQLException, ClassNotFoundException {
+    private void deleteProduct() throws SQLException, ClassNotFoundException {
         printProducts();
         System.out.println("Enter product id from above to delete: ");
         int id = sc.nextInt();
@@ -260,7 +221,7 @@ public class AdminApp {
         System.out.println("Product deleted !");
     }
 
-    private static void reviewCrud() {
+    private void reviewCrud() {
         while (true) {
             try {
                 System.out.println("--------------------------------------");
@@ -291,14 +252,14 @@ public class AdminApp {
         }
     }
 
-    private static void printReviews() throws ClassNotFoundException, SQLException {
+    private void printReviews() throws ClassNotFoundException, SQLException {
         Map<Integer, Review> reviews = reviewService.getAllReviews();
         for (Integer id : reviews.keySet()) {
             System.out.println("Review Id: " + id + ", " + reviews.get(id));
         }
     }
 
-    private static void getReviewById() throws SQLException, ClassNotFoundException {
+    private void getReviewById() throws SQLException, ClassNotFoundException {
         System.out.println("Enter id of review: ");
         int id = sc.nextInt();
         sc.nextLine();
@@ -306,30 +267,19 @@ public class AdminApp {
         System.out.println(review);
     }
 
-    private static void printFlaggedReviews() throws ClassNotFoundException, SQLException {
+    private void printFlaggedReviews() throws ClassNotFoundException, SQLException {
         Map<Integer, Review> reviews = reviewService.getFlaggedReviews();
         for (Integer id : reviews.keySet()) {
             System.out.println("Review Id: " + id + ", " + reviews.get(id));
         }
     }
 
-    private static void deleteFlaggedReviews() throws SQLException {
+    private void deleteFlaggedReviews() throws SQLException {
         reviewService.deleteFlaggedReviews();
         System.out.println("Deleted flagged reviews !");
     }
 
-    public static void getReviewForProduct() throws SQLException, ClassNotFoundException {
-        printProducts();
-        System.out.println("Enter product id from above to get reviews on: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-        Map<Integer, Review> reviews = reviewService.getReviewForProduct(id);
-        for (Integer reviewId : reviews.keySet()) {
-            System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
-        }
-    }
-
-    private static void storeCrud() {
+    private void storeCrud() {
         while (true) {
             try {
                 System.out.println("--------------------------------------");
@@ -366,29 +316,14 @@ public class AdminApp {
         }
     }
 
-    public static void printStores() throws ClassNotFoundException, SQLException {
-        Map<Integer, Store> stores = storeService.getStores();
-        for (Integer id : stores.keySet()) {
-            System.out.println("Store Id: " + id + ", " + stores.get(id));
-        }
-    }
-
-    public static void getStoreById() throws SQLException, ClassNotFoundException {
-        System.out.println("Enter store id: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-        Store store = storeService.getStore(id);
-        System.out.println(store);
-    }
-
-    private static void createStore() throws SQLException, ClassNotFoundException {
+    private void createStore() throws SQLException, ClassNotFoundException {
         System.out.println("Please enter store name: ");
         String storeName = sc.nextLine();
         storeService.createStore(new Store(storeName));
         System.out.println("Store has been created");
     }
 
-    private static void updateStore() throws ClassNotFoundException, SQLException {
+    private void updateStore() throws ClassNotFoundException, SQLException {
         printStores();
         System.out.println("Please enter store id to update: ");
         int id = sc.nextInt();
@@ -399,7 +334,7 @@ public class AdminApp {
         System.out.println("Store has been updated");
     }
 
-    private static void deleteStore() throws ClassNotFoundException, SQLException {
+    private void deleteStore() throws ClassNotFoundException, SQLException {
         printStores();
         System.out.println("Please enter store id to delete: ");
         int id = sc.nextInt();
@@ -408,7 +343,7 @@ public class AdminApp {
         System.out.println("Store has been deleted");
     }
 
-    private static void createPrice() throws SQLException, ClassNotFoundException {
+    private void createPrice() throws SQLException, ClassNotFoundException {
         printProducts();
         System.out.println("Please choose product id from above: ");
         int productId = sc.nextInt();
@@ -423,7 +358,7 @@ public class AdminApp {
         System.out.println("Price has been inserted !");
     }
 
-    private static void updatePrice() throws SQLException, ClassNotFoundException {
+    private void updatePrice() throws SQLException, ClassNotFoundException {
         printProducts();
         System.out.println("Please choose product id from above: ");
         int productId = sc.nextInt();
@@ -439,20 +374,7 @@ public class AdminApp {
         System.out.println("Price has been updated !");
     }
 
-    private static void getPriceAtStore() throws SQLException, ClassNotFoundException {
-        printProducts();
-        System.out.println("Please choose product id from above: ");
-        int productId = sc.nextInt();
-        sc.nextLine();
-        printStores();
-        System.out.println("Please choose store id from above: ");
-        int storeId = sc.nextInt();
-        sc.nextLine();
-        int price = storeService.getProductPrice(productId, storeId);
-        System.out.println("Price: " + price + "$");
-    }
-
-    private static void warehouseCrud() {
+    private void warehouseCrud() {
         while (true) {
             try {
                 System.out.println("--------------------------------------");
@@ -488,21 +410,21 @@ public class AdminApp {
         }
     }
 
-    private static void printWarehouses() throws ClassNotFoundException, SQLException {
+    private void printWarehouses() throws ClassNotFoundException, SQLException {
         Map<Integer, Warehouse> warehouses = warehouseService.getWarehouses();
         for (Integer id : warehouses.keySet()) {
             System.out.println("Warehouse Id: " + id + ", " + warehouses.get(id));
         }
     }
 
-    private static void getWarehouseById() throws SQLException, ClassNotFoundException {
+    private void getWarehouseById() throws SQLException, ClassNotFoundException {
         System.out.println("Please enter warehouse id: ");
         int id = sc.nextInt(); sc.nextLine();
         Warehouse warehouse = warehouseService.getWarehouse(id);
         System.out.println(warehouse);
     }
 
-    private static void createWarehouse() throws SQLException, ClassNotFoundException {
+    private void createWarehouse() throws SQLException, ClassNotFoundException {
         System.out.println("Please enter name of new warehouse: ");
         String name = sc.nextLine();
         System.out.println("Please enter new address of warehouse: ");
@@ -511,7 +433,7 @@ public class AdminApp {
         System.out.println("Created warehouse !");
     }
 
-    private static void updateWarehouse() throws SQLException, ClassNotFoundException {
+    private void updateWarehouse() throws SQLException, ClassNotFoundException {
         System.out.println("Please enter warehouse id: ");
         int id = sc.nextInt(); sc.nextLine();
         System.out.println("Please enter new name of warehouse: ");
@@ -522,14 +444,14 @@ public class AdminApp {
         System.out.println("Created warehouse !");
     }
 
-    private static void deleteWarehouse() throws SQLException {
+    private void deleteWarehouse() throws SQLException {
         System.out.println("Please enter warehouse id: ");
         int id = sc.nextInt(); sc.nextLine();
         warehouseService.delete(id);
         System.out.println("Deleted warehouse !");
     }
 
-    private static void insertProduct() throws SQLException, ClassNotFoundException {
+    private void insertProduct() throws SQLException, ClassNotFoundException {
         printWarehouses();
         System.out.println("Choose warehouse id from above: ");
         int warehouseId = sc.nextInt();
@@ -542,7 +464,7 @@ public class AdminApp {
         System.out.println("Stock and product has been inserted !");
     }
 
-    private static void updateProductStock() throws SQLException, ClassNotFoundException {
+    private void updateProductStock() throws SQLException, ClassNotFoundException {
         printWarehouses();
         System.out.println("Choose warehouse id from above: ");
         int warehouseId = sc.nextInt();
@@ -555,7 +477,7 @@ public class AdminApp {
         System.out.println("Stock has been updated !");
     }
 
-    private static void getProductStock() throws SQLException, ClassNotFoundException {
+    private void getProductStock() throws SQLException, ClassNotFoundException {
         printProducts();
         System.out.println("Enter product id from above: ");
         int id = sc.nextInt();
@@ -563,7 +485,7 @@ public class AdminApp {
         System.out.println("Stock of product: " + stock);
     }
 
-    private static void customerCrud() {
+    private void customerCrud() {
         while (true) {
             try {
                 System.out.println("--------------------------------------");
@@ -587,14 +509,14 @@ public class AdminApp {
         }
     }
 
-    private static void printCustomers() throws ClassNotFoundException, SQLException {
+    private void printCustomers() throws ClassNotFoundException, SQLException {
         Map<Integer, Customer> customers = customerService.getAllCustomers();
         for (Integer id : customers.keySet()) {
             System.out.println("Id: " + id + ", " + customers.get(id));
         }
     }
 
-    private static void getCustomerById() throws ClassNotFoundException, SQLException {
+    private void getCustomerById() throws ClassNotFoundException, SQLException {
         System.out.println("Enter id: ");
         int id = sc.nextInt();
         Customer customer = customerService.getCustomer(id);
