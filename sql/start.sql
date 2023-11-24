@@ -378,7 +378,7 @@ CREATE PACKAGE BODY admin_pkg AS
         count_admin  NUMBER;
     BEGIN 
         IF id IS NULL THEN 
-            RAISE_APPLICATION_ERROR(-20004, 'Customer id cannot be null');
+            RAISE_APPLICATION_ERROR(-20004, 'customer id cannot be null');
         END IF;
         SELECT COUNT(*) INTO count_admin FROM admins WHERE admin_id = id;
         IF count_admin = 0 THEN 
@@ -1058,9 +1058,6 @@ CREATE PACKAGE BODY review_pkg AS
         review_pkg.validate_description(vdescription);
         UPDATE reviews SET rating = vrating, description = vdescription
         WHERE review_id = id;
-        EXCEPTION 
-            WHEN others THEN 
-                RAISE_APPLICATION_ERROR(-20000, 'Cannot update review');
     END;
     
     -- Deletes a review with the specified ID.
