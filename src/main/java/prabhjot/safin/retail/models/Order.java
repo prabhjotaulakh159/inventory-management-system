@@ -51,36 +51,52 @@ public class Order implements SQLData {
         stream.writeDate(this.orderDate);
     }
 
+    /**
+     * Accessor for customer id
+     * @return Customer who made the order
+     */
     public int getCustomerId() {
         return customerId;
     }
 
+    /**
+     * Mutator for customer id
+     * @param customerId New customer id
+     */
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
     }
 
+    /**
+     * Accessor for store id
+     * @return Store id where order is placed
+     */
     public int getStoreId() {
         return storeId;
     }
 
+    /**
+     * Mutator for store id
+     * @param storeId New store id
+     */
     public void setStoreId(int storeId) {
         this.storeId = storeId;
     }
 
+    /**
+     * Accessor for order date
+     * @return Date the order was placed
+     */
     public Date getOrderDate() {
         return orderDate;
     }
 
+    /**
+     * Mutator for order date
+     * @param orderDate New order date
+     */
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     @Override

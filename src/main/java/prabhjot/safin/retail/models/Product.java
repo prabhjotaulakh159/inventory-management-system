@@ -18,6 +18,11 @@ public class Product implements SQLData{
 
     }
     
+    /**
+     * Constructor
+     * @param name Name of product
+     * @param category_id Id of the category
+     */
     public Product(String name, int category_id){
         this.name= name;
         this.category_id= category_id;
@@ -41,18 +46,34 @@ public class Product implements SQLData{
         stream.writeInt(this.category_id);
     }
 
+    /**
+     * Accessor for name
+     * @return Product name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Mutator for name
+     * @param name New producr name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Accessor for category id
+     * @return Category for the product
+     */
     public int getCategory_id() {
         return category_id;
     }
 
+    /**
+     * Mutator for category id
+     * @param category_id New category id of product
+     */
     public void setCategory_id(int category_id) {
         this.category_id = category_id;
     }

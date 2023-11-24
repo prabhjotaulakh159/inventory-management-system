@@ -17,6 +17,10 @@ import prabhjot.safin.retail.models.Product;
 public class ProductService {
     private Connection connection;
     
+    /**
+     * Constructor
+     * @param connection Current database connection
+     */
     public ProductService(Connection connection){
         this.connection = connection;
     }

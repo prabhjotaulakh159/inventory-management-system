@@ -14,16 +14,19 @@ import prabhjot.safin.retail.models.Admin;
 public class AdminService {
     private Connection connection;
 
+    /**
+     * Constructor
+     * @param connection Current connection to database
+     */
     public AdminService(Connection connection) {
         this.connection = connection;
     }
 
     /**
-     * Authenticates an administrator based on ID and password.
-     *
+     * Authenticates an administrator based on ID and password
      * @param admin Holds admin credentials
      * @return True if authentication is successful, otherwise false.
-     * @throws SQLException            If a database access error occurs.
+     * @throws SQLException If a database access error occurs.
      */
     public int login(Admin admin) throws SQLException, ClassNotFoundException {
         String SQL = "{? = call admin_pkg.login (?, ?)}";

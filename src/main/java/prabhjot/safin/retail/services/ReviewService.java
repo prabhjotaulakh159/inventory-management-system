@@ -19,7 +19,6 @@ public class ReviewService {
 
     /**
      * Constructs a new ReviewService with the specified database connection.
-     *
      * @param connection The database connection to be used by the service.
      */
     public ReviewService(Connection connection) {
@@ -28,7 +27,6 @@ public class ReviewService {
 
     /**
      * Creates a new review in the database.
-     *
      * @param review The Review object representing the review to be created.
      * @throws SQLException If a database access error occurs.
      * @throws ClassNotFoundException If the class is not found
@@ -47,7 +45,6 @@ public class ReviewService {
 
     /**
      * Updates an existing review in the database.
-     *
      * @param reviewId    The ID of the review to be updated.
      * @param rating      The new rating for the review.
      * @param description The new description for the review.
@@ -66,7 +63,6 @@ public class ReviewService {
 
     /**
      * Deletes a review from the database based on its ID.
-     *
      * @param reviewId The ID of the review to be deleted.
      * @throws SQLException If a database access error occurs.
      */
@@ -81,7 +77,6 @@ public class ReviewService {
 
     /**
      * Retrieves a review from the database based on its ID.
-     *
      * @param reviewId The ID of the review to be retrieved.
      * @return The Review object representing the retrieved review, or null if not found.
      * @throws SQLException            If a database access error occurs.
@@ -103,7 +98,6 @@ public class ReviewService {
 
     /**
      * Retrieves all reviews from the database and returns them as a Map.
-     *
      * @return A Map where keys are review IDs and values are Review objects.
      * @throws SQLException            If a database access error occurs.
      * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
@@ -125,7 +119,6 @@ public class ReviewService {
 
     /**
      * Retrieves flagged reviews from the database and returns them as a Map.
-     *
      * @return A Map where keys are review IDs and values are Review objects.
      * @throws SQLException            If a database access error occurs.
      * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
@@ -147,7 +140,6 @@ public class ReviewService {
 
     /**
      * Deletes flagged reviews from the database.
-     *
      * @throws SQLException If a database access error occurs.
      */
     public void deleteFlaggedReviews() throws SQLException {
@@ -160,7 +152,6 @@ public class ReviewService {
 
     /**
      * Retrieves reviews for a specific product from the database and returns them as a Map.
-     *
      * @param productId The ID of the product for which reviews are retrieved.
      * @return A Map where keys are review IDs and values are Review objects.
      * @throws SQLException            If a database access error occurs.

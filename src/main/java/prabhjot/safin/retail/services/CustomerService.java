@@ -17,6 +17,10 @@ import prabhjot.safin.retail.models.Customer;
 public class CustomerService {
     private Connection connection;
 
+    /**
+     * Constructor
+     * @param connection Current database connection
+     */
     public CustomerService(Connection connection) {
         this.connection = connection;
     }
@@ -26,7 +30,7 @@ public class CustomerService {
      * @param customerId The ID of the customer.
      * @param password   The password for authentication.
      * @return The Customer object if authentication is successful, otherwise null.
-     * @throws SQLException            If a database access error occurs.
+     * @throws SQLException If a database access error occurs.
      * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
      */
     public Customer login(int customerId, String password) throws SQLException, ClassNotFoundException {
@@ -81,6 +85,7 @@ public class CustomerService {
             customers.put(resultSet.getInt(2), this.getCustomer(resultSet.getInt(2)));
         }
         resultSet.close();
+        callableStatement.close();
         return customers;
     }
 }

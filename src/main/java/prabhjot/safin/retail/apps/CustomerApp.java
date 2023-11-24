@@ -11,6 +11,10 @@ import prabhjot.safin.retail.models.Customer;
 import prabhjot.safin.retail.models.Order;
 import prabhjot.safin.retail.models.Review;
 
+/**
+ * Customer version of the application
+ * @author Prabhjot Aulakh, Safin Haque
+ */
 public class CustomerApp extends Application {
     public CustomerApp() throws SQLException {
         super();
@@ -47,6 +51,9 @@ public class CustomerApp extends Application {
         }
     }
 
+    /**
+     * Logs in a customer
+     */
     private void login(){
         while(true){
             try{
@@ -77,6 +84,9 @@ public class CustomerApp extends Application {
 
     }
 
+    /**
+     * Provides UI for product related operations
+     */
     private void productCrud(){
         while(true){
             try{
@@ -107,6 +117,11 @@ public class CustomerApp extends Application {
         }
     }
 
+    /**
+     * Prompts users to enter a product id and get a reviews on it
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void getReviewOfProduct() throws SQLException, ClassNotFoundException{
         printProducts();
         showCancelInteger();
@@ -131,7 +146,9 @@ public class CustomerApp extends Application {
         }
     }
        
-
+    /**
+     * Provides UI for options on orders
+     */
     private void ordersOptions(){
          while(true){
             try{
@@ -162,6 +179,11 @@ public class CustomerApp extends Application {
         }
     }
 
+    /**
+     * Provides UI to create an order
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void createOrder() throws SQLException, ClassNotFoundException {
         printStores();
         showCancelInteger();
@@ -211,6 +233,11 @@ public class CustomerApp extends Application {
         System.out.println("Here is your order id: " + orderId);
     }
 
+    /**
+     * Provides UI to delete an order
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void delete_order() throws SQLException, ClassNotFoundException {
         Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
         for(Integer orderId : orders.keySet()){
@@ -228,6 +255,11 @@ public class CustomerApp extends Application {
         System.out.println("Order has been deleted!");
     }
     
+    /**
+     * Provides UI to get the details of an order
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void getOrderDetails() throws SQLException, ClassNotFoundException {
         Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
         for(Integer orderId : orders.keySet()){
@@ -247,6 +279,9 @@ public class CustomerApp extends Application {
         }
     }
 
+    /**
+     * Provides UI for view all orders for the logged in customer
+     */
     public void viewAllOrders() throws SQLException, ClassNotFoundException{
         Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
         for(Integer orderId : orders.keySet()){
@@ -254,7 +289,9 @@ public class CustomerApp extends Application {
         }
     }
 
-
+    /**
+     * Provides UI for review options
+     */
     private void reviewsOptions(){
         while(true){
             try{
@@ -283,6 +320,11 @@ public class CustomerApp extends Application {
         }
     }
 
+    /**
+     * Provides UI to create a review 
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void createReview() throws SQLException, ClassNotFoundException{
         printProducts();
         showCancelInteger();
@@ -311,6 +353,11 @@ public class CustomerApp extends Application {
         System.out.println("Review Created!");
     }
     
+    /**
+     * Provides UI to delete a review
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void deleteReview() throws SQLException, ClassNotFoundException{
         Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
         for (Integer reviewId : reviews.keySet()) {
@@ -327,6 +374,11 @@ public class CustomerApp extends Application {
         System.out.println("Review Removed!");
     }
 
+    /**
+     * Provides UI to flag a review
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void flagReview() throws SQLException, ClassNotFoundException{
         showCancelInteger();
         System.out.println("Which review Id do you want to flag?");
@@ -339,6 +391,11 @@ public class CustomerApp extends Application {
         System.out.println("Review has been flagged");
     }
 
+    /**
+     * Provides UI to update a review
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void updateReview() throws SQLException, ClassNotFoundException {
         Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
         for(Integer reviewId : reviews.keySet()){

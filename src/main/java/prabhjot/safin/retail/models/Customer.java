@@ -17,6 +17,28 @@ public class Customer implements SQLData {
     private String password;
     private String type = "CUSTOMER_TYPE";
 
+    public Customer() {
+
+    }
+
+    /**
+     * Constructor
+     * @param firstname Firstname of customer
+     * @param lastname Lastname of customer
+     * @param email Email of customer
+     * @param address Address of customer
+     * @param password Password of customer
+     */
+    public Customer(String firstname, String lastname, String email, String address, String password) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.address = address;
+        this.password = password;
+    }
+
+
+
     @Override
     public String getSQLTypeName() throws SQLException {
         return this.type;

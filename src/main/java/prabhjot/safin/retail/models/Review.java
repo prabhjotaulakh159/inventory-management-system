@@ -23,7 +23,6 @@ public class Review implements SQLData {
 
     /**
      * Constructs a new Review.
-     *
      * @param customerId The ID of the customer submitting the review.
      * @param productId  The ID of the product being reviewed.
      * @param flags      Flags associated with the review.

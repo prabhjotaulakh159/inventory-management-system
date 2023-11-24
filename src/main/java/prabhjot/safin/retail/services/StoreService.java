@@ -39,7 +39,7 @@ public class StoreService {
         CallableStatement callableStatement= connection.prepareCall(sql);
         callableStatement.setObject(1, store);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -55,7 +55,7 @@ public class StoreService {
         callableStatement.setInt(1, id);
         callableStatement.setString(2, name);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -69,7 +69,7 @@ public class StoreService {
         CallableStatement callableStatement= connection.prepareCall(sql);
         callableStatement.setInt(1, id);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -87,7 +87,7 @@ public class StoreService {
         callableStatement.setInt(2, productId);
         callableStatement.setInt(3, price);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -105,7 +105,7 @@ public class StoreService {
         callableStatement.setInt(2, productId);
         callableStatement.setInt(3, price);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 

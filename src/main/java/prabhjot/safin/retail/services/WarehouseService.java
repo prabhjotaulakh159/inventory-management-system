@@ -40,7 +40,7 @@ public class WarehouseService {
         CallableStatement callableStatement = connection.prepareCall(SQL);
         callableStatement.setObject(1, warehouse);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -60,7 +60,7 @@ public class WarehouseService {
         callableStatement.setInt(1, warehouseId);
         callableStatement.setObject(2, warehouse);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -75,7 +75,7 @@ public class WarehouseService {
         CallableStatement callableStatement = connection.prepareCall(SQL);
         callableStatement.setInt(1, warehouseId);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -93,7 +93,7 @@ public class WarehouseService {
         callableStatement.setInt(2, productId);
         callableStatement.setInt(3, quantity);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
@@ -111,7 +111,7 @@ public class WarehouseService {
         callableStatement.setInt(2, productId);
         callableStatement.setInt(3, quantity);
         callableStatement.execute();
-        connection.commit();
+        this.connection.commit();
         callableStatement.close();
     }
 
