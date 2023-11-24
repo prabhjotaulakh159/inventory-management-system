@@ -30,8 +30,7 @@ public class CustomerApp extends Application {
                 System.out.println("Press 4 to exit");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
-
-                if(input == 1) productCrud();
+                if     (input == 1) productCrud();
                 else if(input == 2) ordersOptions();
                 else if(input == 3) reviewsOptions();
                 else if(input == 4) break;
@@ -161,7 +160,6 @@ public class CustomerApp extends Application {
         Order order = new Order(id, storeid, new Date(System.currentTimeMillis()));
         Map<Integer, Integer> products= new HashMap<>();
         while(true){
-            System.out.println("Enter 0 to quit");
             try{
                 printProducts();
                 System.out.println("choose which product you'd like to buy");

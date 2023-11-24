@@ -54,9 +54,14 @@ public abstract class Application {
     }
     
     public void getProductById() throws SQLException, ClassNotFoundException {
+        showCancelInteger();
         System.out.println("Enter id of product: ");
+        
         int id = sc.nextInt();
         sc.nextLine();
+        
+        if (cancelIntegerOperation(id)) return;
+        
         Product product = productService.getProduct(id);
         Category category = categoryService.getCategory(product.getCategory_id());
         System.out.println(product + ", " + category);
@@ -78,22 +83,34 @@ public abstract class Application {
     }
 
     public void getStoreById() throws SQLException, ClassNotFoundException {
+        showCancelInteger();
         System.out.println("Enter store id: ");
+        
         int id = sc.nextInt();
         sc.nextLine();
+        
+        if (cancelIntegerOperation(id)) return;
+        
         Store store = storeService.getStore(id);
         System.out.println(store);
     }
 
     public void getPriceAtStore() throws SQLException, ClassNotFoundException {
         printProducts();
+        showCancelInteger();
         System.out.println("Please choose product id from above: ");
+        
         int productId = sc.nextInt();
         sc.nextLine();
+        
+        if (cancelIntegerOperation(productId)) return;
+
         printStoresWithProduct(productId);
         System.out.println("Please choose store id from above: ");
+        
         int storeId = sc.nextInt();
         sc.nextLine();
+        
         int price = storeService.getProductPrice(productId, storeId);
         System.out.println("Price: " + price + "$");
     }
@@ -101,9 +118,14 @@ public abstract class Application {
 
     public void getReviewForProduct() throws SQLException, ClassNotFoundException {
         printProducts();
+        showCancelInteger();
         System.out.println("Enter product id from above to get reviews on: ");
+        
         int id = sc.nextInt();
         sc.nextLine();
+        
+        if (cancelIntegerOperation(id)) return;
+        
         Map<Integer, Review> reviews = reviewService.getReviewForProduct(id);
         for (Integer reviewId : reviews.keySet()) {
             System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
@@ -112,5 +134,21 @@ public abstract class Application {
 
     public void handleSQLException(String message){
         System.out.println(message.split("\n")[0]);
+    }
+
+    public boolean cancelStringOperation(String Q) {
+        return Q.toUpperCase().equals("Q");
+    }
+
+    public boolean cancelIntegerOperation(int input) {
+        return input == 0;
+    }
+
+    public void showCancelInteger() {
+        System.out.println("Enter 0 to quit");
+    }
+
+    public void showCancelString() {
+        System.out.println("Enter Q to quit");
     }
 }
