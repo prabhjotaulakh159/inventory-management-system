@@ -413,7 +413,6 @@ CREATE PACKAGE category_pkg AS
     PROCEDURE delete_category(id IN NUMBER);
     FUNCTION get_category(id IN NUMBER) RETURN category_type;
     FUNCTION get_categories RETURN number_array;
-    PROCEDURE customer_update_info(vcustomer IN customer_pkg, id in NUMBER)
 END category_pkg;
 /
 CREATE PACKAGE BODY category_pkg AS 
@@ -497,6 +496,7 @@ CREATE PACKAGE customer_pkg AS
     FUNCTION login(id IN NUMBER, password IN VARCHAR2) RETURN customer_type;
     FUNCTION get_customers RETURN number_array;
     FUNCTION get_customer_by_id(id IN NUMBER) RETURN customer_type;
+    PROCEDURE customer_update_info(vcustomer IN customer_type, id in NUMBER);
 END customer_pkg;
 /
 CREATE PACKAGE BODY customer_pkg AS 
@@ -686,6 +686,7 @@ CREATE PACKAGE store_pkg AS
     FUNCTION get_price_of_product(prodid IN NUMBER, storeid IN NUMBER) RETURN NUMBER;
     FUNCTION get_store(vstoreid IN NUMBER) RETURN store_type;
     FUNCTION get_stores RETURN number_array;
+    FUNCTION get_stores_with_product(prodid IN NUMBER) RETURN number_array;
 END store_pkg;
 /
 CREATE PACKAGE BODY store_pkg AS 
@@ -782,6 +783,9 @@ CREATE PACKAGE BODY store_pkg AS
         SELECT price INTO vprice FROM products_stores ps
         WHERE ps.product_id = prodid AND ps.store_id = storeid;
         RETURN vprice;
+        EXCEPTION   
+            WHEN no_data_found THEN
+                RAISE_APPLICATION_ERROR(-20003, 'Product not sold at this store for the moment');
     END;
 
     -- fetches a store
@@ -810,6 +814,19 @@ CREATE PACKAGE BODY store_pkg AS
         SELECT store_id BULK COLLECT INTO stores_arr FROM stores;
         RETURN stores_arr;
     END;
+    
+    FUNCTION get_stores_with_product(prodid IN NUMBER) RETURN number_array AS 
+        store_arr number_array;
+    BEGIN 
+        store_arr := number_array();
+        SELECT store_id BULK COLLECT INTO store_arr FROM products_stores
+        WHERE product_id = prodid;
+        IF store_arr.COUNT = 0 THEN 
+            RAISE_APPLICATION_ERROR(-20003, 'No store price with that product');
+        END IF;
+        RETURN store_arr;
+    END;
+
 END store_pkg;
 /
 
@@ -1425,7 +1442,7 @@ INSERT INTO products_stores (product_id, store_id, price) VALUES (13, 11, 40);
 INSERT INTO products_stores (product_id, store_id, price) VALUES (14, 2, 856600);
 INSERT INTO products_stores (product_id, store_id, price) VALUES (15, 1, 50);
 INSERT INTO products_stores (product_id, store_id, price) VALUES (15, 7, 16);
---
+
 INSERT INTO orders (customer_id, store_id, order_date) VALUES (1, 11, TO_DATE('10/02/2023', 'MM/DD/YYYY')); -- 1
 INSERT INTO orders (customer_id, store_id, order_date) VALUES (1, 7, TO_DATE('10/23/2023', 'MM/DD/YYYY')); --2
 INSERT INTO orders (customer_id, store_id, order_date) VALUES (2, 6, TO_DATE('10/11/2023', 'MM/DD/YYYY')); -- 3
