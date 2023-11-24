@@ -438,12 +438,64 @@ public class CustomerApp extends Application {
      * @throws ClassNotFoundException
      */
     private void updateCustomer() throws SQLException, ClassNotFoundException  {
-        showCancelInteger();
-        System.out.println("What you want to update ?");
-        System.out.println("Enter 1 for firstname");
-        System.out.println("Enter 2 for lastname");
-        System.out.println("Enter 3 for email");
-        System.out.println("Enter 4 for address");
+        while (true) {
+            try {
+                showCancelInteger();
+                System.out.println("What you want to update ?");
+                System.out.println("Enter 1 for firstname");
+                System.out.println("Enter 2 for lastname");
+                System.out.println("Enter 3 for email");
+                System.out.println("Enter 4 for address");
+                System.out.println("Enter 5 for password");
+                
+                int input = sc.nextInt();
+                sc.nextLine();
+                
+                if (cancelIntegerOperation(input)) return;
+
+                String info = null;
+
+                if (input == 1) {
+                    showCancelString();
+                    System.out.println("Enter new firstname: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setFirstname(info);
+                } else if (input == 2) {
+                    showCancelString();
+                    System.out.println("Enter new lastname: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setLastname(sc.nextLine());
+                } else if (input == 3) {
+                    showCancelString();
+                    System.out.println("Enter new email: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setEmail(sc.nextLine());
+                } else if (input == 4) {
+                    showCancelString();
+                    System.out.println("Enter new address: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setAddress(sc.nextLine());
+                } else if (input == 5) {
+                    showCancelString();
+                    System.out.println("Enter new password: ");
+                    info = sc.nextLine();
+                    if (cancelStringOperation(info)) return;
+                    this.current.setPassword(sc.nextLine());
+                } else {
+                    throw new InputMismatchException();
+                }
+
+                customerService.updateCustomerInformation(this.current, this.id);
+                System.out.println("Customer information has been updated !");
+            } catch (InputMismatchException e) {
+                System.out.println("Not a valid option");
+                sc.next();
+            }
+        }
     }
 }
 
