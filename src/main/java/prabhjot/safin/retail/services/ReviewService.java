@@ -114,6 +114,7 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        resultSet.close();
         return reviews;
     }
 
@@ -134,6 +135,7 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        resultSet.close();
         return reviews;
     }
 
@@ -168,6 +170,7 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        resultSet.close();
         return reviews;
     }
 
@@ -199,6 +202,7 @@ public class ReviewService {
         while (resultSet.next()) {
             reviews.put(resultSet.getInt(2), this.getReview(resultSet.getInt(2)));
         }
+        resultSet.close();
         return reviews;
     }
 }

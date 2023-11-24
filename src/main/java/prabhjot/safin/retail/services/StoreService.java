@@ -158,6 +158,7 @@ public class StoreService {
         while(resultSet.next()){
             stores.put(resultSet.getInt(2), this.getStore(resultSet.getInt(2)));
         }
+        resultSet.close();
         return stores;
     }
 
