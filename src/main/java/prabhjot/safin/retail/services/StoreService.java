@@ -40,6 +40,7 @@ public class StoreService {
         callableStatement.setObject(1, store);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -55,6 +56,7 @@ public class StoreService {
         callableStatement.setString(2, name);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -68,6 +70,7 @@ public class StoreService {
         callableStatement.setInt(1, id);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -85,6 +88,7 @@ public class StoreService {
         callableStatement.setInt(3, price);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -102,6 +106,7 @@ public class StoreService {
         callableStatement.setInt(3, price);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -119,6 +124,7 @@ public class StoreService {
         callableStatement.setInt(3, storeId);
         callableStatement.execute();
         int price = callableStatement.getInt(1);
+        callableStatement.close();
         return price;
     }
     
@@ -139,6 +145,7 @@ public class StoreService {
         callableStatement.setInt(2, id);
         callableStatement.execute();
         Store store= (Store) callableStatement.getObject(1);
+        callableStatement.close();
         return store;
     }
 
@@ -158,6 +165,8 @@ public class StoreService {
         while(resultSet.next()){
             stores.put(resultSet.getInt(2), this.getStore(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return stores;
     }
 
@@ -178,6 +187,8 @@ public class StoreService {
         while(resultSet.next()){
             stores.put(resultSet.getInt(2), this.getStore(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return stores;
     }
 }

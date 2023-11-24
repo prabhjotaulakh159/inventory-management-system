@@ -33,6 +33,7 @@ public class CategoryService {
         callableStatement.setObject(1, category);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -49,6 +50,7 @@ public class CategoryService {
         callableStatement.setString(2, category);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -63,6 +65,7 @@ public class CategoryService {
         callableStatement.setInt(1, categoryId);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -83,6 +86,7 @@ public class CategoryService {
         callableStatement.setInt(2, categoryId);
         callableStatement.execute();
         Category category = (Category) callableStatement.getObject(1);
+        callableStatement.close();
         return category;  
     }
 
@@ -103,6 +107,7 @@ public class CategoryService {
         while (resultSet.next()) {
             categories.put(resultSet.getInt(2), this.getCategory(resultSet.getInt(2)));
         }
+        resultSet.close();
         return categories;
     }
 }

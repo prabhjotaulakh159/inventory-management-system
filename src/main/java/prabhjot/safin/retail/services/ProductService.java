@@ -36,6 +36,7 @@ public class ProductService {
         callableStatement.setObject(1, product);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -55,6 +56,7 @@ public class ProductService {
         callableStatement.setObject(2, product);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -69,6 +71,7 @@ public class ProductService {
         callableStatement.setInt(1, id);
         callableStatement.execute();
         connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -88,6 +91,7 @@ public class ProductService {
         callableStatement.setInt(2, id);
         callableStatement.execute();
         Product product = (Product) callableStatement.getObject(1);
+        callableStatement.close();
         return product;
     }
 
@@ -107,6 +111,8 @@ public class ProductService {
         while(resultSet.next()) {
             products.put(resultSet.getInt(2), this.getProduct(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return products;
     }
 }

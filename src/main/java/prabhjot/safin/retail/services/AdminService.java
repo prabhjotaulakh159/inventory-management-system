@@ -33,6 +33,7 @@ public class AdminService {
         callableStatement.setString(3, admin.getPassword());
         callableStatement.execute();
         int status = callableStatement.getInt(1);
+        callableStatement.close();
         return status;
     }
 }

@@ -17,6 +17,7 @@ public class CustomerApp extends Application {
     }
 
     private int id;
+    
     @Override
     public void run() {
         try{
@@ -30,17 +31,20 @@ public class CustomerApp extends Application {
                 System.out.println("Press 4 to exit");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
-
-                if(input == 1) productCrud();
+                if     (input == 1) productCrud();
                 else if(input == 2) ordersOptions();
                 else if(input == 3) reviewsOptions();
                 else if(input == 4) break;
                 else System.out.println("Invalid Option");
             }
+            System.out.println("Goodbye !");
+            connectionProvider.kill();
         } catch (InputMismatchException e) {
             System.out.println("Not a valid option !");
             sc.next();
-        } 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void login(){
@@ -105,13 +109,21 @@ public class CustomerApp extends Application {
 
     private void getReviewOfProduct() throws SQLException, ClassNotFoundException{
         printProducts();
+        showCancelInteger();
         System.out.println("Type the product id you want to see reviews from:");
-        int productId= sc.nextInt(); sc.nextLine();
+        
+        int productId= sc.nextInt(); 
+        sc.nextLine();
+        
+        if(cancelIntegerOperation(productId))return;
+        
         Map<Integer, Review> reviews = reviewService.getReviewForProduct(productId);
+        
         System.out.println("Reviews:");
         for(Integer id: reviews.keySet()){
             System.out.println("Review ID: " + id + " | " + reviews.get(id));
         }
+        
         System.out.println("Would you like to flag one of these reviews? y/n");
         String answer= sc.nextLine().toLowerCase();
         if(answer.equals("y")){
@@ -152,25 +164,40 @@ public class CustomerApp extends Application {
 
     private void createOrder() throws SQLException, ClassNotFoundException {
         printStores();
+        showCancelInteger();
         System.out.println("Which store do you want to buy from? Enter the store Id:");
+        
         int storeid= sc.nextInt();
+        
+        if(cancelIntegerOperation(storeid))return;
+        
         Order order = new Order(id, storeid, new Date(System.currentTimeMillis()));
         Map<Integer, Integer> products= new HashMap<>();
         while(true){
-            System.out.println("Enter 0 to quit");
             try{
                 printProducts();
+                showCancelInteger();
                 System.out.println("choose which product you'd like to buy");
-                int productId=sc.nextInt();
-                System.out.println("How many would you like to buy?");
-                int quantity= sc.nextInt(); sc.nextLine();
-                products.put(productId, quantity);
-                System.out.println("Are you done picking your products? y/n");
-                String ans= sc.nextLine().toLowerCase();
 
-                if(ans.equals("y")){
-                    break;
-                }
+                int productId=sc.nextInt();
+                
+                if (cancelIntegerOperation(productId)) return;
+
+                showCancelInteger();
+                System.out.println("How many would you like to buy?");
+                
+                int quantity= sc.nextInt(); 
+                sc.nextLine();
+                
+                if (cancelIntegerOperation(quantity)) return;
+
+                products.put(productId, quantity);
+                
+                System.out.println("Are you done picking your products? y/n");
+                
+                String ans= sc.nextLine().toLowerCase();
+                if(ans.equals("y")) break;
+
             }catch (SQLException e) {
                 handleSQLException(e.getMessage());
             } catch (InputMismatchException e) {
@@ -189,8 +216,14 @@ public class CustomerApp extends Application {
         for(Integer orderId : orders.keySet()){
             System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
         }
+        
+        showCancelInteger();
         System.out.println("Choose which Order you want to delete");
+        
         int deleteId= sc.nextInt();
+       
+        if (cancelIntegerOperation(deleteId)) return;
+        
         orderService.deleteOrder(deleteId);
         System.out.println("Order has been deleted!");
     }
@@ -200,8 +233,14 @@ public class CustomerApp extends Application {
         for(Integer orderId : orders.keySet()){
             System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
         }
+
+        showCancelInteger();
         System.out.println("Choose order to get details on: ");
+        
         int orderId = sc.nextInt();
+        
+        if (cancelIntegerOperation(orderId)) return;
+        
         Map<String, Integer> details = orderService.getOrderDetails(orderId);
         for (String name : details.keySet()) {
             System.out.println("Product: " + name + ", Quantity: " + details.get(name) + ", Price: " + orderService.getOrderTotal(orderId));
@@ -246,27 +285,56 @@ public class CustomerApp extends Application {
 
     private void createReview() throws SQLException, ClassNotFoundException{
         printProducts();
+        showCancelInteger();
         System.out.println("Choose which product you want to review, enter id:");
+        
         int productId= sc.nextInt();
+        
+        if (cancelIntegerOperation(productId)) return;
+        
+        showCancelInteger();
         System.out.println("Enter your rating, it can be between 1 and 5");
+        
         int rating= sc.nextInt(); sc.nextLine();
+        
+        if (cancelIntegerOperation(rating)) return;
+
+        showCancelString();
         System.out.println("Give us a brief description on what you like/dislike:");
+        
         String description = sc.nextLine();
+        
+        if (cancelStringOperation(description)) return;
+        
         Review review = new Review(id, productId, 0, rating, description);
         reviewService.create(review);
         System.out.println("Review Created!");
     }
     
-    private void deleteReview() throws SQLException{
+    private void deleteReview() throws SQLException, ClassNotFoundException{
+        Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
+        for (Integer reviewId : reviews.keySet()) {
+            System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
+        }
+        showCancelInteger();
         System.out.println("Enter the Review Id you want to delete");
+        
         int reviewId= sc.nextInt();
+        
+        if (cancelIntegerOperation(reviewId)) return;
+        
         reviewService.delete(reviewId);
         System.out.println("Review Removed!");
     }
 
     private void flagReview() throws SQLException, ClassNotFoundException{
+        showCancelInteger();
         System.out.println("Which review Id do you want to flag?");
+        
         int review = sc.nextInt();
+        
+        if (cancelIntegerOperation(review)) return;
+        
         reviewService.flagReview(review);
         System.out.println("Review has been flagged");
     }
@@ -276,12 +344,27 @@ public class CustomerApp extends Application {
         for(Integer reviewId : reviews.keySet()){
             System.out.println("Review ID: " + reviewId + " | " + reviews.get(reviewId));
         }
+    
+        showCancelInteger();
         System.out.println("Which Review you want to Update? Enter their Id:");
+        
         int reviewId = sc.nextInt(); sc.nextLine();
+
+        if (cancelIntegerOperation(reviewId)) return;
+
+        showCancelInteger();
         System.out.println("What is your updated Rating?:");
+        
         int rating = sc.nextInt(); sc.nextLine();
+        
+        if (cancelIntegerOperation(rating)) return;
+
+        showCancelString();
         System.out.println("Whats your new Description?");
+        
         String description = sc.nextLine();
+
+        if (cancelStringOperation(description)) return;
 
         reviewService.update(reviewId, rating, description);
         System.out.println("Review has been Updated!");

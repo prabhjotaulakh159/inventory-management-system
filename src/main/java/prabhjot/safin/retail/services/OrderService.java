@@ -47,6 +47,8 @@ public class OrderService {
             callableStatement2.execute();
         }
         this.connection.commit();
+        callableStatement.close();
+        callableStatement2.close();
         return orderId;
     }
 
@@ -61,6 +63,7 @@ public class OrderService {
         callableStatement.setInt(1, orderId);
         callableStatement.execute();
         this.connection.commit();
+        callableStatement.close();
     }
 
     /**
@@ -80,6 +83,7 @@ public class OrderService {
         callableStatement.setInt(2, orderId);
         callableStatement.execute();
         Order order = (Order) callableStatement.getObject(1);
+        callableStatement.close();
         return order;
     }
 
@@ -101,6 +105,8 @@ public class OrderService {
         while(resultSet.next()) {
             orders.put(resultSet.getInt(2), this.getOrder(resultSet.getInt(2)));
         }
+        callableStatement.close();
+        resultSet.close();
         return orders;
     }
 
@@ -120,10 +126,11 @@ public class OrderService {
         callableStatement.setInt(2, orderId);
         callableStatement.execute();
         ResultSet products = callableStatement.getArray(1).getResultSet();
+        CallableStatement quantityStatement = null;
         while (products.next()) {
             String productName = productService.getProduct(products.getInt(2)).getName();
             String quantitySql = "{? = call order_pkg.get_order_product_quantity(?,?)}";
-            CallableStatement quantityStatement = this.connection.prepareCall(quantitySql);
+            quantityStatement = this.connection.prepareCall(quantitySql);
             quantityStatement.registerOutParameter(1, Types.INTEGER);
             quantityStatement.setInt(2, orderId);
             quantityStatement.setInt(3, products.getInt(1));
@@ -131,6 +138,9 @@ public class OrderService {
             int quantity = quantityStatement.getInt(1);
             productQuantityMapping.put(productName, quantity);
         }
+        callableStatement.close();
+        quantityStatement.close();
+        products.close();
         return productQuantityMapping;
     }
 
@@ -145,6 +155,7 @@ public class OrderService {
         callableStatement.setInt(2, orderId);
         callableStatement.execute();
         int price = callableStatement.getInt(1);
+        callableStatement.close();
         return price;
     }
 }
