@@ -8,6 +8,11 @@ public class Admin {
     private int id;
     private String password;
     
+    /**
+     * Constructor
+     * @param id Id of admin
+     * @param password Password of admin
+     */
     public Admin(int id, String password) {
         this.id = id;
         this.password = password;

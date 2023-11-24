@@ -18,6 +18,10 @@ import prabhjot.safin.retail.services.ReviewService;
 import prabhjot.safin.retail.services.StoreService;
 import prabhjot.safin.retail.services.WarehouseService;
 
+/**
+ * Defines common methods and functionalities between customers and admins
+ * @author Prabhjot Aulakh, Safin Haque
+ */
 public abstract class Application {
     protected static Scanner sc;
     protected static ConnectionProvider connectionProvider;
@@ -43,8 +47,16 @@ public abstract class Application {
         orderService = new OrderService(connectionProvider.getConnection());
     }
 
+    /**
+     * Entry point of the application
+     */
     public abstract void run();
 
+    /**
+     * Prints products on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void printProducts() throws SQLException, ClassNotFoundException {
         Map<Integer, Product> products = productService.getProducts();
         for (Integer id : products.keySet()) {
@@ -53,6 +65,11 @@ public abstract class Application {
         }
     }
     
+    /**
+     * Gets a product by it's id and prints on the terminal 
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void getProductById() throws SQLException, ClassNotFoundException {
         showCancelInteger();
         System.out.println("Enter id of product: ");
@@ -67,6 +84,11 @@ public abstract class Application {
         System.out.println(product + ", " + category);
     }
 
+    /**
+     * Prints all stores on the terminal
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public void printStores() throws ClassNotFoundException, SQLException {
         Map<Integer, Store> stores = storeService.getStores();
         for (Integer id : stores.keySet()) {
@@ -74,6 +96,12 @@ public abstract class Application {
         }
     }
 
+    /**
+     * Print stores whom have the price of a product
+     * @param id Product id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void printStoresWithProduct(int id) throws ClassNotFoundException, SQLException {
         Map<Integer, Store> stores = storeService.getStoresWithProduct(id);
         System.out.println("Available price for stores: ");
@@ -82,6 +110,11 @@ public abstract class Application {
         }
     }
 
+    /**
+     * Retrieves a store by id and prints it on the terminal
+     * @throws SQlException
+     * @throws ClassNotFoundException
+     */
     public void getStoreById() throws SQLException, ClassNotFoundException {
         showCancelInteger();
         System.out.println("Enter store id: ");
@@ -95,6 +128,11 @@ public abstract class Application {
         System.out.println(store);
     }
 
+    /**
+     * Retrives a price from a store and prints it on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void getPriceAtStore() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
@@ -118,7 +156,11 @@ public abstract class Application {
         System.out.println("Price: " + price + "$");
     }
 
-
+    /**
+     * Retrives reviews for a product and prints them on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public void getReviewForProduct() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
@@ -135,22 +177,42 @@ public abstract class Application {
         }
     }
 
+    /**
+     * Parses an SQL exception and prints the first line
+     * @param message SQL error message to parse
+     */
     public void handleSQLException(String message){
         System.out.println(message.split("\n")[0]);
     }
 
+    /**
+     * Checks if a string (input) is a Q, meaning they choose to cancel an operation
+     * @param Q String to check cancellation 
+     * @return If it's equal to Q
+     */
     public boolean cancelStringOperation(String Q) {
         return Q.toUpperCase().equals("Q");
     }
 
+    /**
+     * Checks if an integer from input is equal to 0, in which case the user decided to cancel an operation
+     * @param input User input as int
+     * @return If input is equal to 0
+     */
     public boolean cancelIntegerOperation(int input) {
         return input == 0;
     }
 
+    /**
+     * Shows the user what to enter to cancel a integer-related operation
+     */
     public void showCancelInteger() {
         System.out.println("Enter 0 to quit");
     }
 
+    /**
+     * Shows the user what to enter to cancel a string-related operation
+     */
     public void showCancelString() {
         System.out.println("Enter Q to quit");
     }

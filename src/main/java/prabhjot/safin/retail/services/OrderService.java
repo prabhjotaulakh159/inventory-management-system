@@ -17,6 +17,10 @@ import prabhjot.safin.retail.models.Order;
 public class OrderService {
     private Connection connection;
 
+    /**
+     * Constructor
+     * @param connection Current database connection
+     */
     public OrderService(Connection connection) {
         this.connection = connection;
     }

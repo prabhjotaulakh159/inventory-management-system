@@ -18,6 +18,11 @@ public class Warehouse implements SQLData {
 
     }
 
+    /**
+     * Constructor
+     * @param name Name of warehouse
+     * @param address Address of warehouse
+     */
     public Warehouse(String name, String address) {
         this.name = name;
         this.address = address;

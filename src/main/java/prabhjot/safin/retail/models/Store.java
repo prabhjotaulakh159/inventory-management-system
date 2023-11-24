@@ -30,7 +30,7 @@ public class Store implements SQLData{
         return this.type;
     }
 
-      @Override
+    @Override
     public void readSQL(SQLInput stream, String typeName) throws SQLException {
         this.name = stream.readString();
         this.type = typeName;

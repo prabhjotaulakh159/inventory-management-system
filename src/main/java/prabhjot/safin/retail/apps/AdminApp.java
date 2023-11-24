@@ -13,6 +13,10 @@ import prabhjot.safin.retail.models.Review;
 import prabhjot.safin.retail.models.Store;
 import prabhjot.safin.retail.models.Warehouse;
 
+/**
+ * Admin version of the application
+ * @author Prabhjot Aulakh, Safin Haque
+ */
 public class AdminApp extends Application {
     public AdminApp() throws SQLException {
         super();
@@ -53,6 +57,9 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Logs in a admin
+     */
     private void login() {
         while (true) {
             try {
@@ -87,6 +94,9 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Provides UI for category options
+     */
     private void categoryCrud() {
         while (true) {
             try {
@@ -120,6 +130,11 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Prints categories on the terminal
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     private void printCategories() throws ClassNotFoundException, SQLException {
         Map<Integer, Category> categories = categoryService.getCategories();
         for (Integer id : categories.keySet()) { 
@@ -127,6 +142,11 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Provides UI to get a category by id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void getCategoryById() throws ClassNotFoundException, SQLException {
         showCancelInteger();
         System.out.println("Enter id of category: ");
@@ -140,6 +160,11 @@ public class AdminApp extends Application {
         System.out.println(category);
     }
 
+    /**
+     * Provides UI to create a category
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void createCategory() throws SQLException, ClassNotFoundException {
         showCancelString();        
         System.out.println("Enter category name: ");
@@ -152,6 +177,11 @@ public class AdminApp extends Application {
         System.out.println("Successfully created category !");
     }
 
+    /**
+     * Provides UI to update a category
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void updateCategory() throws ClassNotFoundException, SQLException {
         printCategories();
         showCancelInteger();
@@ -173,6 +203,11 @@ public class AdminApp extends Application {
         System.out.println("Successfully updated category !");
     }
 
+    /**
+     * Provides UI to delete a category
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void deleteCategory() throws ClassNotFoundException, SQLException {
         printCategories();
         showCancelInteger();
@@ -187,6 +222,9 @@ public class AdminApp extends Application {
         System.out.println("Successfully deleted category");
     }
 
+    /**
+     * Provides UI to delete for product options
+     */
     private void productCrud() {
         while (true) {
             try {
@@ -218,6 +256,11 @@ public class AdminApp extends Application {
         }
     }
     
+    /**
+     * Provides UI to create a product
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void createProduct() throws ClassNotFoundException, SQLException {
         showCancelString();
         System.out.println("Enter name of the product: ");
@@ -239,6 +282,11 @@ public class AdminApp extends Application {
         System.out.println("Product created !");
     }
 
+    /**
+     * Provides UI to update a product
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void updateProduct() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
@@ -268,6 +316,11 @@ public class AdminApp extends Application {
         System.out.println("Updated product !");
     }
 
+    /**
+     * Provides UI to delete a product
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void deleteProduct() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
@@ -282,6 +335,9 @@ public class AdminApp extends Application {
         System.out.println("Product deleted !");
     }
 
+    /**
+     * Provides UI for review options
+     */
     private void reviewCrud() {
         while (true) {
             try {
@@ -313,13 +369,23 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Prints all reviews on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void printReviews() throws ClassNotFoundException, SQLException {
         Map<Integer, Review> reviews = reviewService.getAllReviews();
         for (Integer id : reviews.keySet()) {
             System.out.println("Review Id: " + id + ", " + reviews.get(id));
         }
     }
-
+    
+    /**
+     * Provides UI to get a review by id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void getReviewById() throws SQLException, ClassNotFoundException {
         showCancelInteger();
         System.out.println("Enter id of review: ");
@@ -333,6 +399,9 @@ public class AdminApp extends Application {
         System.out.println(review);
     }
 
+    /**
+     * Prints flagged reviews on the terminal
+     */
     private void printFlaggedReviews() throws ClassNotFoundException, SQLException {
         Map<Integer, Review> reviews = reviewService.getFlaggedReviews();
         for (Integer id : reviews.keySet()) {
@@ -340,11 +409,17 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Deletes flagged reviews in the database
+     */
     private void deleteFlaggedReviews() throws SQLException {
         reviewService.deleteFlaggedReviews();
         System.out.println("Deleted flagged reviews !");
     }
 
+    /**
+     * Provides UI for store operations
+     */
     private void storeCrud() {
         while (true) {
             try {
@@ -382,6 +457,11 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Provides UI to create a store
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void createStore() throws SQLException, ClassNotFoundException {
         showCancelString();
         System.out.println("Please enter store name: ");
@@ -394,6 +474,11 @@ public class AdminApp extends Application {
         System.out.println("Store has been created");
     }
 
+    /**
+     * Provides UI to update a store
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     private void updateStore() throws ClassNotFoundException, SQLException {
         printStores();
         showCancelInteger();
@@ -415,6 +500,11 @@ public class AdminApp extends Application {
         System.out.println("Store has been updated");
     }
 
+    /**
+     * Provides UI to delete a store
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void deleteStore() throws ClassNotFoundException, SQLException {
         printStores();
         showCancelInteger();
@@ -429,6 +519,11 @@ public class AdminApp extends Application {
         System.out.println("Store has been deleted");
     }
 
+    /**
+     * Provides UI to create a price for a product at a store
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void createPrice() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
@@ -459,6 +554,11 @@ public class AdminApp extends Application {
         System.out.println("Price has been inserted !");
     }
 
+    /**
+     * Provides UI to update a price for a product at a store
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void updatePrice() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
@@ -490,6 +590,9 @@ public class AdminApp extends Application {
         System.out.println("Price has been updated !");
     }
 
+    /**
+     * Provides UI for warehouse options
+     */
     private void warehouseCrud() {
         while (true) {
             try {
@@ -526,6 +629,11 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Prints warehouses on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void printWarehouses() throws ClassNotFoundException, SQLException {
         Map<Integer, Warehouse> warehouses = warehouseService.getWarehouses();
         for (Integer id : warehouses.keySet()) {
@@ -533,6 +641,11 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Provides UI to get a warehouse by id and print it on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void getWarehouseById() throws SQLException, ClassNotFoundException {
         showCancelInteger();
         System.out.println("Please enter warehouse id: ");
@@ -546,6 +659,11 @@ public class AdminApp extends Application {
         System.out.println(warehouse);
     }
 
+    /**
+     * Provides UI to create a warehouse
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void createWarehouse() throws SQLException, ClassNotFoundException {
         showCancelString();
         System.out.println("Please enter name of new warehouse: ");
@@ -565,6 +683,11 @@ public class AdminApp extends Application {
         System.out.println("Created warehouse !");
     }
 
+    /**
+     * Provides UI to update a warehouse
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void updateWarehouse() throws SQLException, ClassNotFoundException {
         showCancelInteger();
         System.out.println("Please enter warehouse id: ");
@@ -591,6 +714,11 @@ public class AdminApp extends Application {
         System.out.println("Updated warehouse !");
     }
 
+    /**
+     * Provides UI to delete a warehouse
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void deleteWarehouse() throws SQLException {
         showCancelInteger();
         System.out.println("Please enter warehouse id: ");
@@ -603,6 +731,11 @@ public class AdminApp extends Application {
         System.out.println("Deleted warehouse !");
     }
 
+    /**
+     * Provides UI to insert a product and a quantity in a warehouse
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void insertProduct() throws SQLException, ClassNotFoundException {
         printWarehouses();
         showCancelInteger();
@@ -631,6 +764,11 @@ public class AdminApp extends Application {
         System.out.println("Stock and product has been inserted !");
     }
 
+    /**
+     * Provides UI to update the stock of a product at a warehouse
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void updateProductStock() throws SQLException, ClassNotFoundException {
         printWarehouses();
         showCancelInteger();
@@ -659,6 +797,11 @@ public class AdminApp extends Application {
         System.out.println("Stock has been updated !");
     }
 
+    /**
+     * Provides UI to get the total stock of product
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void getProductStock() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
@@ -672,6 +815,9 @@ public class AdminApp extends Application {
         System.out.println("Stock of product: " + stock);
     }
 
+    /**
+     * Provides UI for customer options
+     */
     private void customerCrud() {
         while (true) {
             try {
@@ -696,6 +842,11 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Prints all customers on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void printCustomers() throws ClassNotFoundException, SQLException {
         Map<Integer, Customer> customers = customerService.getAllCustomers();
         for (Integer id : customers.keySet()) {
@@ -703,6 +854,11 @@ public class AdminApp extends Application {
         }
     }
 
+    /**
+     * Provides UI to get a customer by id
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     private void getCustomerById() throws ClassNotFoundException, SQLException {
         showCancelInteger();
         System.out.println("Enter id: ");

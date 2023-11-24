@@ -17,6 +17,10 @@ public class Category implements SQLData {
 
     }
 
+    /**
+     * Constructor
+     * @param category Category name 
+     */
     public Category(String category) {
         this.category = category;
     }

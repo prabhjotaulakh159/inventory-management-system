@@ -10,18 +10,25 @@ import java.util.Map;
 
 import prabhjot.safin.retail.models.Category;
 
+/**
+ * Performs CRUD operations on the category table
+ * @author Prabhjot Aulakh, Safin Haque
+ */
 public class CategoryService {
     private Connection connection;
 
+    /**
+     * Constructor
+     * @param connection Current database connection
+     */
     public CategoryService(Connection connection) {
         this.connection = connection;
     }
 
     /**
      * Creates a new category in the database.
-     *
      * @param category The Category object representing the category to be created.
-     * @throws SQLException            If a database access error occurs.
+     * @throws SQLException If a database access error occurs.
      * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
      */
     public void createCategory(Category category) throws SQLException, ClassNotFoundException {
@@ -38,7 +45,6 @@ public class CategoryService {
 
     /**
      * Updates an existing category in the database.
-     *
      * @param categoryId The ID of the category to be updated.
      * @param category   The updated category name.
      * @throws SQLException If a database access error occurs.
@@ -55,7 +61,6 @@ public class CategoryService {
 
     /**
      * Deletes a category from the database based on its ID.
-     *
      * @param categoryId The ID of the category to be deleted.
      * @throws SQLException If a database access error occurs.
      */
@@ -70,10 +75,9 @@ public class CategoryService {
 
     /**
      * Retrieves a category from the database based on its ID.
-     *
      * @param categoryId The ID of the category to be retrieved.
      * @return The Category object representing the retrieved category.
-     * @throws SQLException            If a database access error occurs.
+     * @throws SQLException If a database access error occurs.
      * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
      */
     public Category getCategory(int categoryId) throws SQLException, ClassNotFoundException {
@@ -92,9 +96,8 @@ public class CategoryService {
 
     /**
      * Retrieves all categories from the database and returns them as a Map.
-     *
      * @return A Map where keys are category IDs and values are Category objects.
-     * @throws SQLException            If a database access error occurs.
+     * @throws SQLException If a database access error occurs.
      * @throws ClassNotFoundException Thrown if the JVM cannot find the specified class in the classpath.
      */
     public Map<Integer, Category> getCategories() throws SQLException, ClassNotFoundException {
@@ -108,6 +111,7 @@ public class CategoryService {
             categories.put(resultSet.getInt(2), this.getCategory(resultSet.getInt(2)));
         }
         resultSet.close();
+        callableStatement.close();
         return categories;
     }
 }
