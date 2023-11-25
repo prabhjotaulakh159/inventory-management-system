@@ -137,7 +137,7 @@ public class OrderService {
             quantityStatement = this.connection.prepareCall(quantitySql);
             quantityStatement.registerOutParameter(1, Types.INTEGER);
             quantityStatement.setInt(2, orderId);
-            quantityStatement.setInt(3, products.getInt(1));
+            quantityStatement.setInt(3, products.getInt(2));
             quantityStatement.execute();
             int quantity = quantityStatement.getInt(1);
             productQuantityMapping.put(productName, quantity);
