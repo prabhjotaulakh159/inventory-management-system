@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import prabhjot.safin.retail.models.Admin;
-import prabhjot.safin.retail.models.audit.Audit;
+import prabhjot.safin.retail.models.Audit;
 import prabhjot.safin.retail.models.Category;
 import prabhjot.safin.retail.models.Customer;
 import prabhjot.safin.retail.models.Product;
@@ -907,18 +907,16 @@ public class AdminApp extends Application {
      */
     public void getAuditLogsOnTable() throws SQLException {
         showCancelInteger();
+        System.out.println("--------------------------------------");
         System.out.println("Enter 1 to get admin logs");
         System.out.println("Enter 2 to get customers logs");
         System.out.println("Enter 3 to get categories logs");
         System.out.println("Enter 4 to get warehouses logs");
         System.out.println("Enter 5 to get products logs");
-        System.out.println("Enter 6 to get stock update in warehouse logs");
-        System.out.println("Enter 7 to get store logs");
-        System.out.println("Enter 8 to get store product price update logs");
-        System.out.println("Enter 9 to get order logs");
-        System.out.println("Enter 10 to get order products logs");
-        System.out.println("Enter 11 to get review logs");
-
+        System.out.println("Enter 6 to get store logs");
+        System.out.println("Enter 7 to get order logs");
+        System.out.println("Enter 8 to get review logs");
+        System.out.println("--------------------------------------");
 
         int input = sc.nextInt();
 
@@ -929,14 +927,10 @@ public class AdminApp extends Application {
         else if (input == 3) printAudit(AuditTable.CATEGORIES);
         else if (input == 4) printAudit(AuditTable.WAREHOUSES);
         else if (input == 5) printAudit(AuditTable.PRODUCTS);
-        else if (input == 6) printAudit(AuditTable.PRODUCTS_WAREHOUSES);
-        else if (input == 7) printAudit(AuditTable.STORES);
-        else if (input == 8) printAudit(AuditTable.PRODUCTS_STORES);
-        else if (input == 9) printAudit(AuditTable.ORDERS);
-        else if (input == 10) printAudit(AuditTable.ORDERS_PRODUCTS); 
-        else if (input == 11) printAudit(AuditTable.REVIEWS);
+        else if (input == 6) printAudit(AuditTable.STORES);
+        else if (input == 7) printAudit(AuditTable.ORDERS);
+        else if (input == 8) printAudit(AuditTable.REVIEWS);
         else throw new InputMismatchException(); 
-
     }
 
     /**
