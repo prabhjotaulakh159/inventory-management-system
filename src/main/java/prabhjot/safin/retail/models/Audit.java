@@ -1,4 +1,4 @@
-package prabhjot.safin.retail.models.audit;
+package prabhjot.safin.retail.models;
 
 import java.sql.Date;
 
