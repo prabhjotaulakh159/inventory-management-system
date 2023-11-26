@@ -17,6 +17,7 @@ import prabhjot.safin.retail.services.ProductService;
 import prabhjot.safin.retail.services.ReviewService;
 import prabhjot.safin.retail.services.StoreService;
 import prabhjot.safin.retail.services.WarehouseService;
+import prabhjot.safin.retail.services.audit.AuditService;
 
 /**
  * Defines common methods and functionalities between customers and admins
@@ -33,6 +34,7 @@ public abstract class Application {
     protected static WarehouseService warehouseService;
     protected static CustomerService customerService;
     protected static OrderService orderService;
+    protected static AuditService auditService;
 
     public Application() throws SQLException {
         sc = new Scanner(System.in);
@@ -45,6 +47,7 @@ public abstract class Application {
         warehouseService = new WarehouseService(connectionProvider.getConnection());
         customerService = new CustomerService(connectionProvider.getConnection());
         orderService = new OrderService(connectionProvider.getConnection());
+        auditService = new AuditService(connectionProvider.getConnection());
     }
 
     /**
