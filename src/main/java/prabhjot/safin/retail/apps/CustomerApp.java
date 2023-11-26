@@ -16,77 +16,74 @@ import prabhjot.safin.retail.models.Review;
  * @author Prabhjot Aulakh, Safin Haque
  */
 public class CustomerApp extends Application {
-    public CustomerApp() throws SQLException {
-        super();
-    }
-
     private int id;
     private Customer current;
     
     @Override
     public void run() {
-    login();
-    while(true){
-        try{
-            while(true){
-                 System.out.println("MAIN MENU");
-                System.out.println("--------------------------------------");
-                System.out.println("Here are your options: ");
-                System.out.println("Press 1 for Products");
-                System.out.println("Press 2 for Orders");
-                System.out.println("Press 3 for Placing Reviews");
-                System.out.println("Press 4 to update your information");
-                System.out.println("Press 5 to exit");
-                System.out.println("--------------------------------------");
-                int input = sc.nextInt();
-                if     (input == 1) productCrud();
-                else if(input == 2) ordersOptions();
-                else if(input == 3) reviewsOptions();
-                else if(input == 4) updateCustomer();
-                else if(input == 5) break;
-                else System.out.println("Invalid Option");
-            }
-            System.out.println("Goodbye!");
+        this.login();
+        while(true) {
+            System.out.println("--------------------------------------");
+            System.out.println("Here are your options: ");
+            System.out.println("Press 1 for Products");
+            System.out.println("Press 2 for Orders");
+            System.out.println("Press 3 for Placing Reviews");
+            System.out.println("Press 4 to update your information");
+            System.out.println("Press 5 to exit");
+            System.out.println("--------------------------------------");
+            try {
+                int input = Integer.parseInt(sc.nextLine());
+                if (input == 1) { 
+                    this.productCrud();
+                } else if (input == 2) {
+                    this.ordersOptions();
+                } else if (input == 3) {
+                    this.reviewsOptions();
+                } else if (input == 4) {
+                    this.updateCustomer();
+                } else if (input == 5) {
+                    break;
+                } else {
+                    throw new NumberFormatException();   
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            } 
+        }
+        System.out.println("Goodbye !");
+        try {
             connectionProvider.kill();
-            break;
-        } catch (InputMismatchException e) {
-            System.out.println("Sorry, not a great input type. Try again");
-            sc.next();
         } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            this.handleSQLException(e);
         }
     }
         
-    }
-
     /**
      * Logs in a customer
      */
-    private void login(){
-        while(true){
-            try{
+    private void login() {
+        while (true) {
+            try {
                 Console console = System.console();
                 System.out.println("Enter your customer ID: ");
-                id=sc.nextInt();
+                this.id = Integer.parseInt(sc.nextLine());
                 System.out.println("Enter your password: ");
                 String password = "";
                 char[] passwordInput = console.readPassword();
-                for (char c : passwordInput) password += c;
-                this.current = customerService.login(id, password);
-                if(current != null){
-                    System.out.println("Welcome " + current.getFirstname() + " " + current.getLastname() + "!");
-                    break;
+                for (char c : passwordInput) { 
+                    password += c;
                 }
-                else{
+                this.current = this.customerService.login(id, password);
+                if (this.current != null) {
+                    System.out.println("Welcome " + this.current.getFirstname() + " " + this.current.getLastname() + "!");
+                    break;
+                } else {
                     System.out.println("Invalid Login");
                 }
-            }catch (SQLException e) {
-                handleSQLException(e.getMessage());
-            } catch (InputMismatchException e) {
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (NumberFormatException e) {
                 System.out.println("Please enter valid data");
-                sc.next();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -97,220 +94,237 @@ public class CustomerApp extends Application {
     /**
      * Provides UI for product related operations
      */
-    private void productCrud(){
-        while(true){
-            try{
-                 System.out.println("PRODUCTS");
-                System.out.println("--------------------------------------");
-                System.out.println("Enter 1 to get all products");
-                System.out.println("Enter 2 to get a product by id");
-                System.out.println("Enter 3 to get the Reviews of a product");
-                System.out.println("Enter 4 to get product price at store");
-                System.out.println("Enter 5 to exit products");
-                System.out.println("--------------------------------------");
-                int input = sc.nextInt();
-                sc.nextLine();
-
-                if(input == 1) printProducts();
-                else if(input == 2) getProductById();
-                else if(input == 3) getReviewOfProduct();
-                else if(input == 4) getPriceAtStore();
-                else if (input == 5) break;
-                else System.out.println("Invalid Option");
-            }catch (SQLException e) {
-                handleSQLException(e.getMessage());
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid option entered !");
-                sc.next();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+    private void productCrud() {
+        while (true) {
+            System.out.println("PRODUCTS");
+            System.out.println("--------------------------------------");
+            System.out.println("Enter 1 to get all products");
+            System.out.println("Enter 2 to get a product by id");
+            System.out.println("Enter 3 to get the Reviews of a product");
+            System.out.println("Enter 4 to get product price at store");
+            System.out.println("Enter 5 to exit products");
+            System.out.println("--------------------------------------");
+            try {
+                int input = Integer.parseInt(sc.nextLine()); 
+                if (input == 1) {
+                   this.printProducts();
+                } else if (input == 2) {
+                    this.getProductById();
+                } else if (input == 3) {
+                    this.getReviewOfProduct();
+                } else if (input == 4) {
+                    this.getPriceAtStore();
+                } else if (input == 5) {
+                    break;
+                } else {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            } 
         }
     }
 
     /**
      * Prompts users to enter a product id and get a reviews on it
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void getReviewOfProduct() throws SQLException, ClassNotFoundException{
-        printProducts();
-        System.out.println();
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("Type the product id you want to see reviews from:");
-        System.out.println("--------------------------------------");
-        
-        int productId= sc.nextInt(); 
-        sc.nextLine();
-        
-        if(cancelIntegerOperation(productId))return;
-        
-        Map<Integer, Review> reviews = reviewService.getReviewForProduct(productId);
-        
-        System.out.println("Reviews:");
-        System.out.println("--------------------------------------");
-        for(Integer id: reviews.keySet()){
-            System.out.println("Review ID: " + id + " | " + reviews.get(id));
-        }
-        System.out.println("--------------------------------------");
-        System.out.println();
-
-        System.out.println("--------------------------------------");
-        System.out.println("Would you like to flag one of these reviews? y/n");
-        System.out.println("--------------------------------------");
-        String answer= sc.nextLine().toLowerCase();
-        if(answer.equals("y")){
-            flagReview();
+    private void getReviewOfProduct() {
+        while (true) {
+            try {
+                this.printProducts();
+                System.out.println();
+                System.out.println("--------------------------------------");
+                this.showCancelInteger();
+                System.out.println("Type the product id you want to see reviews from:");
+                System.out.println("--------------------------------------");
+                int productId = Integer.parseInt(sc.nextLine());             
+                if (this.cancelIntegerOperation(productId)) {
+                    return;
+                }
+                Map<Integer, Review> reviews = reviewService.getReviewForProduct(productId);
+                System.out.println("Reviews: ");
+                System.out.println("--------------------------------------");
+                for (Integer id: reviews.keySet()) {
+                    System.out.println("Review ID: " + id + " | " + reviews.get(id));
+                }
+                System.out.println("--------------------------------------");
+                System.out.println();
+                System.out.println("--------------------------------------");
+                System.out.println("Enter Y to flag a review");
+                System.out.println("--------------------------------------");
+                String answer = sc.nextLine().toLowerCase();
+                if (answer.equals("Y")) {
+                    this.flagReview();
+                }
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);   
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();   
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
         }
     }
        
     /**
      * Provides UI for options on orders
      */
-    private void ordersOptions(){
-         while(true){
-            try{
-                 System.out.println("ORDERS");
-                System.out.println("--------------------------------------");
-                System.out.println("Enter 1 to Create an Order");
-                System.out.println("Enter 2 to Delete your Order");
-                System.out.println("Enter 3 to get Details of Order");
-                System.out.println("Enter 4 to View all your orders");
-                System.out.println("Enter 5 to Exit Orders");
-                System.out.println("--------------------------------------");
-                int input = sc.nextInt();
-                sc.nextLine();
-
-                if(input == 1) createOrder();
-                else if(input == 2) delete_order();
-                else if(input == 3) getOrderDetails();
-                else if(input == 4) viewAllOrders();
-                else if(input == 5) break;
-                else System.out.println("Invalid Option");
-            }catch (SQLException e) {
-                handleSQLException(e.getMessage());
+    private void ordersOptions() {
+        while (true) {
+            System.out.println("ORDERS");
+            System.out.println("--------------------------------------");
+            System.out.println("Enter 1 to Create an Order");
+            System.out.println("Enter 2 to Delete your Order");
+            System.out.println("Enter 3 to get Details of Order");
+            System.out.println("Enter 4 to View all your orders");
+            System.out.println("Enter 5 to Exit Orders");
+            System.out.println("--------------------------------------");
+            try {
+                int input = Integer.parseInt(sc.nextLine());
+                if (input == 1)  {
+                    this.createOrder(); 
+                } else if (input == 2) {
+                    this.deleteOrder();
+                } else if (input == 3) {
+                    this.getOrderDetails();
+                } else if (input == 4) {
+                    this.viewAllOrders();
+                } else if (input == 5) {
+                    break;
+                } else {
+                    throw new NumberFormatException();
+                }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid option entered !");
-                sc.next();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+                System.out.println("Please enter valid data");
+            } 
         }
     }
 
     /**
      * Provides UI to create an order
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void createOrder() throws SQLException, ClassNotFoundException {
-        System.out.println("--------------------------------------");
-        printStores();
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("Which store do you want to buy from? Enter the store Id:");
-        System.out.println("--------------------------------------");
-        
-        int storeid= sc.nextInt();
-        
-        if(cancelIntegerOperation(storeid))return;
-        
+    private void createOrder() {
+        int storeid = 0;
+        while (true) {
+            try {
+                this.printStores();
+                this.showCancelInteger();
+                System.out.println("Which store do you want to buy from? Enter the store Id:");
+                storeid = Integer.parseInt(sc.nextLine());
+                if (this.cancelIntegerOperation(storeid)) {
+                    return;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
+        } 
         Order order = new Order(id, storeid, new Date(System.currentTimeMillis()));
-        Map<Integer, Integer> products= new HashMap<>();
-        while(true){
-            try{
+        Map<Integer, Integer> products = new HashMap<>();
+        while (true) {
+            try {
                 System.out.println("--------------------------------------");
-                printProducts();
+                this.printProducts();
                 System.out.println("--------------------------------------");
-                showCancelInteger();
-                System.out.println("Which Product You want to Buy? Enter Their Id:");
+                this.showCancelInteger();
+                System.out.println("Which product you want to buy? Enter its ID:");
                 System.out.println("--------------------------------------");
-
-                int productId=sc.nextInt();
-                
-                if (cancelIntegerOperation(productId)) return;
-
+                int productId = Integer.parseInt(sc.nextLine());
+                if (cancelIntegerOperation(productId)) {
+                    return;
+                }
                 System.out.println("--------------------------------------");
-                showCancelInteger();
+                this.showCancelInteger();
                 System.out.println("How many would you like to buy?");
                 System.out.println("--------------------------------------");
-                
-                int quantity= sc.nextInt(); 
-                sc.nextLine();
-                
-                if (cancelIntegerOperation(quantity)) return;
-
+                int quantity =  Integer.parseInt(sc.nextLine());
+                if (cancelIntegerOperation(quantity)) {
+                    return;
+                }
                 products.put(productId, quantity);
-                
                 System.out.println("--------------------------------------");
-                System.out.println("Are you done picking your products? y/n");
+                System.out.println("Enter Y to stop picking products");
                 System.out.println("--------------------------------------");
-                String ans= sc.nextLine().toLowerCase();
-                if(ans.equals("y")) break;
-
-            }catch (SQLException e) {
-                handleSQLException(e.getMessage());
+                String ans = sc.nextLine().toUpperCase();
+                if (ans.equals("Y")) {
+                    break;
+                }
+                int orderId = this.orderService.createOrder(order, products);
+                System.out.println("Here is your order id: " + orderId);
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
             } catch (InputMismatchException e) {
-                System.out.println("Invalid option entered !");
-                sc.next();
+                System.out.println("Please enter valid data");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
-        int orderId= orderService.createOrder(order, products);
-        System.out.println("--------------------------------------");
-        System.out.println("Here is your order id: " + orderId);
-        System.out.println("--------------------------------------");
     }
 
     /**
      * Provides UI to delete an order
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void delete_order() throws SQLException, ClassNotFoundException {
-        Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
-        System.out.println("--------------------------------------");
-        for(Integer orderId : orders.keySet()){
-            System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
+    private void deleteOrder() {
+        while (true) {
+            try {
+                Map<Integer, Order> orders = this.orderService.getOrdersByCustomer(id);
+                System.out.println("--------------------------------------");
+                for (Integer id : orders.keySet()) {
+                    System.out.println("Order Id: " + id + ", " + orders.get(id));
+                }
+                System.out.println("--------------------------------------");
+                this.showCancelInteger();
+                System.out.println("Choose which Order you want to delete by id");
+                System.out.println("--------------------------------------");
+                int id = Integer.parseInt(sc.nextLine());
+                if (this.cancelIntegerOperation(id)) {
+                    return;
+                }
+                this.orderService.deleteOrder(id);
+                System.out.println("--------------------------------------");
+                System.out.println("Order has been deleted!");
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
         }
-        System.out.println("--------------------------------------");
-        
-        showCancelInteger();
-        System.out.println("Choose which Order you want to delete");
-        System.out.println("--------------------------------------");
-        
-        int deleteId= sc.nextInt();
-       
-        if (cancelIntegerOperation(deleteId)) return;
-        
-        orderService.deleteOrder(deleteId);
-        System.out.println("--------------------------------------");
-        System.out.println("Order has been deleted!");
         System.out.println("--------------------------------------");
     }
     
     /**
      * Provides UI to get the details of an order
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void getOrderDetails() throws SQLException, ClassNotFoundException {
-        viewAllOrders();
-        showCancelInteger();
-        System.out.println("Choose order to get details on: ");
-        System.out.println("--------------------------------------");
-
-        int orderId = sc.nextInt();
-        
-        if (cancelIntegerOperation(orderId)) return;
-        
-        Map<String, Integer> details = orderService.getOrderDetails(orderId);
-        System.out.println("Here are the Products in your Order!");
-        System.out.println("--------------------------------------");
-        for (String name : details.keySet()) {
-            System.out.println("Product: " + name + ", Quantity: " + details.get(name) + ", Price: " + orderService.getOrderTotal(orderId));
+    private void getOrderDetails() {
+        while (true) {
+            try {
+                Map<Integer, Order> orders = this.orderService.getOrdersByCustomer(id);
+                for(Integer orderId : orders.keySet()){
+                    System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
+                }
+                this.showCancelInteger();
+                System.out.println("Choose order to get details on: ");
+                int orderId = Integer.parseInt(sc.nextLine());
+                if (cancelIntegerOperation(orderId)) { 
+                    return;
+                }
+                Map<String, Integer> details = orderService.getOrderDetails(orderId);
+                for (String name : details.keySet()) {
+                    System.out.println("Product: " + name + ", Quantity: " + details.get(name) + ", Price: " + orderService.getOrderTotal(orderId));
+                }
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
         }
         System.out.println("--------------------------------------");
     }
@@ -318,13 +332,19 @@ public class CustomerApp extends Application {
     /**
      * Provides UI for view all orders for the logged in customer
      */
-    public void viewAllOrders() throws SQLException, ClassNotFoundException{
-        Map<Integer, Order> orders = orderService.getOrdersByCustomer(id);
-        System.out.println("Here Are your Orders!");
-        System.out.println("--------------------------------------");
-        for(Integer orderId : orders.keySet()){
-            System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
-        }
+    public void viewAllOrders() {
+        try {
+            Map<Integer, Order> orders = this.orderService.getOrdersByCustomer(this.id);
+            System.out.println("Here Are your Orders!");
+            System.out.println("--------------------------------------");
+            for (Integer orderId : orders.keySet()) {
+                System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
+            }
+        } catch (SQLException e) {
+            this.handleSQLException(e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }   
         System.out.println("--------------------------------------");
     }
 
@@ -332,245 +352,259 @@ public class CustomerApp extends Application {
      * Provides UI for review options
      */
     private void reviewsOptions(){
-        while(true){
-            try{
-                 System.out.println("REVIEWS");
-                System.out.println("--------------------------------------");
-                System.out.println("Enter 1 to Make a Review");
-                System.out.println("Enter 2 to delete a Review you made");
-                System.out.println("Enter 3 to update a Review");
-                System.out.println("Enter 4 to exit Review");
-                System.out.println("--------------------------------------");
-                int input = sc.nextInt();
-                sc.nextLine();
-
-                if(input == 1)createReview();
-                else if(input == 2) deleteReview();
-                else if(input == 3) updateReview();
-                else if(input == 4) break;
-                else System.out.println("Invalid Option");
-            }catch (SQLException e) {
-                handleSQLException(e.getMessage());
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid option entered !");
-                sc.next();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+        while (true) {
+            System.out.println("REVIEWS");
+            System.out.println("--------------------------------------");
+            System.out.println("Enter 1 to make a Review");
+            System.out.println("Enter 2 to delete a Review you made");
+            System.out.println("Enter 3 to update a Review");
+            System.out.println("Enter 4 to exit Review");
+            System.out.println("--------------------------------------");
+            try {
+                int input = Integer.parseInt(sc.nextLine());
+                if (input == 1) {
+                    this.createReview();  
+                } else if(input == 2) {
+                    this.deleteReview();
+                } else if(input == 3) { 
+                    this.updateReview();
+                } else if(input == 4) { 
+                    break;
+                } else {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            } 
         }
     }
 
     /**
      * Provides UI to create a review 
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void createReview() throws SQLException, ClassNotFoundException{
-        printProducts();
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("Choose which product you want to review, enter id:");
-        System.out.println("--------------------------------------");
-        
-        int productId= sc.nextInt();
-        
-        if (cancelIntegerOperation(productId)) return;
-        
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("Enter your rating, it can be between 1 and 5");
-        System.out.println("--------------------------------------");
-        
-        int rating= sc.nextInt(); sc.nextLine();
-        
-        if (cancelIntegerOperation(rating)) return;
-
-        System.out.println("--------------------------------------");
-        showCancelString();
-        System.out.println("Give us a brief description on what you like/dislike:");
-        System.out.println("--------------------------------------");
-        
-        String description = sc.nextLine();
-        
-        if (cancelStringOperation(description)) return;
-        
-        Review review = new Review(id, productId, 0, rating, description);
-        reviewService.create(review);
-        System.out.println("--------------------------------------");
-        System.out.println("Review Created!");
-        System.out.println("--------------------------------------");
+    private void createReview() {
+        while (true) {
+            try {
+                this.printProducts();
+                System.out.println("--------------------------------------");
+                this.showCancelInteger();
+                System.out.println("Choose which product you want to review, enter id:");
+                System.out.println("--------------------------------------");
+                int productId = Integer.parseInt(sc.nextLine());
+                if (this.cancelIntegerOperation(productId)) {
+                    return;
+                }
+                System.out.println("--------------------------------------");
+                this.showCancelInteger();
+                System.out.println("Enter your rating, it can be between 1 and 5");
+                System.out.println("--------------------------------------");
+                int rating = Integer.parseInt(sc.nextLine());
+                if (this.cancelIntegerOperation(rating)) {
+                    return;
+                }
+                System.out.println("--------------------------------------");
+                this.showCancelString();
+                System.out.println("Give us a brief description on what you like/dislike:");
+                System.out.println("--------------------------------------");
+                String description = sc.nextLine();
+                if (this.cancelStringOperation(description)) {
+                    return;
+                }
+                Review review = new Review(id, productId, 0, rating, description);
+                reviewService.create(review);
+                System.out.println("--------------------------------------");
+                System.out.println("Review Created!");
+                System.out.println("--------------------------------------");
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
+        }
     }
     
     /**
      * Provides UI to delete a review
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void deleteReview() throws SQLException, ClassNotFoundException{
-        printCustomerReviews();
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("Enter the Review Id you want to delete");
-        System.out.println("--------------------------------------");
-        
-        int reviewId= sc.nextInt();
-        
-        if (cancelIntegerOperation(reviewId)) return;
-        
-        reviewService.delete(reviewId);
-        System.out.println("--------------------------------------");
-        System.out.println("Review Removed!");
-        System.out.println("--------------------------------------");
+    private void deleteReview() {
+        while (true) {
+            try {
+                Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
+                for (Integer reviewId : reviews.keySet()) {
+                    System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
+                }
+                showCancelInteger();
+                System.out.println("Enter the Review Id you want to delete");
+                int reviewId = Integer.parseInt(sc.nextLine());
+                if (cancelIntegerOperation(reviewId)) {
+                    return;
+                }
+                reviewService.delete(reviewId);
+                System.out.println("Review Removed!");
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
+        }
     }
 
     /**
      * Provides UI to flag a review
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void flagReview() throws SQLException, ClassNotFoundException{
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("Which review Id do you want to flag?");
-        System.out.println("--------------------------------------");
-        
-        int review = sc.nextInt();
-        
-        if (cancelIntegerOperation(review)) return;
-        
-        reviewService.flagReview(review);
-        System.out.println("--------------------------------------");
-        System.out.println("Review has been flagged");
-        System.out.println("--------------------------------------");
+    private void flagReview() {
+        while (true) {
+            try {
+                System.out.println("--------------------------------------");
+                showCancelInteger();
+                System.out.println("Which review Id do you want to flag?");
+                System.out.println("--------------------------------------");
+                int review = Integer.parseInt(sc.nextLine());
+                if (cancelIntegerOperation(review)) {
+                    return;
+                }
+                this.reviewService.flagReview(review);
+                System.out.println("--------------------------------------");
+                System.out.println("Review has been flagged");
+                System.out.println("--------------------------------------");
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
+        }
     }
 
     /**
      * Provides UI to update a review
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void updateReview() throws SQLException, ClassNotFoundException {
-        printCustomerReviews();
-        
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("Which Review you want to Update? Enter their Id:");
-        System.out.println("--------------------------------------");
-        
-        int reviewId = sc.nextInt(); sc.nextLine();
-
-        if (cancelIntegerOperation(reviewId)) return;
-
-        System.out.println("--------------------------------------");
-        showCancelInteger();
-        System.out.println("What is your updated Rating?:");
-        System.out.println("--------------------------------------");
-        
-        int rating = sc.nextInt(); sc.nextLine();
-        
-        if (cancelIntegerOperation(rating)) return;
-
-        System.out.println("--------------------------------------");
-        showCancelString();
-        System.out.println("Whats your new Description?");
-        System.out.println("--------------------------------------");
-        
-        String description = sc.nextLine();
-
-        if (cancelStringOperation(description)) return;
-
-        reviewService.update(reviewId, rating, description);
-        System.out.println("--------------------------------------");
-        System.out.println("Review has been Updated!");
-        System.out.println("--------------------------------------");
-    }
-
-    private void printCustomerReviews() throws SQLException, ClassNotFoundException{
-        Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
-        System.out.println("Here are your Reviews!");
-        System.out.println("--------------------------------------");
-        for(Integer reviewId : reviews.keySet()){
-            System.out.println("Review ID: " + reviewId + " | " + reviews.get(reviewId));
+    private void updateReview() {
+        while (true) {
+            try {
+                Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
+                for(Integer reviewId : reviews.keySet()){
+                    System.out.println("Review ID: " + reviewId + " | " + reviews.get(reviewId));
+                }
+                showCancelInteger();
+                System.out.println("Which Review you want to Update? Enter their Id:");
+                int reviewId = Integer.parseInt(this.sc.nextLine());
+                if (cancelIntegerOperation(reviewId)) {
+                    return;
+                }
+                showCancelInteger();
+                System.out.println("What is your updated Rating?:");
+                int rating =Integer.parseInt(this.sc.nextLine());
+                if (cancelIntegerOperation(rating)) { 
+                    return;
+                }
+                showCancelString();
+                System.out.println("Whats your new Description?");
+                String description = this.sc.nextLine();
+                if (cancelStringOperation(description)) {
+                    return;
+                }
+                this.reviewService.update(reviewId, rating, description);
+                System.out.println("Review has been Updated!");
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();   
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
         }
-        System.out.println("--------------------------------------");
     }
 
     /**
      * Provides UI to update current customers information
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    private void updateCustomer() throws SQLException, ClassNotFoundException  {
+    private void updateCustomer() {
         while (true) {
+            System.out.println("What you want to update ?");
+            System.out.println("Enter 1 for firstname");
+            System.out.println("Enter 2 for lastname");
+            System.out.println("Enter 3 for email");
+            System.out.println("Enter 4 for address");
+            System.out.println("Enter 5 for password");
             try {
-                System.out.println("UPDATE INFO");
-                System.out.println("--------------------------------------");
                 showCancelInteger();
-                System.out.println("What you want to update ?");
-                System.out.println("Enter 1 for firstname");
-                System.out.println("Enter 2 for lastname");
-                System.out.println("Enter 3 for email");
-                System.out.println("Enter 4 for address");
-                System.out.println("Enter 5 for password");
-                System.out.println("--------------------------------------");
-                int input = sc.nextInt();
-                sc.nextLine();
-                
-                if (cancelIntegerOperation(input)) return;
-
+                int input = Integer.parseInt(this.sc.nextLine());
+                if (cancelIntegerOperation(input)) {
+                    return;
+                }
                 String info = null;
-
                 if (input == 1) {
                     System.out.println("--------------------------------------");
-                    showCancelString();
+                    this.showCancelString();
                     System.out.println("Enter new firstname: ");
                     System.out.println("--------------------------------------");
-                    info = sc.nextLine();
-                    if (cancelStringOperation(info)) return;
+                    info = this.sc.nextLine();
+                    if (cancelStringOperation(info)) { 
+                        return;
+                    }
                     this.current.setFirstname(info);
                 } else if (input == 2) {
                     System.out.println("--------------------------------------");
-                    showCancelString();
+                    this.showCancelString();
                     System.out.println("Enter new lastname: ");
                     System.out.println("--------------------------------------");
-                    info = sc.nextLine();
-                    if (cancelStringOperation(info)) return;
+                    info = this.sc.nextLine();
+                    if (cancelStringOperation(info)) {
+                        return;
+                    }
                     this.current.setLastname(info);
                 } else if (input == 3) {
                     System.out.println("--------------------------------------");
-                    showCancelString();
+                    this.showCancelString();
                     System.out.println("Enter new email: ");
                     System.out.println("--------------------------------------");
-                    info = sc.nextLine();
-                    if (cancelStringOperation(info)) return;
+                    info = this.sc.nextLine();
+                    if (cancelStringOperation(info)) {
+                        return;
+                    }
                     this.current.setEmail(info);
                 } else if (input == 4) {
                     System.out.println("--------------------------------------");
-                    showCancelString();
+                    this.showCancelString();
                     System.out.println("Enter new address: ");
                     System.out.println("--------------------------------------");
-                    info = sc.nextLine();
-                    if (cancelStringOperation(info)) return;
+                    info = this.sc.nextLine();
+                    if (cancelStringOperation(info)) {
+                        return;
+                    }
                     this.current.setAddress(info);
                 } else if (input == 5) {
                     System.out.println("--------------------------------------");
-                    showCancelString();
+                    this.showCancelString();
                     System.out.println("Enter new password: ");
                     System.out.println("--------------------------------------");
-                    info = sc.nextLine();
-                    if (cancelStringOperation(info)) return;
+                    info = this.sc.nextLine();
+                    if (cancelStringOperation(info)) {
+                        return;
+                    }
                     this.current.setPassword(info);
                 } else {
                     throw new InputMismatchException();
                 }
-
-                customerService.updateCustomerInformation(this.current, this.id);
+                this.customerService.updateCustomerInformation(this.current, this.id);
                 System.out.println("--------------------------------------");
                 System.out.println("Customer information has been updated !");
                 System.out.println("--------------------------------------");
-            } catch (InputMismatchException e) {
-                System.out.println("Not a valid option");
-                sc.next();
+                break;
+            } catch (NullPointerException e) {
+                System.out.println("Please enter valid data");
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }
