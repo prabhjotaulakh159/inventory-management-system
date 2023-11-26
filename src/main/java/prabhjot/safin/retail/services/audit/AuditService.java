@@ -7,7 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import prabhjot.safin.retail.models.Audit;
+import prabhjot.safin.retail.models.audit.Audit;
+import prabhjot.safin.retail.models.audit.ProductAudit;
 
 /**
  * Performs CRUD operations of audit tables
@@ -34,8 +35,12 @@ public class AuditService {
         String input = "SELECT * FROM " + audit.getTableName();
         PreparedStatement preparedStatement = this.connection.prepareStatement(input);
         ResultSet results = preparedStatement.executeQuery();
-        while(results.next()){
-            auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
+        while(results.next()) {
+            if (audit == AuditTable.PRODUCTS_WAREHOUSES || audit == AuditTable.ORDERS_PRODUCTS || audit == AuditTable.PRODUCTS_STORES) {
+                auditList.add(new ProductAudit(results.getString(1), results.getDate(2), results.getInt(3), results.getInt(4)));
+            } else {
+                auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
+            }
         }
         preparedStatement.close();
         results.close();
