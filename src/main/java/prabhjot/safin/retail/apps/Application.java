@@ -65,32 +65,40 @@ public abstract class Application {
     protected void printProducts() {
         try {
             Map<Integer, Product> products = productService.getProducts();
+            System.out.println("Here are All the Products!");
+            System.out.println("--------------------------------------");
             for (Integer id : products.keySet()) {
                 Category category = categoryService.getCategory(products.get(id).getCategory_id());
                 System.out.println("Product Id: " + id + ", " + products.get(id) + ", " + category);
             }
+            System.out.println("--------------------------------------");
         } catch (SQLException e) {
             this.handleSQLException(e);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        System.out.println("--------------------------------------");
     }
-    
     /**
      * Gets a product by it's id and prints on the terminal 
      */
     protected void getProductById() {
         while (true) {
             try {
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("Enter id of product: ");
+                System.out.println("--------------------------------------");
                 int id = Integer.parseInt(this.sc.nextLine());
                 if (cancelIntegerOperation(id)) {
                     return;
                 }
                 Product product = this.productService.getProduct(id);
                 Category category = this.categoryService.getCategory(product.getCategory_id());
+                System.out.println("--------------------------------------");
                 System.out.println(product + ", " + category);
+                System.out.println("--------------------------------------");
+                System.out.println();
                 break;
             } catch (SQLException e) {
                 this.handleSQLException(e);
@@ -126,14 +134,17 @@ public abstract class Application {
         try {
             Map<Integer, Store> stores = storeService.getStoresWithProduct(id);
             System.out.println("Available price for stores: ");
+            System.out.println("--------------------------------------");
             for (Integer i : stores.keySet()) {
                 System.out.println("Store Id: " + i + ", " + stores.get(i));
             }
+            System.out.println("--------------------------------------");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             this.handleSQLException(e);
         }
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -163,25 +174,33 @@ public abstract class Application {
 
     /**
      * Retrives a price from a store and prints it on the terminal
+     * @throws SQLException
+     * @throws ClassNotFoundException
      */
     protected void getPriceAtStore()  {
         while (true) {
             try {
+                System.out.println("--------------------------------------");
                 this.printProducts();
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("Please choose product id from above: ");
+                System.out.println("--------------------------------------");
                 int productId = Integer.parseInt(this.sc.nextLine());
                 if (this.cancelIntegerOperation(productId)) { 
                     return;
                 }
                 this.printStoresWithProduct(productId);
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("Please choose store id from above: ");
+                System.out.println("--------------------------------------");
                 int storeId = Integer.parseInt(this.sc.nextLine());
                 if (this.cancelIntegerOperation(storeId)) {
                     return;
                 }
                 int price = this.storeService.getProductPrice(productId, storeId);
+                System.out.println("--------------------------------------");
                 System.out.println("Price: " + price + "$");
                 break;
             } catch (SQLException e) {
@@ -192,6 +211,7 @@ public abstract class Application {
                 System.out.println("Please enter valid data");
             }
         }
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -200,17 +220,23 @@ public abstract class Application {
     protected void getReviewForProduct() {
         while (true) {
             try {
+                System.out.println("--------------------------------------");
                 this.printProducts();
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
+                System.out.println("Enter product id from above to get reviews on: ");
+                System.out.println("--------------------------------------");
                 System.out.println("Enter product id from above to get reviews on: ");
                 int id = Integer.parseInt(this.sc.nextLine());
                 if (this.cancelIntegerOperation(id)) { 
                     return;
                 }
                 Map<Integer, Review> reviews = reviewService.getReviewForProduct(id);
+                System.out.println("--------------------------------------");
                 for (Integer reviewId : reviews.keySet()) {
                     System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
                 }
+                System.out.println("--------------------------------------");
                 break;
             } catch (SQLException e) {
                 this.handleSQLException(e);

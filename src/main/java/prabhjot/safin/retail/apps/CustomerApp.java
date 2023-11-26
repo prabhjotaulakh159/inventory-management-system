@@ -57,7 +57,7 @@ public class CustomerApp extends Application {
             this.handleSQLException(e);
         }
     }
-
+        
     /**
      * Logs in a customer
      */
@@ -96,6 +96,7 @@ public class CustomerApp extends Application {
      */
     private void productCrud() {
         while (true) {
+            System.out.println("PRODUCTS");
             System.out.println("--------------------------------------");
             System.out.println("Enter 1 to get all products");
             System.out.println("Enter 2 to get a product by id");
@@ -131,18 +132,26 @@ public class CustomerApp extends Application {
         while (true) {
             try {
                 this.printProducts();
+                System.out.println();
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("Type the product id you want to see reviews from:");
+                System.out.println("--------------------------------------");
                 int productId = Integer.parseInt(sc.nextLine());             
                 if (this.cancelIntegerOperation(productId)) {
                     return;
                 }
                 Map<Integer, Review> reviews = reviewService.getReviewForProduct(productId);
                 System.out.println("Reviews: ");
+                System.out.println("--------------------------------------");
                 for (Integer id: reviews.keySet()) {
                     System.out.println("Review ID: " + id + " | " + reviews.get(id));
                 }
+                System.out.println("--------------------------------------");
+                System.out.println();
+                System.out.println("--------------------------------------");
                 System.out.println("Enter Y to flag a review");
+                System.out.println("--------------------------------------");
                 String answer = sc.nextLine().toLowerCase();
                 if (answer.equals("Y")) {
                     this.flagReview();
@@ -163,6 +172,7 @@ public class CustomerApp extends Application {
      */
     private void ordersOptions() {
         while (true) {
+            System.out.println("ORDERS");
             System.out.println("--------------------------------------");
             System.out.println("Enter 1 to Create an Order");
             System.out.println("Enter 2 to Delete your Order");
@@ -214,27 +224,35 @@ public class CustomerApp extends Application {
         Map<Integer, Integer> products = new HashMap<>();
         while (true) {
             try {
+                System.out.println("--------------------------------------");
                 this.printProducts();
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
-                System.out.println("choose which product you'd like to buy");
+                System.out.println("Which product you want to buy? Enter its ID:");
+                System.out.println("--------------------------------------");
                 int productId = Integer.parseInt(sc.nextLine());
                 if (cancelIntegerOperation(productId)) {
                     return;
                 }
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("How many would you like to buy?");
+                System.out.println("--------------------------------------");
                 int quantity =  Integer.parseInt(sc.nextLine());
                 if (cancelIntegerOperation(quantity)) {
                     return;
                 }
                 products.put(productId, quantity);
+                System.out.println("--------------------------------------");
                 System.out.println("Enter Y to stop picking products");
+                System.out.println("--------------------------------------");
                 String ans = sc.nextLine().toUpperCase();
                 if (ans.equals("Y")) {
                     break;
                 }
                 int orderId = this.orderService.createOrder(order, products);
                 System.out.println("Here is your order id: " + orderId);
+                break;
             } catch (SQLException e) {
                 this.handleSQLException(e);
             } catch (InputMismatchException e) {
@@ -252,16 +270,20 @@ public class CustomerApp extends Application {
         while (true) {
             try {
                 Map<Integer, Order> orders = this.orderService.getOrdersByCustomer(id);
+                System.out.println("--------------------------------------");
                 for (Integer id : orders.keySet()) {
                     System.out.println("Order Id: " + id + ", " + orders.get(id));
                 }
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("Choose which Order you want to delete by id");
+                System.out.println("--------------------------------------");
                 int id = Integer.parseInt(sc.nextLine());
                 if (this.cancelIntegerOperation(id)) {
                     return;
                 }
                 this.orderService.deleteOrder(id);
+                System.out.println("--------------------------------------");
                 System.out.println("Order has been deleted!");
                 break;
             } catch (SQLException e) {
@@ -272,6 +294,7 @@ public class CustomerApp extends Application {
                 System.out.println("Please enter valid data");
             }
         }
+        System.out.println("--------------------------------------");
     }
     
     /**
@@ -303,6 +326,7 @@ public class CustomerApp extends Application {
                 System.out.println("Please enter valid data");
             }
         }
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -311,6 +335,8 @@ public class CustomerApp extends Application {
     public void viewAllOrders() {
         try {
             Map<Integer, Order> orders = this.orderService.getOrdersByCustomer(this.id);
+            System.out.println("Here Are your Orders!");
+            System.out.println("--------------------------------------");
             for (Integer orderId : orders.keySet()) {
                 System.out.println("Order Id: " + orderId + ", " + orders.get(orderId));
             }
@@ -319,6 +345,7 @@ public class CustomerApp extends Application {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }   
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -326,8 +353,9 @@ public class CustomerApp extends Application {
      */
     private void reviewsOptions(){
         while (true) {
+            System.out.println("REVIEWS");
             System.out.println("--------------------------------------");
-            System.out.println("Enter 1 to Make a Review");
+            System.out.println("Enter 1 to make a Review");
             System.out.println("Enter 2 to delete a Review you made");
             System.out.println("Enter 3 to update a Review");
             System.out.println("Enter 4 to exit Review");
@@ -358,27 +386,35 @@ public class CustomerApp extends Application {
         while (true) {
             try {
                 this.printProducts();
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("Choose which product you want to review, enter id:");
+                System.out.println("--------------------------------------");
                 int productId = Integer.parseInt(sc.nextLine());
                 if (this.cancelIntegerOperation(productId)) {
                     return;
                 }
+                System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("Enter your rating, it can be between 1 and 5");
+                System.out.println("--------------------------------------");
                 int rating = Integer.parseInt(sc.nextLine());
                 if (this.cancelIntegerOperation(rating)) {
                     return;
                 }
+                System.out.println("--------------------------------------");
                 this.showCancelString();
                 System.out.println("Give us a brief description on what you like/dislike:");
+                System.out.println("--------------------------------------");
                 String description = sc.nextLine();
                 if (this.cancelStringOperation(description)) {
                     return;
                 }
                 Review review = new Review(id, productId, 0, rating, description);
                 reviewService.create(review);
+                System.out.println("--------------------------------------");
                 System.out.println("Review Created!");
+                System.out.println("--------------------------------------");
                 break;
             } catch (SQLException e) {
                 this.handleSQLException(e);
@@ -425,14 +461,19 @@ public class CustomerApp extends Application {
     private void flagReview() {
         while (true) {
             try {
+                System.out.println("--------------------------------------");
                 showCancelInteger();
                 System.out.println("Which review Id do you want to flag?");
+                System.out.println("--------------------------------------");
                 int review = Integer.parseInt(sc.nextLine());
                 if (cancelIntegerOperation(review)) {
                     return;
                 }
                 this.reviewService.flagReview(review);
+                System.out.println("--------------------------------------");
                 System.out.println("Review has been flagged");
+                System.out.println("--------------------------------------");
+                break;
             } catch (SQLException e) {
                 this.handleSQLException(e);
             } catch (NumberFormatException e) {
@@ -501,50 +542,63 @@ public class CustomerApp extends Application {
                 }
                 String info = null;
                 if (input == 1) {
+                    System.out.println("--------------------------------------");
                     this.showCancelString();
                     System.out.println("Enter new firstname: ");
+                    System.out.println("--------------------------------------");
                     info = this.sc.nextLine();
                     if (cancelStringOperation(info)) { 
                         return;
                     }
                     this.current.setFirstname(info);
                 } else if (input == 2) {
+                    System.out.println("--------------------------------------");
                     this.showCancelString();
                     System.out.println("Enter new lastname: ");
+                    System.out.println("--------------------------------------");
                     info = this.sc.nextLine();
                     if (cancelStringOperation(info)) {
                         return;
                     }
-                    this.current.setLastname(sc.nextLine());
+                    this.current.setLastname(info);
                 } else if (input == 3) {
+                    System.out.println("--------------------------------------");
                     this.showCancelString();
                     System.out.println("Enter new email: ");
+                    System.out.println("--------------------------------------");
                     info = this.sc.nextLine();
                     if (cancelStringOperation(info)) {
                         return;
                     }
-                    this.current.setEmail(sc.nextLine());
+                    this.current.setEmail(info);
                 } else if (input == 4) {
+                    System.out.println("--------------------------------------");
                     this.showCancelString();
                     System.out.println("Enter new address: ");
+                    System.out.println("--------------------------------------");
                     info = this.sc.nextLine();
                     if (cancelStringOperation(info)) {
                         return;
                     }
-                    this.current.setAddress(sc.nextLine());
+                    this.current.setAddress(info);
                 } else if (input == 5) {
+                    System.out.println("--------------------------------------");
                     this.showCancelString();
                     System.out.println("Enter new password: ");
+                    System.out.println("--------------------------------------");
                     info = this.sc.nextLine();
                     if (cancelStringOperation(info)) {
                         return;
                     }
-                    this.current.setPassword(sc.nextLine());
+                    this.current.setPassword(info);
                 } else {
                     throw new InputMismatchException();
                 }
                 this.customerService.updateCustomerInformation(this.current, this.id);
+                System.out.println("--------------------------------------");
                 System.out.println("Customer information has been updated !");
+                System.out.println("--------------------------------------");
+                break;
             } catch (NullPointerException e) {
                 System.out.println("Please enter valid data");
             } catch (SQLException e) {
