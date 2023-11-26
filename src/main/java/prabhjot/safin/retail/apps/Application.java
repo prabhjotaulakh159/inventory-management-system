@@ -24,30 +24,34 @@ import prabhjot.safin.retail.services.audit.AuditService;
  * @author Prabhjot Aulakh, Safin Haque
  */
 public abstract class Application {
-    protected static Scanner sc;
-    protected static ConnectionProvider connectionProvider;
-    protected static AdminService adminService;
-    protected static CategoryService categoryService;
-    protected static ProductService productService;
-    protected static ReviewService reviewService;
-    protected static StoreService storeService;
-    protected static WarehouseService warehouseService;
-    protected static CustomerService customerService;
-    protected static OrderService orderService;
-    protected static AuditService auditService;
+    protected Scanner sc;
+    protected ConnectionProvider connectionProvider;
+    protected AdminService adminService;
+    protected CategoryService categoryService;
+    protected ProductService productService;
+    protected ReviewService reviewService;
+    protected StoreService storeService;
+    protected WarehouseService warehouseService;
+    protected CustomerService customerService;
+    protected OrderService orderService;
+    protected AuditService auditService;
 
-    public Application() throws SQLException {
-        sc = new Scanner(System.in);
-        connectionProvider = new ConnectionProvider();
-        adminService = new AdminService(connectionProvider.getConnection());
-        categoryService = new CategoryService(connectionProvider.getConnection());
-        productService = new ProductService(connectionProvider.getConnection());
-        reviewService = new ReviewService(connectionProvider.getConnection());
-        storeService = new StoreService(connectionProvider.getConnection());
-        warehouseService = new WarehouseService(connectionProvider.getConnection());
-        customerService = new CustomerService(connectionProvider.getConnection());
-        orderService = new OrderService(connectionProvider.getConnection());
-        auditService = new AuditService(connectionProvider.getConnection());
+    public Application() {
+        try {
+            this.connectionProvider = new ConnectionProvider();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        this.sc = new Scanner(System.in);
+        this.adminService = new AdminService(connectionProvider.getConnection());
+        this.categoryService = new CategoryService(connectionProvider.getConnection());
+        this.productService = new ProductService(connectionProvider.getConnection());
+        this.reviewService = new ReviewService(connectionProvider.getConnection());
+        this.storeService = new StoreService(connectionProvider.getConnection());
+        this.warehouseService = new WarehouseService(connectionProvider.getConnection());
+        this.customerService = new CustomerService(connectionProvider.getConnection());
+        this.orderService = new OrderService(connectionProvider.getConnection());
+        this.auditService = new AuditService(connectionProvider.getConnection());
     }
 
     /**
@@ -60,7 +64,7 @@ public abstract class Application {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void printProducts() throws SQLException, ClassNotFoundException {
+    protected void printProducts() throws SQLException, ClassNotFoundException {
         Map<Integer, Product> products = productService.getProducts();
         for (Integer id : products.keySet()) {
             Category category = categoryService.getCategory(products.get(id).getCategory_id());
@@ -73,7 +77,7 @@ public abstract class Application {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void getProductById() throws SQLException, ClassNotFoundException {
+    protected void getProductById() throws SQLException, ClassNotFoundException {
         showCancelInteger();
         System.out.println("Enter id of product: ");
         
@@ -92,7 +96,7 @@ public abstract class Application {
      * @throws ClassNotFoundException
      * @throws SQLException
      */
-    public void printStores() throws ClassNotFoundException, SQLException {
+    protected void printStores() throws ClassNotFoundException, SQLException {
         Map<Integer, Store> stores = storeService.getStores();
         for (Integer id : stores.keySet()) {
             System.out.println("Store Id: " + id + ", " + stores.get(id));
@@ -105,7 +109,7 @@ public abstract class Application {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void printStoresWithProduct(int id) throws ClassNotFoundException, SQLException {
+    protected void printStoresWithProduct(int id) throws ClassNotFoundException, SQLException {
         Map<Integer, Store> stores = storeService.getStoresWithProduct(id);
         System.out.println("Available price for stores: ");
         for (Integer i : stores.keySet()) {
@@ -118,7 +122,7 @@ public abstract class Application {
      * @throws SQlException
      * @throws ClassNotFoundException
      */
-    public void getStoreById() throws SQLException, ClassNotFoundException {
+    protected void getStoreById() throws SQLException, ClassNotFoundException {
         showCancelInteger();
         System.out.println("Enter store id: ");
         
@@ -136,7 +140,7 @@ public abstract class Application {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void getPriceAtStore() throws SQLException, ClassNotFoundException {
+    protected void getPriceAtStore() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
         System.out.println("Please choose product id from above: ");
@@ -164,7 +168,7 @@ public abstract class Application {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public void getReviewForProduct() throws SQLException, ClassNotFoundException {
+    protected void getReviewForProduct() throws SQLException, ClassNotFoundException {
         printProducts();
         showCancelInteger();
         System.out.println("Enter product id from above to get reviews on: ");
@@ -182,10 +186,10 @@ public abstract class Application {
 
     /**
      * Parses an SQL exception and prints the first line
-     * @param message SQL error message to parse
+     * @param e SQL error
      */
-    public void handleSQLException(String message){
-        System.out.println(message.split("\n")[0]);
+    protected void handleSQLException(SQLException e){
+        System.out.println(e.getMessage().split("\n")[0]);
     }
 
     /**
@@ -193,7 +197,7 @@ public abstract class Application {
      * @param Q String to check cancellation 
      * @return If it's equal to Q
      */
-    public boolean cancelStringOperation(String Q) {
+    protected boolean cancelStringOperation(String Q) {
         return Q.toUpperCase().equals("Q");
     }
 
@@ -202,21 +206,21 @@ public abstract class Application {
      * @param input User input as int
      * @return If input is equal to 0
      */
-    public boolean cancelIntegerOperation(int input) {
+    protected boolean cancelIntegerOperation(int input) {
         return input == 0;
     }
 
     /**
      * Shows the user what to enter to cancel a integer-related operation
      */
-    public void showCancelInteger() {
+    protected void showCancelInteger() {
         System.out.println("Enter 0 to quit");
     }
 
     /**
      * Shows the user what to enter to cancel a string-related operation
      */
-    public void showCancelString() {
+    protected void showCancelString() {
         System.out.println("Enter Q to quit");
     }
 }
