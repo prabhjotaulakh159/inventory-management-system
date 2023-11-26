@@ -47,9 +47,22 @@ public class AuditService {
         return auditList;
     }
 
-    
 
-    public List<Audit> getAuditByDate(AuditTable audit) throws SQLException{
 
+    public List<Audit> getAuditByDate(AuditTable audit, int id) throws SQLException{
+        List<Audit> auditList = new ArrayList<>();
+        String input = "SELECT * FROM " + audit.getTableName();
+        PreparedStatement preparedStatement = this.connection.prepareStatement(input);
+        ResultSet results = preparedStatement.executeQuery();
+        while(results.next()) {
+            if (audit == AuditTable.PRODUCTS_WAREHOUSES || audit == AuditTable.ORDERS_PRODUCTS || audit == AuditTable.PRODUCTS_STORES) {
+                auditList.add(new ProductAudit(results.getString(1), results.getDate(2), results.getInt(3), results.getInt(4)));
+            } else {
+                auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
+            }
+        }
+        preparedStatement.close();
+        results.close();
+        return auditList;
     }
 }
