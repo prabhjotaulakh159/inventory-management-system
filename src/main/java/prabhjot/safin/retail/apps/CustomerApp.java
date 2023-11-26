@@ -261,6 +261,7 @@ public class CustomerApp extends Application {
         int orderId= orderService.createOrder(order, products);
         System.out.println("--------------------------------------");
         System.out.println("Here is your order id: " + orderId);
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -287,6 +288,7 @@ public class CustomerApp extends Application {
         orderService.deleteOrder(deleteId);
         System.out.println("--------------------------------------");
         System.out.println("Order has been deleted!");
+        System.out.println("--------------------------------------");
     }
     
     /**
@@ -396,6 +398,7 @@ public class CustomerApp extends Application {
         reviewService.create(review);
         System.out.println("--------------------------------------");
         System.out.println("Review Created!");
+        System.out.println("--------------------------------------");
     }
     
     /**
@@ -417,6 +420,7 @@ public class CustomerApp extends Application {
         reviewService.delete(reviewId);
         System.out.println("--------------------------------------");
         System.out.println("Review Removed!");
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -447,30 +451,38 @@ public class CustomerApp extends Application {
      */
     private void updateReview() throws SQLException, ClassNotFoundException {
         printCustomerReviews();
-    
+        
+        System.out.println("--------------------------------------");
         showCancelInteger();
         System.out.println("Which Review you want to Update? Enter their Id:");
+        System.out.println("--------------------------------------");
         
         int reviewId = sc.nextInt(); sc.nextLine();
 
         if (cancelIntegerOperation(reviewId)) return;
 
+        System.out.println("--------------------------------------");
         showCancelInteger();
         System.out.println("What is your updated Rating?:");
+        System.out.println("--------------------------------------");
         
         int rating = sc.nextInt(); sc.nextLine();
         
         if (cancelIntegerOperation(rating)) return;
 
+        System.out.println("--------------------------------------");
         showCancelString();
         System.out.println("Whats your new Description?");
+        System.out.println("--------------------------------------");
         
         String description = sc.nextLine();
 
         if (cancelStringOperation(description)) return;
 
         reviewService.update(reviewId, rating, description);
+        System.out.println("--------------------------------------");
         System.out.println("Review has been Updated!");
+        System.out.println("--------------------------------------");
     }
 
     private void printCustomerReviews() throws SQLException, ClassNotFoundException{

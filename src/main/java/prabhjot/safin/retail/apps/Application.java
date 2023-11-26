@@ -171,6 +171,7 @@ public abstract class Application {
         if (cancelIntegerOperation(storeId)) return;
         
         int price = storeService.getProductPrice(productId, storeId);
+        System.out.println("--------------------------------------");
         System.out.println("Price: " + price + "$");
         System.out.println("--------------------------------------");
     }
