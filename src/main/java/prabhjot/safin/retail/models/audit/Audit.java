@@ -1,4 +1,4 @@
-package prabhjot.safin.retail.models;
+package prabhjot.safin.retail.models.audit;
 
 import java.sql.Date;
 
@@ -18,9 +18,9 @@ public class Audit {
      * @param objId Id of entity changed
      */
     public Audit(String change, Date date, int objId) {
-      this.change = change;
-      this.date = date;
-      this.objId = objId;
+        this.change = change;
+        this.date = date;
+        this.objId = objId;
     }
 
     /**
