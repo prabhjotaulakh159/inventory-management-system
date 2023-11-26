@@ -317,16 +317,6 @@ OBJECTS/TYPES
 CREATE TYPE number_array IS VARRAY(100) OF NUMBER;
 /
 
-CREATE TYPE audit_type AS OBJECT (
-    action CHAR(6),
-    audit_date DATE,
-    obj_id NUMBER
-);
-/
-
-CREATE TYPE audit_array IS VARRAY(100) OF audit_type;
-/
-
 CREATE TYPE order_type AS OBJECT (
     customer    NUMBER,
     store       NUMBER,

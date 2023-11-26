@@ -1,83 +1,78 @@
 package prabhjot.safin.retail.models;
 
 import java.sql.Date;
-import java.sql.SQLData;
-import java.sql.SQLException;
-import java.sql.SQLInput;
-import java.sql.SQLOutput;
 
-public class Audit implements SQLData {
-    public String change;
-    public Date date;
-    public int obj_id;
-    public String type= "AUDIT_TYPE";
-
-
-    public Audit(){
-      
-    }
+/**
+ * Represents an audit row in audit tables
+ * @author Prabhjot Aulakh, Safin Haque
+ */
+public class Audit {
+    private String change;
+    private Date date;
+    private int objId;
     
-    public Audit(String change, Date date, int obj_id) {
-      this.change = change;
-      this.date = date;
-      this.obj_id = obj_id;
+    /**
+     * Constructor
+     * @param change Change that occured in the table
+     * @param date Date of the change
+     * @param objId Id of entity changed
+     */
+    public Audit(String change, Date date, int objId) {
+        this.change = change;
+        this.date = date;
+        this.objId = objId;
     }
 
-    @Override
-    public String getSQLTypeName() throws SQLException {
-      return this.type;
-    }
-
-    @Override
-    public void readSQL(SQLInput stream, String typeName) throws SQLException {
-      this.change= stream.readNString();
-      this.date= stream.readDate();
-      this.obj_id= stream.readInt();
-      this.type = typeName;
-    }
-
-    @Override
-    public void writeSQL(SQLOutput stream) throws SQLException {
-      stream.writeString(this.change);
-      stream.writeDate(this.date);
-      stream.writeInt(this.obj_id);
-    }
-
+    /**
+     * Accessor for change
+     * @return Change on row
+     */
     public String getChange() {
       return change;
     }
 
+    /**
+     * Mutator for change
+     * @param change Change on row
+     */
     public void setChange(String change) {
       this.change = change;
     }
 
+    /**
+     * Accessor for date
+     * @return Date of change
+     */
     public Date getDate() {
       return date;
     }
 
+    /**
+     * Mutator for date
+     * @param Date of change
+     */
     public void setDate(Date date) {
       this.date = date;
     }
 
-    public int getObj_id() {
-      return obj_id;
+    /**
+     * Accessor for obj id
+     * @return Id of entity changed
+     */
+    public int getObjId() {
+      return objId;
     }
 
-    public void setObj_id(int obj_id) {
-      this.obj_id = obj_id;
+    /**
+     * mutator for obj id
+     * @param Id of entity changed
+     */
+    public void setObjId(int objId) {
+      this.objId = objId;
+    }    
+
+    @Override
+    public String toString() {
+        return "Action: " + this.change + ", Date: " + this.date + ", Id: " + this.objId; 
     }
-
-    public String getType() {
-      return type;
-    }
-
-    public void setType(String type) {
-      this.type = type;
-    }
-
-    
-
-    
-
-    
 }

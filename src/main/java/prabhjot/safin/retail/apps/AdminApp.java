@@ -2,16 +2,20 @@ package prabhjot.safin.retail.apps;
 
 import java.io.Console;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Map;
 
 import prabhjot.safin.retail.models.Admin;
+import prabhjot.safin.retail.models.Audit;
 import prabhjot.safin.retail.models.Category;
 import prabhjot.safin.retail.models.Customer;
 import prabhjot.safin.retail.models.Product;
 import prabhjot.safin.retail.models.Review;
 import prabhjot.safin.retail.models.Store;
 import prabhjot.safin.retail.models.Warehouse;
+import prabhjot.safin.retail.services.audit.AuditTable;
 
 /**
  * Admin version of the application
@@ -35,7 +39,8 @@ public class AdminApp extends Application {
                 System.out.println("Press 4 for stores");
                 System.out.println("Press 5 for warehouses");
                 System.out.println("Press 6 for customers");
-                System.out.println("Press 7 to exit");
+                System.out.println("Press 7 for audits");
+                System.out.println("Press 8 to exit");
                 System.out.println("--------------------------------------");
                 int input = sc.nextInt();
                 if      (input == 1) categoryCrud();
@@ -44,7 +49,8 @@ public class AdminApp extends Application {
                 else if (input == 4) storeCrud();
                 else if (input == 5) warehouseCrud();
                 else if (input == 6) customerCrud();
-                else if (input == 7) break;
+                else if (input == 7) auditCrud();
+                else if (input == 8) break;
                 else System.out.println("Not a valid option !");
             }
             System.out.println("Goodbye !");
@@ -869,5 +875,123 @@ public class AdminApp extends Application {
         
         Customer customer = customerService.getCustomer(id);
         System.out.println(customer);
+    }
+
+    /**
+     * Provides UI to view audits
+     */
+    public void auditCrud() {
+        while(true) {
+            System.out.println("Enter 1 to get all audit logs");
+            System.out.println("Enter 2 to get an audit by id");
+            System.out.println("Enter 3 to exit audits");
+            try {
+                int input = sc.nextInt();
+                sc.nextLine();
+                
+                if (input == 1) getAuditLogsOnTable();
+                else if(input == 2)getAuditById();
+                else if (input == 3) break;
+                else throw new InputMismatchException();
+            
+            } catch (SQLException e) {
+                handleSQLException(e.getMessage());
+            } catch (InputMismatchException e) {
+                System.out.println("Not a valid option !");
+                sc.next();
+            }
+        }
+    }
+
+    /**
+     * Provides UI to get audit logs on a table
+     */
+    public void getAuditLogsOnTable() throws SQLException {
+        System.out.println("--------------------------------------");
+        showCancelInteger();
+        System.out.println("Enter 1 to get admin logs");
+        System.out.println("Enter 2 to get customers logs");
+        System.out.println("Enter 3 to get categories logs");
+        System.out.println("Enter 4 to get warehouses logs");
+        System.out.println("Enter 5 to get products logs");
+        System.out.println("Enter 6 to get store logs");
+        System.out.println("Enter 7 to get order logs");
+        System.out.println("Enter 8 to get review logs");
+        System.out.println("--------------------------------------");
+        
+        int input = sc.nextInt();
+
+        if (cancelIntegerOperation(input)) return;
+
+        if      (input == 1) printAudit(AuditTable.ADMINS);
+        else if (input == 2) printAudit(AuditTable.CUSTOMERS);
+        else if (input == 3) printAudit(AuditTable.CATEGORIES);
+        else if (input == 4) printAudit(AuditTable.WAREHOUSES);
+        else if (input == 5) printAudit(AuditTable.PRODUCTS);
+        else if (input == 6) printAudit(AuditTable.STORES);
+        else if (input == 7) printAudit(AuditTable.ORDERS);
+        else if (input == 8) printAudit(AuditTable.REVIEWS);
+        else throw new InputMismatchException(); 
+    }
+
+    /**
+     * Prints all audits on the terminal
+     * @throws SQLException
+     */
+    public void printAudit(AuditTable table) throws SQLException {
+        List<Audit> logs = auditService.getListOfAuditWanted(table);
+        for (Audit log : logs) {
+            System.out.println(log);
+        }
+    }
+
+
+
+
+    public void getAuditById() throws SQLException{
+        System.out.println("--------------------------------------");
+        showCancelInteger();
+         System.out.println("Enter 1 to choose admin logs by Id");
+        System.out.println("Enter 2 to choose customers logs by Id");
+        System.out.println("Enter 3 to choose categories logs by Id");
+        System.out.println("Enter 4 to choose warehouses logs by Id");
+        System.out.println("Enter 5 to choose products logs by Id");
+        System.out.println("Enter 6 to choose store logs by Id");
+        System.out.println("Enter 7 to choose order logs by Id");
+        System.out.println("Enter 8 to choose review logs by Id");
+        System.out.println("--------------------------------------");
+        int logsChosen = sc.nextInt();
+        if (cancelIntegerOperation(logsChosen)) return;
+        System.out.println("--------------------------------------");
+        showCancelInteger();
+        System.out.println("enter the Id you want to see a list of :");
+        System.out.println("--------------------------------------");
+
+        int idChosen = sc.nextInt();
+        if (cancelIntegerOperation(idChosen)) return;
+        
+
+        List<Audit> audits = new ArrayList<>();
+
+        if(logsChosen == 1) audits = auditService.getAuditById(AuditTable.ADMINS, idChosen);
+        else if(logsChosen == 2) audits = auditService.getAuditById(AuditTable.CUSTOMERS, idChosen);
+        else if(logsChosen == 3) audits = auditService.getAuditById(AuditTable.CATEGORIES, idChosen);
+        else if(logsChosen == 4) audits = auditService.getAuditById(AuditTable.WAREHOUSES, idChosen);
+        else if(logsChosen == 5) audits = auditService.getAuditById(AuditTable.PRODUCTS, idChosen);
+        else if(logsChosen == 6) audits = auditService.getAuditById(AuditTable.STORES, idChosen);
+        else if(logsChosen == 7)audits=auditService.getAuditById(AuditTable.ORDERS, idChosen);
+        else if(logsChosen == 8) audits=auditService.getAuditById(AuditTable.REVIEWS, idChosen);
+        else throw new InputMismatchException(); 
+
+        System.out.println();
+        System.out.println("--------------------------------------");
+        printAudit(audits);
+        System.out.println("--------------------------------------");
+    }
+
+    public void printAudit(List<Audit> audits) throws SQLException {
+        for (Audit log : audits) {
+            System.out.println(log);
+        }
     }
 }
