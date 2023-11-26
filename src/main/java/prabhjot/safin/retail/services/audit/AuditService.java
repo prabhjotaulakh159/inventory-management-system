@@ -35,7 +35,8 @@ public class AuditService {
         PreparedStatement preparedStatement = this.connection.prepareStatement(input);
         ResultSet results = preparedStatement.executeQuery();
         while(results.next()) {
-            auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
+                auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
+          
         }
         preparedStatement.close();
         results.close();
@@ -44,17 +45,13 @@ public class AuditService {
 
 
 
-    public List<Audit> getAuditByDate(AuditTable audit, int id) throws SQLException{
+    public List<Audit> getAuditById(AuditTable audit, int id) throws SQLException{
         List<Audit> auditList = new ArrayList<>();
-        String input = "SELECT * FROM " + audit.getTableName();
+        String input = "SELECT * FROM " + audit.getTableName() + " WHERE " + audit.getIdColName() + " = " + id;
         PreparedStatement preparedStatement = this.connection.prepareStatement(input);
         ResultSet results = preparedStatement.executeQuery();
         while(results.next()) {
-            if (audit == AuditTable.PRODUCTS_WAREHOUSES || audit == AuditTable.ORDERS_PRODUCTS || audit == AuditTable.PRODUCTS_STORES) {
-                auditList.add(new ProductAudit(results.getString(1), results.getDate(2), results.getInt(3), results.getInt(4)));
-            } else {
-                auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
-            }
+            auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
         }
         preparedStatement.close();
         results.close();
