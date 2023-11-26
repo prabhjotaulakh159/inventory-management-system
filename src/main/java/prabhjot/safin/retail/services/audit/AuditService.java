@@ -41,4 +41,10 @@ public class AuditService {
         results.close();
         return auditList;
     }
+
+    
+
+    public List<Audit> getAuditByDate(AuditTable audit) throws SQLException{
+
+    }
 }

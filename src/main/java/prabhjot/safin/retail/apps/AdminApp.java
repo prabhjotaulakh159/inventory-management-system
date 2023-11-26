@@ -928,4 +928,8 @@ public class AdminApp extends Application {
             System.out.println(log);
         }
     }
+
+    public void getAuditByDate() throws SQLException{
+
+    }
 }
