@@ -40,7 +40,7 @@ public abstract class Application {
         try {
             this.connectionProvider = new ConnectionProvider();
         } catch (SQLException e) {
-            e.printStackTrace();
+            this.handleSQLException(e);
         }
         this.sc = new Scanner(System.in);
         this.adminService = new AdminService(connectionProvider.getConnection());
@@ -61,126 +61,164 @@ public abstract class Application {
 
     /**
      * Prints products on the terminal
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    protected void printProducts() throws SQLException, ClassNotFoundException {
-        Map<Integer, Product> products = productService.getProducts();
-        for (Integer id : products.keySet()) {
-            Category category = categoryService.getCategory(products.get(id).getCategory_id());
-            System.out.println("Product Id: " + id + ", " + products.get(id) + ", " + category);
+    protected void printProducts() {
+        try {
+            Map<Integer, Product> products = productService.getProducts();
+            for (Integer id : products.keySet()) {
+                Category category = categoryService.getCategory(products.get(id).getCategory_id());
+                System.out.println("Product Id: " + id + ", " + products.get(id) + ", " + category);
+            }
+        } catch (SQLException e) {
+            this.handleSQLException(e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
     
     /**
      * Gets a product by it's id and prints on the terminal 
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    protected void getProductById() throws SQLException, ClassNotFoundException {
-        showCancelInteger();
-        System.out.println("Enter id of product: ");
-        
-        int id = sc.nextInt();
-        sc.nextLine();
-        
-        if (cancelIntegerOperation(id)) return;
-        
-        Product product = productService.getProduct(id);
-        Category category = categoryService.getCategory(product.getCategory_id());
-        System.out.println(product + ", " + category);
+    protected void getProductById() {
+        while (true) {
+            try {
+                this.showCancelInteger();
+                System.out.println("Enter id of product: ");
+                int id = Integer.parseInt(this.sc.nextLine());
+                if (cancelIntegerOperation(id)) {
+                    return;
+                }
+                Product product = this.productService.getProduct(id);
+                Category category = this.categoryService.getCategory(product.getCategory_id());
+                System.out.println(product + ", " + category);
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }   
+        }
     }
 
     /**
      * Prints all stores on the terminal
-     * @throws ClassNotFoundException
-     * @throws SQLException
      */
-    protected void printStores() throws ClassNotFoundException, SQLException {
-        Map<Integer, Store> stores = storeService.getStores();
-        for (Integer id : stores.keySet()) {
-            System.out.println("Store Id: " + id + ", " + stores.get(id));
+    protected void printStores() {
+        try {
+            Map<Integer, Store> stores = this.storeService.getStores();
+            for (Integer id : stores.keySet()) {
+                System.out.println("Store Id: " + id + ", " + stores.get(id));
+            }
+        } catch (SQLException e) {
+            this.handleSQLException(e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     /**
      * Print stores whom have the price of a product
      * @param id Product id
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    protected void printStoresWithProduct(int id) throws ClassNotFoundException, SQLException {
-        Map<Integer, Store> stores = storeService.getStoresWithProduct(id);
-        System.out.println("Available price for stores: ");
-        for (Integer i : stores.keySet()) {
-            System.out.println("Store Id: " + i + ", " + stores.get(i));
+    protected void printStoresWithProduct(int id) {
+        try {
+            Map<Integer, Store> stores = storeService.getStoresWithProduct(id);
+            System.out.println("Available price for stores: ");
+            for (Integer i : stores.keySet()) {
+                System.out.println("Store Id: " + i + ", " + stores.get(i));
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            this.handleSQLException(e);
         }
     }
 
     /**
      * Retrieves a store by id and prints it on the terminal
-     * @throws SQlException
-     * @throws ClassNotFoundException
      */
-    protected void getStoreById() throws SQLException, ClassNotFoundException {
-        showCancelInteger();
-        System.out.println("Enter store id: ");
-        
-        int id = sc.nextInt();
-        sc.nextLine();
-        
-        if (cancelIntegerOperation(id)) return;
-        
-        Store store = storeService.getStore(id);
-        System.out.println(store);
+    protected void getStoreById() {
+        while (true) {
+            try {
+                this.showCancelInteger();
+                System.out.println("Enter store id: ");
+                int id = Integer.parseInt(this.sc.nextLine());
+                if (cancelIntegerOperation(id)) {
+                    return;
+                }
+                Store store = this.storeService.getStore(id);
+                System.out.println(store);
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }   
+        }
     }
 
     /**
      * Retrives a price from a store and prints it on the terminal
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    protected void getPriceAtStore() throws SQLException, ClassNotFoundException {
-        printProducts();
-        showCancelInteger();
-        System.out.println("Please choose product id from above: ");
-        
-        int productId = sc.nextInt();
-        sc.nextLine();
-        
-        if (cancelIntegerOperation(productId)) return;
-
-        printStoresWithProduct(productId);
-        showCancelInteger();
-        System.out.println("Please choose store id from above: ");
-        
-        int storeId = sc.nextInt();
-        sc.nextLine();
-
-        if (cancelIntegerOperation(storeId)) return;
-        
-        int price = storeService.getProductPrice(productId, storeId);
-        System.out.println("Price: " + price + "$");
+    protected void getPriceAtStore()  {
+        while (true) {
+            try {
+                this.printProducts();
+                this.showCancelInteger();
+                System.out.println("Please choose product id from above: ");
+                int productId = Integer.parseInt(this.sc.nextLine());
+                if (this.cancelIntegerOperation(productId)) { 
+                    return;
+                }
+                this.printStoresWithProduct(productId);
+                this.showCancelInteger();
+                System.out.println("Please choose store id from above: ");
+                int storeId = Integer.parseInt(this.sc.nextLine());
+                if (this.cancelIntegerOperation(storeId)) {
+                    return;
+                }
+                int price = this.storeService.getProductPrice(productId, storeId);
+                System.out.println("Price: " + price + "$");
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
+        }
     }
 
     /**
      * Retrives reviews for a product and prints them on the terminal
-     * @throws SQLException
-     * @throws ClassNotFoundException
      */
-    protected void getReviewForProduct() throws SQLException, ClassNotFoundException {
-        printProducts();
-        showCancelInteger();
-        System.out.println("Enter product id from above to get reviews on: ");
-        
-        int id = sc.nextInt();
-        sc.nextLine();
-        
-        if (cancelIntegerOperation(id)) return;
-        
-        Map<Integer, Review> reviews = reviewService.getReviewForProduct(id);
-        for (Integer reviewId : reviews.keySet()) {
-            System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
+    protected void getReviewForProduct() {
+        while (true) {
+            try {
+                this.printProducts();
+                this.showCancelInteger();
+                System.out.println("Enter product id from above to get reviews on: ");
+                int id = Integer.parseInt(this.sc.nextLine());
+                if (this.cancelIntegerOperation(id)) { 
+                    return;
+                }
+                Map<Integer, Review> reviews = reviewService.getReviewForProduct(id);
+                for (Integer reviewId : reviews.keySet()) {
+                    System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
+                }
+                break;
+            } catch (SQLException e) {
+                this.handleSQLException(e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid data");
+            }
         }
     }
 
