@@ -62,10 +62,13 @@ public abstract class Application {
      */
     public void printProducts() throws SQLException, ClassNotFoundException {
         Map<Integer, Product> products = productService.getProducts();
+        System.out.println("Here are All the Products!");
+        System.out.println("--------------------------------------");
         for (Integer id : products.keySet()) {
             Category category = categoryService.getCategory(products.get(id).getCategory_id());
             System.out.println("Product Id: " + id + ", " + products.get(id) + ", " + category);
         }
+        System.out.println("--------------------------------------");
     }
     
     /**
@@ -74,8 +77,10 @@ public abstract class Application {
      * @throws ClassNotFoundException
      */
     public void getProductById() throws SQLException, ClassNotFoundException {
+        System.out.println("--------------------------------------");
         showCancelInteger();
         System.out.println("Enter id of product: ");
+        System.out.println("--------------------------------------");
         
         int id = sc.nextInt();
         sc.nextLine();
@@ -84,7 +89,10 @@ public abstract class Application {
         
         Product product = productService.getProduct(id);
         Category category = categoryService.getCategory(product.getCategory_id());
+        System.out.println("--------------------------------------");
         System.out.println(product + ", " + category);
+        System.out.println("--------------------------------------");
+        System.out.println();
     }
 
     /**
@@ -108,9 +116,11 @@ public abstract class Application {
     public void printStoresWithProduct(int id) throws ClassNotFoundException, SQLException {
         Map<Integer, Store> stores = storeService.getStoresWithProduct(id);
         System.out.println("Available price for stores: ");
+        System.out.println("--------------------------------------");
         for (Integer i : stores.keySet()) {
             System.out.println("Store Id: " + i + ", " + stores.get(i));
         }
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -137,9 +147,12 @@ public abstract class Application {
      * @throws ClassNotFoundException
      */
     public void getPriceAtStore() throws SQLException, ClassNotFoundException {
+        System.out.println("--------------------------------------");
         printProducts();
+        System.out.println("--------------------------------------");
         showCancelInteger();
         System.out.println("Please choose product id from above: ");
+        System.out.println("--------------------------------------");
         
         int productId = sc.nextInt();
         sc.nextLine();
@@ -147,8 +160,10 @@ public abstract class Application {
         if (cancelIntegerOperation(productId)) return;
 
         printStoresWithProduct(productId);
+        System.out.println("--------------------------------------");
         showCancelInteger();
         System.out.println("Please choose store id from above: ");
+        System.out.println("--------------------------------------");
         
         int storeId = sc.nextInt();
         sc.nextLine();
@@ -157,6 +172,7 @@ public abstract class Application {
         
         int price = storeService.getProductPrice(productId, storeId);
         System.out.println("Price: " + price + "$");
+        System.out.println("--------------------------------------");
     }
 
     /**
@@ -165,9 +181,12 @@ public abstract class Application {
      * @throws ClassNotFoundException
      */
     public void getReviewForProduct() throws SQLException, ClassNotFoundException {
+        System.out.println("--------------------------------------");
         printProducts();
+        System.out.println("--------------------------------------");
         showCancelInteger();
         System.out.println("Enter product id from above to get reviews on: ");
+        System.out.println("--------------------------------------");
         
         int id = sc.nextInt();
         sc.nextLine();
@@ -175,9 +194,11 @@ public abstract class Application {
         if (cancelIntegerOperation(id)) return;
         
         Map<Integer, Review> reviews = reviewService.getReviewForProduct(id);
+        System.out.println("--------------------------------------");
         for (Integer reviewId : reviews.keySet()) {
             System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
         }
+        System.out.println("--------------------------------------");
     }
 
     /**
