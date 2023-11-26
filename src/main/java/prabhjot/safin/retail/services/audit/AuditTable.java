@@ -5,15 +5,25 @@ package prabhjot.safin.retail.services.audit;
  * @author Prabhjot Aulakh, Safin Haque
  */
 public enum AuditTable {
-    ADMINS,
-    CUSTOMERS,
-    CATEGORIES,
-    WAREHOUSES,
-    PRODUCTS,
-    PRODUCTS_WAREHOUSES,
-    STORES_AUDIT,
-    PRODUCTS_STORES_AUDIT,
-    ORDERS_AUDIT,
-    ORDERS_PRODUCTS_AUDIT,
-    REVIEWS_AUDIT
+    ADMINS("admins_audit"),
+    CUSTOMERS("customers_audit"),
+    CATEGORIES("categories_audit"),
+    WAREHOUSES("warehouses_audit"),
+    PRODUCTS("products_audit"),
+    PRODUCTS_WAREHOUSES("products_warehouses_audit"),
+    STORES("stores_audit"),
+    PRODUCTS_STORES("products_stores_audit"),
+    ORDERS("orders_audit"),
+    ORDERS_PRODUCTS("orders_products_audit"),
+    REVIEWS("reviews_audit");
+
+    private final String tableName;
+
+    private AuditTable(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getTableName() {
+        return this.tableName;
+    }
 }
