@@ -20,7 +20,7 @@ public class CustomerApp extends Application {
     private Customer current;
     
     @Override
-    public void run() {
+    public void run(){
         this.login();
         while(true) {
             System.out.println("--------------------------------------");
@@ -153,7 +153,7 @@ public class CustomerApp extends Application {
                 System.out.println("Enter Y to flag a review");
                 System.out.println("--------------------------------------");
                 String answer = sc.nextLine().toLowerCase();
-                if (answer.equals("Y")) {
+                if (answer.equals("y")) {
                     this.flagReview();
                 }
                 break;
@@ -170,7 +170,7 @@ public class CustomerApp extends Application {
     /**
      * Provides UI for options on orders
      */
-    private void ordersOptions() {
+    private void ordersOptions(){
         while (true) {
             System.out.println("ORDERS");
             System.out.println("--------------------------------------");
@@ -204,7 +204,8 @@ public class CustomerApp extends Application {
     /**
      * Provides UI to create an order
      */
-    private void createOrder() {
+    private void createOrder(){
+    try{
         int storeid = 0;
         while (true) {
             try {
@@ -214,7 +215,7 @@ public class CustomerApp extends Application {
                 storeid = Integer.parseInt(sc.nextLine());
                 if (this.cancelIntegerOperation(storeid)) {
                     return;
-                }
+                }     
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Please enter valid data");
@@ -250,18 +251,20 @@ public class CustomerApp extends Application {
                 if (ans.equals("Y")) {
                     break;
                 }
-                int orderId = this.orderService.createOrder(order, products);
-                System.out.println("Here is your order id: " + orderId);
-                break;
-            } catch (SQLException e) {
-                this.handleSQLException(e);
             } catch (InputMismatchException e) {
                 System.out.println("Please enter valid data");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+            } 
         }
+        int orderId = this.orderService.createOrder(order, products);
+        System.out.println("Here is your order id: " + orderId);
+    }catch (SQLException e) {
+        this.handleSQLException(e);
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    } catch (NumberFormatException e) {
+        System.out.println("Please enter valid data");
     }
+}
 
     /**
      * Provides UI to delete an order

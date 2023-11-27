@@ -966,7 +966,7 @@ public class AdminApp extends Application {
             System.out.println("Enter 3 to exit customers");
             System.out.println("--------------------------------------");
             try {
-                int input = sc.nextInt();
+                int input = sc.nextInt(); sc.nextLine();
                 if (input == 1) {
                     this.printCustomers();
                 } else if (input == 2) {
@@ -1013,6 +1013,7 @@ public class AdminApp extends Application {
                 }
                 Customer customer = this.customerService.getCustomer(id);
                 System.out.println(customer);
+                break;
             } catch (SQLException e) {
                 this.handleSQLException(e);
             } catch (ClassNotFoundException e) {
@@ -1028,11 +1029,15 @@ public class AdminApp extends Application {
      */
     public void auditCrud() {
         while(true) {
+            this.showCancelInteger();
             System.out.println("Enter 1 to get all audit logs");
             System.out.println("Enter 2 to get an audit by id");
             System.out.println("Enter 3 to exit audits");
             try {
                 int input = Integer.parseInt(this.sc.nextLine());
+                 if (cancelIntegerOperation(input)) {
+                    return;
+                }
                 if (input == 1)  {
                     this.getAuditLogsOnTable();
                 } else if(input == 2) {
