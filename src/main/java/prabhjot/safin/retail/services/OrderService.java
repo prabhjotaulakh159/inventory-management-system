@@ -61,10 +61,11 @@ public class OrderService {
      * @param orderId Id of the order to delete
      * @throws SQLException
      */
-    public void deleteOrder(int orderId) throws SQLException {
-        String SQL = "{call order_pkg.delete_order(?)}";
+    public void deleteOrder(int orderId, int customerId) throws SQLException {
+        String SQL = "{call order_pkg.delete_order(?, ?)}";
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
         callableStatement.setInt(1, orderId);
+        callableStatement.setInt(2, customerId);
         callableStatement.execute();
         this.connection.commit();
         callableStatement.close();
@@ -121,20 +122,20 @@ public class OrderService {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    public Map<String, Integer> getOrderDetails(int orderId) throws SQLException, ClassNotFoundException {
+    public Map<String, Integer> getOrderDetails(int orderId, int customerId) throws SQLException, ClassNotFoundException {
         ProductService productService = new ProductService(this.connection);
         Map<String, Integer> productQuantityMapping = new HashMap<String, Integer>();
-        String SQL = "{? = call order_pkg.get_order_products(?)}";
+        String SQL = "{? = call order_pkg.get_order_products(?, ?)}";
         CallableStatement callableStatement = this.connection.prepareCall(SQL);
         callableStatement.registerOutParameter(1, Types.ARRAY, "NUMBER_ARRAY");
         callableStatement.setInt(2, orderId);
+        callableStatement.setInt(3, customerId);
         callableStatement.execute();
         ResultSet products = callableStatement.getArray(1).getResultSet();
-        CallableStatement quantityStatement = null;
         while (products.next()) {
             String productName = productService.getProduct(products.getInt(2)).getName();
             String quantitySql = "{? = call order_pkg.get_order_product_quantity(?,?)}";
-            quantityStatement = this.connection.prepareCall(quantitySql);
+            CallableStatement quantityStatement = this.connection.prepareCall(quantitySql);
             quantityStatement.registerOutParameter(1, Types.INTEGER);
             quantityStatement.setInt(2, orderId);
             quantityStatement.setInt(3, products.getInt(2));
@@ -143,7 +144,6 @@ public class OrderService {
             productQuantityMapping.put(productName, quantity);
         }
         callableStatement.close();
-        quantityStatement.close();
         products.close();
         return productQuantityMapping;
     }

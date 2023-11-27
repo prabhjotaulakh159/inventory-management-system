@@ -254,6 +254,11 @@ public abstract class Application {
      */
     protected void handleSQLException(SQLException e){
         System.out.println(e.getMessage().split("\n")[0]);
+        try {
+            this.connectionProvider.uncommit();
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+        }
     }
 
     /**

@@ -3,8 +3,10 @@ package prabhjot.safin.retail.apps;
 import java.io.Console;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Map;
 
 import prabhjot.safin.retail.models.Customer;
@@ -150,7 +152,7 @@ public class CustomerApp extends Application {
                 System.out.println("--------------------------------------");
                 System.out.println();
                 System.out.println("--------------------------------------");
-                System.out.println("Enter Y to flag a review");
+                System.out.println("Enter Y to flag a review, else press anything");
                 System.out.println("--------------------------------------");
                 String answer = sc.nextLine().toLowerCase();
                 if (answer.equals("y")) {
@@ -195,7 +197,7 @@ public class CustomerApp extends Application {
                 } else {
                     throw new NumberFormatException();
                 }
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Please enter valid data");
             } 
         }
@@ -209,13 +211,17 @@ public class CustomerApp extends Application {
         int storeid = 0;
         while (true) {
             try {
+                List<Integer> stores = new ArrayList<Integer>(storeService.getStores().keySet());
                 this.printStores();
                 this.showCancelInteger();
                 System.out.println("Which store do you want to buy from? Enter the store Id:");
                 storeid = Integer.parseInt(sc.nextLine());
                 if (this.cancelIntegerOperation(storeid)) {
                     return;
-                }     
+                }
+                if (!stores.contains(storeid)) {
+                    throw new NumberFormatException();   
+                }
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Please enter valid data");
@@ -225,6 +231,7 @@ public class CustomerApp extends Application {
         Map<Integer, Integer> products = new HashMap<>();
         while (true) {
             try {
+                List<Integer> productIds = new ArrayList<Integer>(this.productService.getProducts().keySet());
                 System.out.println("--------------------------------------");
                 this.printProducts();
                 System.out.println("--------------------------------------");
@@ -235,6 +242,9 @@ public class CustomerApp extends Application {
                 if (cancelIntegerOperation(productId)) {
                     return;
                 }
+                if (!productIds.contains(productId)) {
+                    throw new NumberFormatException();   
+                }
                 System.out.println("--------------------------------------");
                 this.showCancelInteger();
                 System.out.println("How many would you like to buy?");
@@ -243,15 +253,18 @@ public class CustomerApp extends Application {
                 if (cancelIntegerOperation(quantity)) {
                     return;
                 }
+                if (quantity <= 0) {
+                    throw new NumberFormatException();
+                }
                 products.put(productId, quantity);
                 System.out.println("--------------------------------------");
-                System.out.println("Enter Y to stop picking products");
+                System.out.println("Enter Y to stop picking products, else press anything");
                 System.out.println("--------------------------------------");
                 String ans = sc.nextLine().toUpperCase();
                 if (ans.equals("Y")) {
                     break;
                 }
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Please enter valid data");
             } 
         }
@@ -273,6 +286,7 @@ public class CustomerApp extends Application {
         while (true) {
             try {
                 Map<Integer, Order> orders = this.orderService.getOrdersByCustomer(id);
+                List<Integer> orderIds = new ArrayList<>(orders.keySet());
                 System.out.println("--------------------------------------");
                 for (Integer id : orders.keySet()) {
                     System.out.println("Order Id: " + id + ", " + orders.get(id));
@@ -285,7 +299,10 @@ public class CustomerApp extends Application {
                 if (this.cancelIntegerOperation(id)) {
                     return;
                 }
-                this.orderService.deleteOrder(id);
+                if (!orderIds.contains(id)) {
+                    throw new NumberFormatException();
+                }
+                this.orderService.deleteOrder(id, this.id);
                 System.out.println("--------------------------------------");
                 System.out.println("Order has been deleted!");
                 break;
@@ -316,10 +333,14 @@ public class CustomerApp extends Application {
                 if (cancelIntegerOperation(orderId)) { 
                     return;
                 }
-                Map<String, Integer> details = orderService.getOrderDetails(orderId);
-                for (String name : details.keySet()) {
-                    System.out.println("Product: " + name + ", Quantity: " + details.get(name) + ", Price: " + orderService.getOrderTotal(orderId));
+                Map<String, Integer> details = orderService.getOrderDetails(orderId, this.id);
+                if (details.size() == 0) {
+                    throw new NumberFormatException();
                 }
+                for (String name : details.keySet()) {
+                    System.out.println("Product: " + name + ", Quantity: " + details.get(name));
+                }
+                System.out.println("Total: " + orderService.getOrderTotal(orderId) + "$");
                 break;
             } catch (SQLException e) {
                 this.handleSQLException(e);
@@ -436,6 +457,7 @@ public class CustomerApp extends Application {
         while (true) {
             try {
                 Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
+                List<Integer> reviewIds = new ArrayList<>(reviews.keySet());
                 for (Integer reviewId : reviews.keySet()) {
                     System.out.println("Review Id: " + reviewId + ", " + reviews.get(reviewId));
                 }
@@ -444,6 +466,9 @@ public class CustomerApp extends Application {
                 int reviewId = Integer.parseInt(sc.nextLine());
                 if (cancelIntegerOperation(reviewId)) {
                     return;
+                }
+                if (!reviewIds.contains(reviewId)) {
+                    throw new NumberFormatException();
                 }
                 reviewService.delete(reviewId);
                 System.out.println("Review Removed!");
@@ -492,6 +517,7 @@ public class CustomerApp extends Application {
         while (true) {
             try {
                 Map<Integer, Review> reviews = reviewService.getReviewsForCustomer(id);
+                List<Integer> reviewIds = new ArrayList<>(reviews.keySet());
                 for(Integer reviewId : reviews.keySet()){
                     System.out.println("Review ID: " + reviewId + " | " + reviews.get(reviewId));
                 }
@@ -500,6 +526,9 @@ public class CustomerApp extends Application {
                 int reviewId = Integer.parseInt(this.sc.nextLine());
                 if (cancelIntegerOperation(reviewId)) {
                     return;
+                }
+                if (!reviewIds.contains(reviewId)) {
+                    throw new NumberFormatException();
                 }
                 showCancelInteger();
                 System.out.println("What is your updated Rating?:");
@@ -595,14 +624,14 @@ public class CustomerApp extends Application {
                     }
                     this.current.setPassword(info);
                 } else {
-                    throw new InputMismatchException();
+                    throw new NumberFormatException();
                 }
                 this.customerService.updateCustomerInformation(this.current, this.id);
                 System.out.println("--------------------------------------");
                 System.out.println("Customer information has been updated !");
                 System.out.println("--------------------------------------");
                 break;
-            } catch (NullPointerException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Please enter valid data");
             } catch (SQLException e) {
                 this.handleSQLException(e);
