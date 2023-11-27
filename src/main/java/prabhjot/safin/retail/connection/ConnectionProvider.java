@@ -34,4 +34,12 @@ public class ConnectionProvider {
     public void kill() throws SQLException {
         this.connection.close();
     }
+
+    /**
+     * Rolls back changes
+     * @throws SQLException
+     */
+    public void uncommit() throws SQLException {
+        this.connection.rollback();
+    }
 }
