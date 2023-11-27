@@ -2,14 +2,16 @@
 1. Go to src/main/java/prabhjot/safin/retail (root of project) 
 2. In the connection folder, create a file called Credentials.java
 3. Copy this code within the file: 
-`
+
+```
 package prabhjot.safin.retail.connection;
 
 public class Credentials {
     public static final String USERNAME = "";
     public static final String PASSWORD = "";
 }
-`
+```
+
 Insert your db username and password within the appropriate places
 
 ## Two applications
