@@ -35,6 +35,27 @@ public class AuditService {
         PreparedStatement preparedStatement = this.connection.prepareStatement(input);
         ResultSet results = preparedStatement.executeQuery();
         while(results.next()) {
+                auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
+          
+        }
+        preparedStatement.close();
+        results.close();
+        return auditList;
+    }
+
+    /**
+     * Gets the audit logs by id for a table 
+     * @param audit Table to get audit logs on
+     * @param id Id of the audit log to get
+     * @return List of audit logs
+     * @throws SQLException
+     */
+    public List<Audit> getAuditById(AuditTable audit, int id) throws SQLException{
+        List<Audit> auditList = new ArrayList<>();
+        String input = "SELECT * FROM " + audit.getTableName() + " WHERE " + audit.getIdColName() + " = " + id;
+        PreparedStatement preparedStatement = this.connection.prepareStatement(input);
+        ResultSet results = preparedStatement.executeQuery();
+        while(results.next()) {
             auditList.add(new Audit(results.getString(1), results.getDate(2), results.getInt(3)));
         }
         preparedStatement.close();
