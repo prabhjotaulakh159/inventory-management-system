@@ -887,7 +887,7 @@ CREATE PACKAGE BODY order_pkg AS
         VALUES (vorderid, vprodid, vquantity);
         EXCEPTION 
             WHEN order_pkg.depleted_stock THEN 
-                RAISE_APPLICATION_ERROR(-20002, 'This item is out of stock');
+                RAISE_APPLICATION_ERROR(-20002, 'Invalid order: One of the items are out of stock');
                 ROLLBACK;
     END;
 
