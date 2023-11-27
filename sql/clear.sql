@@ -45,8 +45,6 @@ DROP TABLE customers;
 DROP TABLE admins;
 
 DROP TYPE number_array FORCE;
-DROP TYPE audit_type FORCE;
-DROP TYPE audit_array;
 DROP TYPE order_type;
 DROP TYPE category_type;
 DROP TYPE customer_type;

@@ -837,10 +837,10 @@ CREATE PACKAGE order_pkg AS
     PROCEDURE check_if_order_exists(id IN NUMBER);
     PROCEDURE create_order (vorder IN order_type, vorder_id OUT NUMBER);
     PROCEDURE insert_product_into_order(vorderid IN NUMBER, vprodid IN NUMBER, vquantity IN NUMBER);
-    PROCEDURE delete_order (id IN NUMBER);
+    PROCEDURE delete_order (id IN NUMBER, cust IN NUMBER);
     FUNCTION get_order(id IN NUMBER) RETURN order_type; 
     FUNCTION get_customer_orders(id IN NUMBER) RETURN number_array;
-    FUNCTION get_order_products(id IN NUMBER) RETURN number_array;
+    FUNCTION get_order_products(id IN NUMBER, cust IN NUMBER) RETURN number_array;
     FUNCTION get_order_product_quantity(vorderid IN NUMBER, vproductid IN NUMBER) RETURN NUMBER;
     FUNCTION price_order(order_number NUMBER) RETURN NUMBER;
 END order_pkg;
@@ -893,9 +893,9 @@ CREATE PACKAGE BODY order_pkg AS
 
     -- deletes an order
     -- id -> id of order to delete
-    PROCEDURE delete_order (id IN NUMBER) AS BEGIN 
+    PROCEDURE delete_order (id IN NUMBER, cust IN NUMBER) AS BEGIN 
         order_pkg.check_if_order_exists(id);
-        DELETE FROM orders WHERE order_id = id;
+        DELETE FROM orders WHERE order_id = id AND customer_id = cust;
     END;
     
     -- gets an order
@@ -932,14 +932,17 @@ CREATE PACKAGE BODY order_pkg AS
     -- gets products within an order
     -- id -> order id
     -- return -> id's of products for an order
-    FUNCTION get_order_products(id IN NUMBER) RETURN number_array AS
+    FUNCTION get_order_products(id IN NUMBER, cust IN NUMBER) RETURN number_array AS
         prod_arr number_array;
     BEGIN 
         prod_arr := number_array();
         order_pkg.check_if_order_exists(id);
-        SELECT product_id BULK COLLECT INTO prod_arr FROM orders_products 
-        WHERE order_id = id;
+        SELECT product_id BULK COLLECT INTO prod_arr FROM orders o 
+        INNER JOIN orders_products op ON o.order_id = op.order_id
+        WHERE o.order_id = id AND o.customer_id = cust;
         RETURN prod_arr;
+        EXCEPTION 
+            WHEN no_data_found THEN RAISE_APPLICATION_ERROR(-20002, 'Not your order');
     END;
 
     -- get the quantity of a product for an order
@@ -1498,3 +1501,4 @@ INSERT INTO reviews (customer_id, product_id, flags, rating, description) VALUES
 
 COMMIT;
 /
+
